@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "algorithm": "c",
+        "charconv": "c",
+        "format": "c",
+        "memory": "c",
+        "vector": "c",
+        "xlocale": "c",
+        "xstring": "c",
+        "xmemory": "cpp",
+        "xiosbase": "cpp"
+    }
+}

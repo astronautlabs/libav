@@ -1,0 +1,16 @@
+{
+  "name": "libav",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
+  },
+  "author": "Astronaut Labs, LLC",
+  "license": "LGPL-2.1-or-later",
+  "gypfile": true,
+  "devDependencies": {
+    "node-addon-api": "^5.0.0"
+  }
+}
