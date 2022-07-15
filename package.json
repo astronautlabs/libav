@@ -15,5 +15,8 @@
   "devDependencies": {
     "node-addon-api": "^5.0.0",
     "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "segfault-handler": "^1.3.0"
   }
 }

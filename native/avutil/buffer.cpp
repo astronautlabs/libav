@@ -24,7 +24,7 @@ void NAVBuffer::Init(Napi::Env env, Napi::Object exports) {
     
     LibAvAddon::Self(env)->AVBuffer = constructor;
 
-    exports.Set("NAVBuffer", constructor->Value());
+    exports.Set("AVBuffer", constructor->Value());
 }
 
 NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
@@ -201,7 +201,7 @@ void NAVBufferPool::Init(Napi::Env env, Napi::Object exports) {
     
     LibAvAddon::Self(env)->AVBuffer = constructor;
 
-    exports.Set("NAVBufferPool", constructor->Value());
+    exports.Set("AVBufferPool", constructor->Value());
 
 }
 

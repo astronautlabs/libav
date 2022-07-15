@@ -54,7 +54,11 @@
             {
               "destination": "build/Release/",
               "files": [
-                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll"
+                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll"
               ]
             }
           ]

@@ -2,6 +2,10 @@
 #include "avutil/index.h"
 
 LibAvAddon::LibAvAddon(Napi::Env env, Napi::Object exports) {
+
+    // This will be done later for us, but we want to access it during initialization phase.
+    env.SetInstanceData<LibAvAddon>(this);
+
     nlavu_init(env, exports);
 
     // In the constructor we declare the functions the add-on makes available
