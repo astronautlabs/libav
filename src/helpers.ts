@@ -10,3 +10,9 @@ export interface Ref<T> {
 }
 
 export type FILE = OpaquePtr;
+
+export class NotImplemented extends Error {
+    constructor() {
+        super("Not implemented");
+    }
+}

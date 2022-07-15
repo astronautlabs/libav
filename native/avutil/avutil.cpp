@@ -1,4 +1,8 @@
-#include <libavutil/avutil.h>
+#include "../common.h"
+
+extern "C" {
+    #include <libavutil/avutil.h>
+}
 
 #include "avutil.h"
 #include "../helpers.h"

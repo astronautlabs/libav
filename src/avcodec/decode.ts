@@ -19,7 +19,7 @@
  */
 
 import { AVFrame, AVHWDeviceType } from "../avutil";
-import { OpaquePtr } from "../helpers";
+import { NotImplemented, OpaquePtr } from "../helpers";
 import { AVCodecContext } from "./avcodec";
 import { AVPacket } from "./packet";
 
@@ -58,21 +58,21 @@ export interface FrameDecodeData {
  *         AVERROR_EOF if and end of stream has been reached, so no more data
  *                     will be available
  */
-export function ff_decode_get_packet(avctx: AVCodecContext, pkt: AVPacket): number {};
+export function ff_decode_get_packet(avctx: AVCodecContext, pkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Set various frame properties from the codec context / packet data.
  */
-export function ff_decode_frame_props(avctx: AVCodecContext, frame: AVFrame): number {};
+export function ff_decode_frame_props(avctx: AVCodecContext, frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Make sure avctx.hw_frames_ctx is set. If it's not set, the function will
  * try to allocate it from hw_device_ctx. If that is not possible, an error
  * message is printed, and an error code is returned.
  */
-export function ff_decode_get_hw_frames_ctx(avctx: AVCodecContext, dev_type: AVHWDeviceType): number {};
+export function ff_decode_get_hw_frames_ctx(avctx: AVCodecContext, dev_type: AVHWDeviceType): number { throw new NotImplemented(); }
 
-export function ff_attach_decode_data(frame: AVFrame): number {};
+export function ff_attach_decode_data(frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Check whether the side-data of src contains a palette of
@@ -81,10 +81,10 @@ export function ff_attach_decode_data(frame: AVFrame): number {};
  * Also emit an error message upon encountering a palette
  * with invalid size.
  */
-export function ff_copy_palette(dst: OpaquePtr, src: AVPacket, logctx: OpaquePtr): number {};
+export function ff_copy_palette(dst: OpaquePtr, src: AVPacket, logctx: OpaquePtr): number { throw new NotImplemented(); }
 
 /**
  * Perform decoder initialization and validation.
  * Called when opening the decoder, before the AVCodec.init() call.
  */
-export function ff_decode_preinit(avctx: AVCodecContext): number {};
+export function ff_decode_preinit(avctx: AVCodecContext): number { throw new NotImplemented(); }

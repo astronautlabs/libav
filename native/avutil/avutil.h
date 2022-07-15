@@ -1,3 +1,4 @@
+#include "../common.h"
 #include <napi.h>
 
 Napi::Value nlavu_avutil_version(const Napi::CallbackInfo& callback);

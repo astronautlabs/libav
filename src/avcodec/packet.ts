@@ -18,8 +18,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-import { AVBuffer, AVRational } from '../avutil';
-import { Ref, Out, OpaquePtr } from '../helpers';
+import { AVBuffer, AVDictionary, AVRational } from '../avutil';
+import { Ref, Out, OpaquePtr, NotImplemented } from '../helpers';
 
 /**
  * @defgroup lavc_packet AVPacket
@@ -446,19 +446,6 @@ export const AV_PKT_FLAG_TRUSTED =   0x0008;
 export const AV_PKT_FLAG_DISPOSABLE = 0x0010;
 
 export enum AVSideDataParamChangeFlags {
-
-    /**
-     * @deprecated those are not used by any decoder
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     */
-    AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_COUNT  = 0x0001,
-
-    /**
-     * @deprecated those are not used by any decoder
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     */
-    AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_LAYOUT = 0x0002,
-
     AV_SIDE_DATA_PARAM_CHANGE_SAMPLE_RATE    = 0x0004,
     AV_SIDE_DATA_PARAM_CHANGE_DIMENSIONS     = 0x0008,
 };
@@ -486,7 +473,7 @@ export function av_packet_alloc(): AVPacket { throw new Error('NotImplemented');
  * @see av_packet_alloc
  * @see av_packet_ref
  */
-export function av_packet_clone(src: AVPacket): AVPacket {};
+export function av_packet_clone(src: AVPacket): AVPacket { throw new NotImplemented(); }
 
 /**
  * Free the packet, if the packet is reference counted, it will be
@@ -495,7 +482,7 @@ export function av_packet_clone(src: AVPacket): AVPacket {};
  * @param pkt packet to be freed. The pointer will be set to NULL.
  * @note passing NULL is a no-op.
  */
-export function av_packet_free(pkt: Ref<AVPacket>) {};
+export function av_packet_free(pkt: Ref<AVPacket>) { throw new NotImplemented(); }
 
 
 /**
@@ -514,7 +501,7 @@ export function av_packet_free(pkt: Ref<AVPacket>) {};
  * @attribute_deprecated
  * @if FF_API_INIT_PACKET
  */
-export function av_init_packet(pkt: AVPacket) {};
+export function av_init_packet(pkt: AVPacket) { throw new NotImplemented(); }
 
 /**
  * Allocate the payload of a packet and initialize its fields with
@@ -524,7 +511,7 @@ export function av_init_packet(pkt: AVPacket) {};
  * @param size wanted payload size
  * @return 0 if OK, AVERROR_xxx otherwise
  */
-export function av_new_packet(pkt: AVPacket, size: number): number {};
+export function av_new_packet(pkt: AVPacket, size: number): number { throw new NotImplemented(); }
 
 /**
  * Reduce packet size, correctly zeroing padding
@@ -532,7 +519,7 @@ export function av_new_packet(pkt: AVPacket, size: number): number {};
  * @param pkt packet
  * @param size new size
  */
-export function av_shrink_packet(pkt: AVPacket, size: number) {};
+export function av_shrink_packet(pkt: AVPacket, size: number) { throw new NotImplemented(); }
 
 /**
  * Increase packet size, correctly zeroing padding
@@ -540,7 +527,7 @@ export function av_shrink_packet(pkt: AVPacket, size: number) {};
  * @param pkt packet
  * @param grow_by number of bytes by which to increase the size of the packet
  */
-export function av_grow_packet(pkt: AVPacket, grow_by: number): number {};
+export function av_grow_packet(pkt: AVPacket, grow_by: number): number { throw new NotImplemented(); }
 
 /**
  * Initialize a reference-counted packet from av_malloc()ed data.
@@ -555,7 +542,7 @@ export function av_grow_packet(pkt: AVPacket, grow_by: number): number {};
  *
  * @return 0 on success, a negative AVERROR on error
  */
-export function av_packet_from_data(pkt: AVPacket, data: Buffer, size: number): number {};
+export function av_packet_from_data(pkt: AVPacket, data: Buffer, size: number): number { throw new NotImplemented(); }
 
 /**
  * Allocate new information of a packet.
@@ -565,8 +552,8 @@ export function av_packet_from_data(pkt: AVPacket, data: Buffer, size: number): 
  * @param size side information size
  * @return pointer to fresh allocated data or NULL otherwise
  */
-function av_packet_new_side_data(pkt: AVPacket, type: AVPacketSideDataType,
-                                size: number): Buffer {}
+export function av_packet_new_side_data(pkt: AVPacket, type: AVPacketSideDataType,
+                                size: number): Buffer { throw new NotImplemented(); }
 
 /**
  * Wrap an existing array as a packet side data.
@@ -582,7 +569,7 @@ function av_packet_new_side_data(pkt: AVPacket, type: AVPacketSideDataType,
  *         owned by the caller.
  */
 export function av_packet_add_side_data(pkt: AVPacket, type: AVPacketSideDataType,
-                            data: Buffer, size: number): number {};
+                            data: Buffer, size: number): number { throw new NotImplemented(); }
 
 /**
  * Shrink the already allocated side data buffer
@@ -593,7 +580,7 @@ export function av_packet_add_side_data(pkt: AVPacket, type: AVPacketSideDataTyp
  * @return 0 on success, < 0 on failure
  */
 export function av_packet_shrink_side_data(pkt: AVPacket, type: AVPacketSideDataType,
-                            size: number): number {};
+                            size: number): number { throw new NotImplemented(); }
 
 /**
  * Get side information from packet.
@@ -605,9 +592,9 @@ export function av_packet_shrink_side_data(pkt: AVPacket, type: AVPacketSideData
  * @return pointer to data if present or NULL otherwise
  */
 export function av_packet_get_side_data(pkt: AVPacket, type: AVPacketSideDataType,
-                                size: Out<number>): Buffer;
+                                size: Out<number>): Buffer { throw new NotImplemented(); }
 
-export function av_packet_side_data_name(type: AVPacketSideDataType): string {};
+export function av_packet_side_data_name(type: AVPacketSideDataType): string { throw new NotImplemented(); }
 
 /**
  * Pack a dictionary for use in side_data.
@@ -616,7 +603,7 @@ export function av_packet_side_data_name(type: AVPacketSideDataType): string {};
  * @param size pointer to store the size of the returned data
  * @return pointer to data if successful, NULL otherwise
  */
-export function av_packet_pack_dictionary(dict: AVDictionary, size: Out<number>): Buffer {}
+export function av_packet_pack_dictionary(dict: AVDictionary, size: Out<number>): Buffer { throw new NotImplemented(); }
 /**
  * Unpack a dictionary from side_data.
  *
@@ -626,7 +613,7 @@ export function av_packet_pack_dictionary(dict: AVDictionary, size: Out<number>)
  * @return 0 on success, < 0 on failure
  */
 export function av_packet_unpack_dictionary(data: Buffer, size: number,
-                                dict: Ref<AVDictionary>): number {}
+                                dict: Ref<AVDictionary>): number { throw new NotImplemented(); }
 
 /**
  * Convenience function to free all the side data stored.
@@ -634,7 +621,7 @@ export function av_packet_unpack_dictionary(data: Buffer, size: number,
  *
  * @param pkt packet
  */
-export function av_packet_free_side_data(pkt: AVPacket) {}
+export function av_packet_free_side_data(pkt: AVPacket) { throw new NotImplemented(); }
 
 /**
  * Setup a new reference to the data described by a given packet
@@ -653,7 +640,7 @@ export function av_packet_free_side_data(pkt: AVPacket) {}
  * @return 0 on success, a negative AVERROR on error. On error, dst
  *         will be blank (as if returned by av_packet_alloc()).
  */
-export function av_packet_ref(dst: AVPacket, src: AVPacket): number {};
+export function av_packet_ref(dst: AVPacket, src: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Wipe the packet.
@@ -663,7 +650,7 @@ export function av_packet_ref(dst: AVPacket, src: AVPacket): number {};
  *
  * @param pkt The packet to be unreferenced.
  */
-export function av_packet_unref(pkt: AVPacket) {};
+export function av_packet_unref(pkt: AVPacket) { throw new NotImplemented(); }
 
 /**
  * Move every field in src to dst and reset src.
@@ -673,7 +660,7 @@ export function av_packet_unref(pkt: AVPacket) {};
  * @param src Source packet, will be reset
  * @param dst Destination packet
  */
-export function av_packet_move_ref(dst: AVPacket, src: AVPacket) {};
+export function av_packet_move_ref(dst: AVPacket, src: AVPacket) { throw new NotImplemented(); }
 
 /**
  * Copy only "properties" fields from src to dst.
@@ -686,7 +673,7 @@ export function av_packet_move_ref(dst: AVPacket, src: AVPacket) {};
  *
  * @return 0 on success AVERROR on failure.
  */
-export function av_packet_copy_props(dst: AVPacket, src: AVPacket): number {}
+export function av_packet_copy_props(dst: AVPacket, src: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Ensure the data described by a given packet is reference counted.
@@ -702,7 +689,7 @@ export function av_packet_copy_props(dst: AVPacket, src: AVPacket): number {}
  * @return 0 on success, a negative AVERROR on error. On failure, the
  *         packet is unchanged.
  */
-export function av_packet_make_refcounted(pkt: AVPacket): number {}
+export function av_packet_make_refcounted(pkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Create a writable reference for the data described by a given packet,
@@ -713,7 +700,7 @@ export function av_packet_make_refcounted(pkt: AVPacket): number {}
  * @return 0 on success, a negative AVERROR on failure. On failure, the
  *         packet is unchanged.
  */
-export function av_packet_make_writable(pkt: AVPacket): number {}
+export function av_packet_make_writable(pkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Convert valid timing fields (timestamps / durations) in a packet from one
@@ -726,4 +713,4 @@ export function av_packet_make_writable(pkt: AVPacket): number {}
  * @param tb_dst destination timebase, to which the timing fields will be
  *               converted
  */
-export function av_packet_rescale_ts(pkt: AVPacket, tb_src: AVRational, tb_dst: AVRational) {};
+export function av_packet_rescale_ts(pkt: AVPacket, tb_src: AVRational, tb_dst: AVRational) { throw new NotImplemented(); }

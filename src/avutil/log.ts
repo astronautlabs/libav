@@ -18,7 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { OpaquePtr, Out, Ref } from "../helpers";
+import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
+import { AVOption, AVOptionRanges } from "./opt";
 
 export enum AVClassCategory {
     AV_CLASS_CATEGORY_NA = 0,
@@ -127,7 +128,7 @@ export interface AVClass {
     /**
      * Return next AVOptions-enabled child or NULL
      */
-    child_next: (obj: OpaquePtr, prev: OpaquePtr);
+    child_next: (obj: OpaquePtr, prev: OpaquePtr) => OpaquePtr;
 
     /**
      * Iterate over the AVClasses corresponding to potential AVOptions-enabled
@@ -277,7 +278,7 @@ export function av_log_once(avcl: OpaquePtr, initial_level: number, subsequent_l
  *        subsequent arguments are converted to output.
  * @param vl The arguments referenced by the format string.
  */
-export function av_vlog(avcl: OpaquePtr, level: number, fmt: string, vl: any[]) {};
+export function av_vlog(avcl: OpaquePtr, level: number, fmt: string, vl: any[]) { throw new NotImplemented(); }
 
 /**
  * Get the current log level
@@ -286,7 +287,7 @@ export function av_vlog(avcl: OpaquePtr, level: number, fmt: string, vl: any[]) 
  *
  * @return Current log level
  */
-export function av_log_get_level(): number {};
+export function av_log_get_level(): number { throw new NotImplemented(); }
 
 /**
  * Set the log level
@@ -295,7 +296,7 @@ export function av_log_get_level(): number {};
  *
  * @param level Logging level
  */
-export function av_log_set_level(level: number) {};
+export function av_log_set_level(level: number) { throw new NotImplemented(); }
 
 /**
  * Set the logging callback
@@ -307,7 +308,7 @@ export function av_log_set_level(level: number) {};
  *
  * @param callback A logging function with a compatible signature.
  */
-export function av_log_set_callback(callback: (avcl: OpaquePtr, level: number, fmt: string, args: any[]) => void) {};
+export function av_log_set_callback(callback: (avcl: OpaquePtr, level: number, fmt: string, args: any[]) => void) { throw new NotImplemented(); }
 
 /**
  * Default logging callback
@@ -322,7 +323,7 @@ export function av_log_set_callback(callback: (avcl: OpaquePtr, level: number, f
  *        subsequent arguments are converted to output.
  * @param vl The arguments referenced by the format string.
  */
-export function av_log_default_callback(avcl: OpaquePtr, level: number, fmt: string, ...vl) {};
+export function av_log_default_callback(avcl: OpaquePtr, level: number, fmt: string, ...vl) { throw new NotImplemented(); }
 
 /**
  * Return the context name
@@ -331,8 +332,8 @@ export function av_log_default_callback(avcl: OpaquePtr, level: number, fmt: str
  *
  * @return The AVClass class_name
  */
-export function av_default_item_name(ctx: OpaquePtr): string {};
-export function av_default_get_category(ptr: OpaquePtr): AVClassCategory {};
+export function av_default_item_name(ctx: OpaquePtr): string { throw new NotImplemented(); }
+export function av_default_get_category(ptr: OpaquePtr): AVClassCategory { throw new NotImplemented(); }
 
 /**
  * Format a line of log the same way as the default callback.
@@ -342,7 +343,7 @@ export function av_default_get_category(ptr: OpaquePtr): AVClassCategory {};
  *                      must point to a persistent integer initially set to 1
  */
 export function av_log_format_line(ptr: OpaquePtr, level: number, fmt: string, args: any[],
-                        line: string, line_size: number, print_prefix: Ref<number>) {};
+                        line: string, line_size: number, print_prefix: Ref<number>) { throw new NotImplemented(); }
 
 /**
  * Format a line of log the same way as the default callback.
@@ -359,7 +360,7 @@ export function av_log_format_line(ptr: OpaquePtr, level: number, fmt: string, a
  *         that the log message was truncated to fit the buffer.
  */
 export function av_log_format_line2(ptr: OpaquePtr, level: number, fmt: string, args,
-                        line: string, line_size: number, print_prefix: Ref<number>): number {};
+                        line: string, line_size: number, print_prefix: Ref<number>): number { throw new NotImplemented(); }
 
 /**
  * Skip repeated messages, this requires the user app to use av_log() instead of
@@ -379,5 +380,5 @@ export const AV_LOG_SKIP_REPEATED = 1;
  */
 export const AV_LOG_PRINT_LEVEL = 2;
 
-export function av_log_set_flags(arg: number) {};
-export function av_log_get_flags(): number {};
+export function av_log_set_flags(arg: number) { throw new NotImplemented(); }
+export function av_log_get_flags(): number { throw new NotImplemented(); }

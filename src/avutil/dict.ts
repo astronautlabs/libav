@@ -27,7 +27,7 @@
  *  where applicable, which uses AVL trees to achieve O(log n) performance.
  */
 
- import { OpaquePtr, Ref } from "../helpers";
+ import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
 
 /**
  * @addtogroup lavu_dict AVDictionary
@@ -103,7 +103,7 @@ export type AVDictionary = OpaquePtr;
  * @return found entry or NULL in case no matching entry was found in the dictionary
  */
 export function av_dict_get(m: AVDictionary, key: string,
-                                prev: AVDictionaryEntry, flags: number): AVDictionaryEntry {};
+                                prev: AVDictionaryEntry, flags: number): AVDictionaryEntry { throw new NotImplemented(); }
 
 /**
  * Get number of entries in dictionary.
@@ -111,7 +111,7 @@ export function av_dict_get(m: AVDictionary, key: string,
  * @param m dictionary
  * @return  number of entries in dictionary
  */
-export function av_dict_count(m: AVDictionary): number {};
+export function av_dict_count(m: AVDictionary): number { throw new NotImplemented(); }
 
 /**
  * Set the given entry in *pm, overwriting an existing entry.
@@ -129,7 +129,7 @@ export function av_dict_count(m: AVDictionary): number {};
  *        Passing a NULL value will cause an existing entry to be deleted.
  * @return >= 0 on success otherwise an error code <0
  */
-export function av_dict_set(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number {};
+export function av_dict_set(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Convenience wrapper for av_dict_set that converts the value to a string
@@ -137,7 +137,7 @@ export function av_dict_set(pm: Ref<AVDictionary>, key: string, value: string, f
  *
  * Note: If AV_DICT_DONT_STRDUP_KEY is set, key will be freed on error.
  */
-export function av_dict_set_int(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number {};
+export function av_dict_set_int(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Parse the key/value pairs list and add the parsed entries to a dictionary.
@@ -157,7 +157,7 @@ export function av_dict_set_int(pm: Ref<AVDictionary>, key: string, value: strin
  */
 export function av_dict_parse_string(pm: Ref<AVDictionary>, str: string,
                         key_val_sep: string, pairs_sep: string,
-                        flags: number): number {};
+                        flags: number): number { throw new NotImplemented(); }
 
 /**
  * Copy entries from one AVDictionary struct into another.
@@ -169,13 +169,13 @@ export function av_dict_parse_string(pm: Ref<AVDictionary>, str: string,
  * @return 0 on success, negative AVERROR code on failure. If dst was allocated
  *           by this function, callers should free the associated memory.
  */
-export function av_dict_copy(dst: Ref<AVDictionary>, src: AVDictionary, flags: number): number {};
+export function av_dict_copy(dst: Ref<AVDictionary>, src: AVDictionary, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Free all the memory allocated for an AVDictionary struct
  * and all keys and values.
  */
-export function av_dict_free(m: Ref<AVDictionary>): void {};
+export function av_dict_free(m: Ref<AVDictionary>): void { throw new NotImplemented(); }
 
 /**
  * Get dictionary entries as a string.
@@ -196,5 +196,6 @@ export function av_dict_get_string(
     m: AVDictionary, buffer: Out<string>,
     key_val_sep: string, pairs_sep: string
 ): number {
+    throw new NotImplemented();
     // @nodeTODO key_val_sep and pairs_sep are char, not string
 };

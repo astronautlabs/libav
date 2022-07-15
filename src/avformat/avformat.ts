@@ -17,6 +17,13 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+import { AVCodec, AVCodecID, AVCodecParameters, AVCodecParserContext, AVDiscard, AVPacket, AVPacketSideData, AVPacketSideDataType } from "../avcodec";
+import { AVDeviceInfoList } from "../avdevice";
+import { AVClass, AVDictionary, AVFrame, AVMediaType, AVRational } from "../avutil";
+import { FILE, OpaquePtr, Out, Ref } from "../helpers";
+import { AVIOContext, AVIOInterruptCB } from "./avio";
+
  
 /**
  * @file
@@ -394,7 +401,7 @@
  * @param size desired payload size
  * @return >0 (read size) if OK, AVERROR_xxx otherwise
  */
-function av_get_packet(s: AVIOContext, pkt: AVPacket, size: number): number { throw new Error('NotImplemented'); }
+export function av_get_packet(s: AVIOContext, pkt: AVPacket, size: number): number { throw new Error('NotImplemented'); }
  
  
 /**
@@ -411,15 +418,16 @@ function av_get_packet(s: AVIOContext, pkt: AVPacket, size: number): number { th
  * @return >0 (read size) if OK, AVERROR_xxx otherwise, previous data
  *         will not be lost even if an error occurs.
  */
-function av_append_packet(s: AVIOContext, pkt: AVPacket, size: number): number { throw new Error('NotImplemented'); }
+export function av_append_packet(s: AVIOContext, pkt: AVPacket, size: number): number { throw new Error('NotImplemented'); }
  
 /*************************************************/
 /* input/output formats */
+export type AVCodecTag = OpaquePtr;
 
 /**
  * This structure contains the data a format has to probe a file.
  */
-interface AVProbeData {
+export interface AVProbeData {
     filename: string;
     /**< Buffer must have AVPROBE_PADDING_SIZE of extra allocated bytes filled with zero. */
     buf: Buffer;
@@ -429,73 +437,74 @@ interface AVProbeData {
     mime_type: string;
 }
 
-const AVPROBE_SCORE_RETRY = (AVPROBE_SCORE_MAX/4);
-const AVPROBE_SCORE_STREAM_RETRY = (AVPROBE_SCORE_MAX/4-1);
+///< maximum score
+export const AVPROBE_SCORE_MAX =       100;
+
+export const AVPROBE_SCORE_RETRY = (AVPROBE_SCORE_MAX/4);
+export const AVPROBE_SCORE_STREAM_RETRY = (AVPROBE_SCORE_MAX/4-1);
  
 ///< score for file extension
-const AVPROBE_SCORE_EXTENSION = 50;
+export const AVPROBE_SCORE_EXTENSION = 50;
 
 ///< score for file mime type
-const AVPROBE_SCORE_MIME =       75;
+export const AVPROBE_SCORE_MIME =       75;
 
-///< maximum score
-const AVPROBE_SCORE_MAX =       100;
  
 ///< extra allocated bytes at the end of the probe buffer
-const AVPROBE_PADDING_SIZE = 32;
+export const AVPROBE_PADDING_SIZE = 32;
  
 /// Demuxer will use avio_open, no opened file should be provided by the caller.
-const AVFMT_NOFILE =        0x0001;
+export const AVFMT_NOFILE =        0x0001;
 
 /**< Needs '%d' in filename. */
-const AVFMT_NEEDNUMBER =    0x0002;
+export const AVFMT_NEEDNUMBER =    0x0002;
 /**
  * The muxer/demuxer is experimental and should be used with caution.
  *
  * - demuxers: will not be selected automatically by probing, must be specified
  *             explicitly.
  */
-const AVFMT_EXPERIMENTAL =  0x0004;
+export const AVFMT_EXPERIMENTAL =  0x0004;
 /**< Show format stream IDs numbers. */
-const AVFMT_SHOW_IDS =      0x0008;
+export const AVFMT_SHOW_IDS =      0x0008;
 
 /**< Format wants global header. */
-const AVFMT_GLOBALHEADER =  0x0040;
+export const AVFMT_GLOBALHEADER =  0x0040;
 
 /**< Format does not need / have any timestamps. */
-const AVFMT_NOTIMESTAMPS =  0x0080;
+export const AVFMT_NOTIMESTAMPS =  0x0080;
 
 /**< Use generic index building code. */
-const AVFMT_GENERIC_INDEX = 0x0100;
+export const AVFMT_GENERIC_INDEX = 0x0100;
 
 /**< Format allows timestamp discontinuities. Note, muxers always require valid (monotone) timestamps */
-const AVFMT_TS_DISCONT =    0x0200;
+export const AVFMT_TS_DISCONT =    0x0200;
 
 /**< Format allows variable fps. */
-const AVFMT_VARIABLE_FPS =  0x0400;
+export const AVFMT_VARIABLE_FPS =  0x0400;
 
 /**< Format does not need width/height */
-const AVFMT_NODIMENSIONS =  0x0800;
+export const AVFMT_NODIMENSIONS =  0x0800;
 
 /**< Format does not require any streams */
-const AVFMT_NOSTREAMS =     0x1000;
+export const AVFMT_NOSTREAMS =     0x1000;
 
 /**< Format does not allow to fall back on binary search via read_timestamp */
-const AVFMT_NOBINSEARCH =   0x2000;
+export const AVFMT_NOBINSEARCH =   0x2000;
 
 /**< Format does not allow to fall back on generic search */
-const AVFMT_NOGENSEARCH =   0x4000;
+export const AVFMT_NOGENSEARCH =   0x4000;
 
 /**< Format does not allow seeking by bytes */
-const AVFMT_NO_BYTE_SEEK =  0x8000;
+export const AVFMT_NO_BYTE_SEEK =  0x8000;
 
 /**< Format allows flushing. If not set, the muxer will not receive a NULL packet in the write_packet function. */
-const AVFMT_ALLOW_FLUSH =  0x10000;
+export const AVFMT_ALLOW_FLUSH =  0x10000;
 
 /**< Format does not require strictly
 increasing timestamps, but they must
 still be monotonic */
-const AVFMT_TS_NONSTRICT = 0x20000;
+export const AVFMT_TS_NONSTRICT = 0x20000;
 
 /**< Format allows muxing negative
  * timestamps. If not set the timestamp
@@ -505,16 +514,16 @@ const AVFMT_TS_NONSTRICT = 0x20000;
  * The user or muxer can override this through
  * AVFormatContext.avoid_negative_ts
  */
-const AVFMT_TS_NEGATIVE =  0x40000;
+export const AVFMT_TS_NEGATIVE =  0x40000;
 
 /**< Seeking is based on PTS */
-const AVFMT_SEEK_TO_PTS =   0x4000000;
+export const AVFMT_SEEK_TO_PTS =   0x4000000;
 
 /**
  * @addtogroup lavf_encoding
  * @{
  */
-interface AVOutputFormat {
+export interface AVOutputFormat {
     name: string;
     /**
      * Descriptive name for the format, meant to be more human-readable
@@ -673,7 +682,7 @@ interface AVOutputFormat {
  * @addtogroup lavf_decoding
  * @{
  */
-interface AVInputFormat {
+export interface AVInputFormat {
     /**
      * A comma separated list of short names for the format. New names
      * may be appended with a minor bump.
@@ -779,7 +788,7 @@ interface AVInputFormat {
      * Get the next timestamp in stream[stream_index].time_base units.
      * @return the timestamp or AV_NOPTS_VALUE if an error occurred
      */
-    read_timestamp: (s: AVFormatContext, stream_index: number, pos: Out<number>, pos_limit: number): number;
+    read_timestamp: (s: AVFormatContext, stream_index: number, pos: Out<number>, pos_limit: number) => number;
  
     /**
      * Start/resume playing - only meaningful if using a network-based format
@@ -833,13 +842,13 @@ enum AVStreamParseType {
     AVSTREAM_PARSE_FULL_RAW,
 }
 
-const AVINDEX_KEYFRAME = 0x0001;
+export const AVINDEX_KEYFRAME = 0x0001;
 /**
  * Flag is used to indicate which frame should be discarded after decoding.
  */
-const AVINDEX_DISCARD_FRAME = 0x0002;
+export const AVINDEX_DISCARD_FRAME = 0x0002;
 
-interface AVIndexEntry {
+export interface AVIndexEntry {
     pos: number;
     /**<
      * Timestamp in AVStream.time_base units, preferably the time from which on correctly decoded frames are available
@@ -869,7 +878,7 @@ interface AVIndexEntry {
  * The stream should be chosen by default among other streams of the same type,
  * unless the user has explicitly specified otherwise.
  */
-const AV_DISPOSITION_DEFAULT =              (1 << 0);
+export const AV_DISPOSITION_DEFAULT =              (1 << 0);
 /**
  * The stream is not in original language.
  *
@@ -877,44 +886,44 @@ const AV_DISPOSITION_DEFAULT =              (1 << 0);
  *       one of them should be set in properly tagged streams.
  * @note This disposition may apply to any stream type, not just audio.
  */
-const AV_DISPOSITION_DUB =                  (1 << 1);
+export const AV_DISPOSITION_DUB =                  (1 << 1);
 /**
  * The stream is in original language.
  *
  * @see the notes for AV_DISPOSITION_DUB
  */
-const AV_DISPOSITION_ORIGINAL =             (1 << 2);
+export const AV_DISPOSITION_ORIGINAL =             (1 << 2);
 /**
  * The stream is a commentary track.
  */
-const AV_DISPOSITION_COMMENT =              (1 << 3);
+export const AV_DISPOSITION_COMMENT =              (1 << 3);
 /**
  * The stream contains song lyrics.
  */
-const AV_DISPOSITION_LYRICS =               (1 << 4);
+export const AV_DISPOSITION_LYRICS =               (1 << 4);
 /**
  * The stream contains karaoke audio.
  */
-const AV_DISPOSITION_KARAOKE =              (1 << 5);
+export const AV_DISPOSITION_KARAOKE =              (1 << 5);
  
 /**
  * Track should be used during playback by default.
  * Useful for subtitle track that should be displayed
  * even when user did not explicitly ask for subtitles.
  */
-const AV_DISPOSITION_FORCED =               (1 << 6);
+export const AV_DISPOSITION_FORCED =               (1 << 6);
 /**
  * The stream is intended for hearing impaired audiences.
  */
-const AV_DISPOSITION_HEARING_IMPAIRED =     (1 << 7);
+export const AV_DISPOSITION_HEARING_IMPAIRED =     (1 << 7);
 /**
  * The stream is intended for visually impaired audiences.
  */
-const AV_DISPOSITION_VISUAL_IMPAIRED =      (1 << 8);
+export const AV_DISPOSITION_VISUAL_IMPAIRED =      (1 << 8);
 /**
  * The audio stream contains music and sound effects without voice.
  */
-const AV_DISPOSITION_CLEAN_EFFECTS =        (1 << 9);
+export const AV_DISPOSITION_CLEAN_EFFECTS =        (1 << 9);
 /**
  * The stream is stored in the file as an attached picture/"cover art" (e.g.
  * APIC frame in ID3v2). The first (usually only) packet associated with it
@@ -922,52 +931,52 @@ const AV_DISPOSITION_CLEAN_EFFECTS =        (1 << 9);
  * seeking takes place. It can also be accessed at any time in
  * AVStream.attached_pic.
  */
-const AV_DISPOSITION_ATTACHED_PIC =         (1 << 10);
+export const AV_DISPOSITION_ATTACHED_PIC =         (1 << 10);
 /**
  * The stream is sparse, and contains thumbnail images, often corresponding
  * to chapter markers. Only ever used with AV_DISPOSITION_ATTACHED_PIC.
  */
-const AV_DISPOSITION_TIMED_THUMBNAILS =     (1 << 11);
+export const AV_DISPOSITION_TIMED_THUMBNAILS =     (1 << 11);
  
 /**
  * The stream is intended to be mixed with a spatial audio track. For example,
  * it could be used for narration or stereo music, and may remain unchanged by
  * listener head rotation.
  */
-const AV_DISPOSITION_NON_DIEGETIC =         (1 << 12);
+export const AV_DISPOSITION_NON_DIEGETIC =         (1 << 12);
  
 /**
  * The subtitle stream contains captions, providing a transcription and possibly
  * a translation of audio. Typically intended for hearing-impaired audiences.
  */
-const AV_DISPOSITION_CAPTIONS =             (1 << 16);
+export const AV_DISPOSITION_CAPTIONS =             (1 << 16);
 /**
  * The subtitle stream contains a textual description of the video content.
  * Typically intended for visually-impaired audiences or for the cases where the
  * video cannot be seen.
  */
-const AV_DISPOSITION_DESCRIPTIONS =         (1 << 17);
+export const AV_DISPOSITION_DESCRIPTIONS =         (1 << 17);
 /**
  * The subtitle stream contains time-aligned metadata that is not intended to be
  * directly presented to the user.
  */
-const AV_DISPOSITION_METADATA =             (1 << 18);
+export const AV_DISPOSITION_METADATA =             (1 << 18);
 /**
  * The audio stream is intended to be mixed with another stream before
  * presentation.
  * Corresponds to mix_type=0 in mpegts.
  */
-const AV_DISPOSITION_DEPENDENT =            (1 << 19);
+export const AV_DISPOSITION_DEPENDENT =            (1 << 19);
 /**
  * The video stream contains still images.
  */
-const AV_DISPOSITION_STILL_IMAGE =          (1 << 20);
+export const AV_DISPOSITION_STILL_IMAGE =          (1 << 20);
  
 /**
  * @return The AV_DISPOSITION_* flag corresponding to disp or a negative error
  *         code if disp does not correspond to a known stream disposition.
  */
-function av_disposition_from_string(disp: string): number { throw new Error('NotImplemented'); }
+export function av_disposition_from_string(disp: string): number { throw new Error('NotImplemented'); }
  
 /**
  * @param disposition a combination of AV_DISPOSITION_* values
@@ -975,34 +984,34 @@ function av_disposition_from_string(disp: string): number { throw new Error('Not
  *         disposition. NULL when the lowest set bit does not correspond
  *         to a known disposition or when disposition is 0.
  */
-function av_disposition_to_string(disposition: number): string { throw new Error('NotImplemented'); }
+export function av_disposition_to_string(disposition: number): string { throw new Error('NotImplemented'); }
  
 /**
  * Options for behavior on timestamp wrap detection.
  */
 
 ///< ignore the wrap
-const AV_PTS_WRAP_IGNORE =      0;
+export const AV_PTS_WRAP_IGNORE =      0;
 
 ///< add the format specific offset on wrap detection
-const AV_PTS_WRAP_ADD_OFFSET =  1;
+export const AV_PTS_WRAP_ADD_OFFSET =  1;
 
 ///< subtract the format specific offset on wrap detection
-const AV_PTS_WRAP_SUB_OFFSET =  -1;
+export const AV_PTS_WRAP_SUB_OFFSET =  -1;
 /**
  * - demuxing: the demuxer read new metadata from the file and updated
  *     AVStream.metadata accordingly
  * - muxing: the user updated AVStream.metadata and wishes the muxer to write
  *     it into the file
  */
-const AVSTREAM_EVENT_FLAG_METADATA_UPDATED = 0x0001;
+export const AVSTREAM_EVENT_FLAG_METADATA_UPDATED = 0x0001;
 
  /**
   * - demuxing: new packets for this stream were read from the file. This
   *   event is informational only and does not guarantee that new packets
   *   for this stream will necessarily be returned from av_read_frame().
   */
-const AVSTREAM_EVENT_FLAG_NEW_PACKETS = (1 << 1);
+export const AVSTREAM_EVENT_FLAG_NEW_PACKETS = (1 << 1);
  
 /**
  * Stream structure.
@@ -1011,7 +1020,7 @@ const AVSTREAM_EVENT_FLAG_NEW_PACKETS = (1 << 1);
  * version bump.
  * sizeof(AVStream) must not be used outside libav*.
  */
-interface AVStream {
+export interface AVStream {
     /**
      * A class for @ref avoptions. Set on stream creation.
      * @if FF_API_AVSTREAM_CLASS
@@ -1173,16 +1182,16 @@ interface AVStream {
     pts_wrap_bits: number;
 }
  
-function av_stream_get_parser(s: AVStream): AVCodecParserContext { throw new Error('NotImplemented'); }
+export function av_stream_get_parser(s: AVStream): AVCodecParserContext { throw new Error('NotImplemented'); }
  
 /**
  * Returns the pts of the last muxed packet + its duration
  *
  * the retuned value is undefined when used with a demuxer.
  */
-function av_stream_get_end_pts(st: AVStream): number { throw new Error('NotImplemented'); }
+export function av_stream_get_end_pts(st: AVStream): number { throw new Error('NotImplemented'); }
  
-const AV_PROGRAM_RUNNING = 1;
+export const AV_PROGRAM_RUNNING = 1;
  
 /**
  * New fields can be added to the end with minor version bumps.
@@ -1190,7 +1199,7 @@ const AV_PROGRAM_RUNNING = 1;
  * version bump.
  * sizeof(AVProgram) must not be used outside libav*.
  */
-interface AVProgram {
+export interface AVProgram {
     id: number;
     flags: number;
 
@@ -1224,20 +1233,20 @@ interface AVProgram {
 
     ///< behavior on wrap detection
     pts_wrap_behavior: number;
-} AVProgram;
+}
  
 /**< signal that no header is present
      (streams are added dynamically) */
-const AVFMTCTX_NOHEADER =      0x0001;
+export const AVFMTCTX_NOHEADER =      0x0001;
 
 /**< signal that the stream is definitely
     not seekable, and attempts to call the
     seek function will fail. For some
     network protocols (e.g. HLS), this can
     change dynamically at runtime. */
-const AVFMTCTX_UNSEEKABLE =    0x0002; 
+export const AVFMTCTX_UNSEEKABLE =    0x0002; 
  
-interface AVChapter {
+export interface AVChapter {
     ///< unique ID to identify the chapter
     id: number;
 
@@ -1257,7 +1266,8 @@ interface AVChapter {
  * Callback used by devices to communicate with application.
  */
 type av_format_control_message = (s: AVFormatContext, type: number, data: Buffer, data_size: number) => number;
-type AVOpenCallback = (s: AVFormatContext, pb: Out<AVIOContext>, url: string, flags: number, int_cb: AVIOInterruptCB, options: AVDictionary);
+type AVOpenCallback = (s: AVFormatContext, pb: Out<AVIOContext>, url: string, flags: number, int_cb: 
+    AVIOInterruptCB, options: AVDictionary) => number;
  
 /**
  * The duration of a video can be estimated through various ways, and this enum can be used
@@ -1270,34 +1280,34 @@ enum AVDurationEstimationMethod {
 }
 
 ///< Generate missing pts even if it requires parsing future frames.
-const AVFMT_FLAG_GENPTS =       0x0001;
+export const AVFMT_FLAG_GENPTS =       0x0001;
 
 ///< Ignore index.
-const AVFMT_FLAG_IGNIDX =       0x0002;
+export const AVFMT_FLAG_IGNIDX =       0x0002;
 
 ///< Do not block when reading packets from input.
-const AVFMT_FLAG_NONBLOCK =     0x0004;
+export const AVFMT_FLAG_NONBLOCK =     0x0004;
 
 ///< Ignore DTS on frames that contain both DTS & PTS
-const AVFMT_FLAG_IGNDTS =       0x0008;
+export const AVFMT_FLAG_IGNDTS =       0x0008;
 
 ///< Do not infer any values from other values, just return what is stored in the container
-const AVFMT_FLAG_NOFILLIN =     0x0010;
+export const AVFMT_FLAG_NOFILLIN =     0x0010;
 
 ///< Do not use AVParsers, you also must set AVFMT_FLAG_NOFILLIN as the fillin code works on frames and no parsing -> no frames. Also seeking to frames can not work if parsing to find frame boundaries has been disabled
-const AVFMT_FLAG_NOPARSE =      0x0020;
+export const AVFMT_FLAG_NOPARSE =      0x0020;
 
 ///< Do not buffer frames when possible
-const AVFMT_FLAG_NOBUFFER =     0x0040;
+export const AVFMT_FLAG_NOBUFFER =     0x0040;
 
 ///< The caller has supplied a custom AVIOContext, don't avio_close() it.
-const AVFMT_FLAG_CUSTOM_IO =    0x0080;
+export const AVFMT_FLAG_CUSTOM_IO =    0x0080;
 
 ///< Discard frames marked corrupted
-const AVFMT_FLAG_DISCARD_CORRUPT =  0x0100;
+export const AVFMT_FLAG_DISCARD_CORRUPT =  0x0100;
 
 ///< Flush the AVIOContext every packet.
-const AVFMT_FLAG_FLUSH_PACKETS =    0x0200;
+export const AVFMT_FLAG_FLUSH_PACKETS =    0x0200;
 
 /**
  * When muxing, try to avoid writing any random/volatile data to the output.
@@ -1305,27 +1315,27 @@ const AVFMT_FLAG_FLUSH_PACKETS =    0x0200;
  *
  * This flag is mainly intended for testing.
  */
-const AVFMT_FLAG_BITEXACT =         0x0400;
+export const AVFMT_FLAG_BITEXACT =         0x0400;
 ///< try to interleave outputted packets by dts (using this flag can slow demuxing down)
-const AVFMT_FLAG_SORT_DTS =    0x10000;
+export const AVFMT_FLAG_SORT_DTS =    0x10000;
 
 
 /**
  * Enable use of private options by delaying codec open (deprecated, does nothing)
  * @if FF_API_LAVF_PRIV_OPT
  */
-const AVFMT_FLAG_PRIV_OPT =    0x20000;
+export const AVFMT_FLAG_PRIV_OPT =    0x20000;
 
 ///< Enable fast, but inaccurate seeks for some formats
-const AVFMT_FLAG_FAST_SEEK =   0x80000;
+export const AVFMT_FLAG_FAST_SEEK =   0x80000;
 
 ///< Stop muxing when the shortest stream stops.
-const AVFMT_FLAG_SHORTEST =   0x100000;
+export const AVFMT_FLAG_SHORTEST =   0x100000;
 
 ///< Add bitstream filters as requested by the muxer
-const AVFMT_FLAG_AUTO_BSF =   0x200000;
+export const AVFMT_FLAG_AUTO_BSF =   0x200000;
 
-const FF_FDEBUG_TS =        0x0001;
+export const FF_FDEBUG_TS =        0x0001;
 
 /**
  * - demuxing: the demuxer read new metadata from the file and updated
@@ -1333,19 +1343,19 @@ const FF_FDEBUG_TS =        0x0001;
  * - muxing: the user updated AVFormatContext.metadata and wishes the muxer to
  *   write it into the file
  */
-const AVFMT_EVENT_FLAG_METADATA_UPDATED = 0x0001;
+export const AVFMT_EVENT_FLAG_METADATA_UPDATED = 0x0001;
 
 ///< Enabled when required by target format
-const AVFMT_AVOID_NEG_TS_AUTO =             -1;
+export const AVFMT_AVOID_NEG_TS_AUTO =             -1;
 
 ///< Do not shift timestamps even when they are negative.
-const AVFMT_AVOID_NEG_TS_DISABLED =          0;
+export const AVFMT_AVOID_NEG_TS_DISABLED =          0;
 
 ///< Shift timestamps so they are non negative
-const AVFMT_AVOID_NEG_TS_MAKE_NON_NEGATIVE = 1;
+export const AVFMT_AVOID_NEG_TS_MAKE_NON_NEGATIVE = 1;
 
 ///< Shift timestamps so that they start at 0
-const AVFMT_AVOID_NEG_TS_MAKE_ZERO =         2;
+export const AVFMT_AVOID_NEG_TS_MAKE_ZERO =         2;
 
 
 /**
@@ -1362,7 +1372,7 @@ const AVFMT_AVOID_NEG_TS_MAKE_ZERO =         2;
  * The AVOption/command line parameter names differ in some cases from the C
  * structure field names for historic reasons or brevity.
  */
-interface AVFormatContext {
+export interface AVFormatContext {
     /**
      * A class for logging and @ref avoptions. Set by avformat_alloc_context().
      * Exports (de)muxer private options if they exist.
@@ -1939,14 +1949,14 @@ interface AVFormatContext {
  * This function will cause global side data to be injected in the next packet
  * of each stream as well as after any subsequent seek.
  */
-function av_format_inject_global_side_data(s: AVFormatContext) { throw new Error('NotImplemented'); }
+export function av_format_inject_global_side_data(s: AVFormatContext) { throw new Error('NotImplemented'); }
  
 /**
  * Returns the method used to set ctx->duration.
  *
  * @return AVFMT_DURATION_FROM_PTS, AVFMT_DURATION_FROM_STREAM, or AVFMT_DURATION_FROM_BITRATE.
  */
-function av_fmt_ctx_get_duration_estimation_method(ctx: AVFormatContext): AVDurationEstimationMethod { throw new Error('NotImplemented'); }
+export function av_fmt_ctx_get_duration_estimation_method(ctx: AVFormatContext): AVDurationEstimationMethod { throw new Error('NotImplemented'); }
  
 /**
  * @defgroup lavf_core Core functions
@@ -1960,17 +1970,17 @@ function av_fmt_ctx_get_duration_estimation_method(ctx: AVFormatContext): AVDura
 /**
  * Return the LIBAVFORMAT_VERSION_INT constant.
  */
-function avformat_version(): number;
+export function avformat_version(): number { throw new Error("NotImplemented"); }
  
 /**
  * Return the libavformat build-time configuration.
  */
-function avformat_configuration(): string;
+export function avformat_configuration(): string { throw new Error("NotImplemented"); }
  
 /**
  * Return the libavformat license.
  */
-function avformat_license(): string;
+export function avformat_license(): string { throw new Error("NotImplemented"); }
  
 /**
  * Do global initialization of network libraries. This is optional,
@@ -1986,13 +1996,13 @@ function avformat_license(): string;
  * OpenSSL libraries is removed, and this function has no purpose
  * anymore.
  */
-function avformat_network_init(): number;
+export function avformat_network_init(): number { throw new Error("NotImplemented"); }
  
 /**
  * Undo the initialization done by avformat_network_init. Call it only
  * once for each time you called avformat_network_init.
  */
-function avformat_network_deinit(): number;
+export function avformat_network_deinit(): number { throw new Error('NotImplemented'); }
  
 /**
  * Iterate over all registered muxers.
@@ -2003,7 +2013,7 @@ function avformat_network_deinit(): number;
  * @return the next registered muxer or NULL when the iteration is
  *         finished
  */
-function av_muxer_iterate(opaque: OpaquePtr): AVOutputFormat { throw new Error('NotImplemented'); }
+export function av_muxer_iterate(opaque: OpaquePtr): AVOutputFormat { throw new Error('NotImplemented'); }
  
 /**
  * Iterate over all registered demuxers.
@@ -2014,20 +2024,20 @@ function av_muxer_iterate(opaque: OpaquePtr): AVOutputFormat { throw new Error('
  * @return the next registered demuxer or NULL when the iteration is
  *         finished
  */
-function av_demuxer_iterate(opaque: OpaquePtr): AVInputFormat { throw new Error('NotImplemented'); }
+export function av_demuxer_iterate(opaque: OpaquePtr): AVInputFormat { throw new Error('NotImplemented'); }
  
 /**
  * Allocate an AVFormatContext.
  * avformat_free_context() can be used to free the context and everything
  * allocated by the framework within it.
  */
-function avformat_alloc_context(): AVFormatContext;
+export function avformat_alloc_context(): AVFormatContext { throw new Error('NotImplemented'); }
  
 /**
  * Free an AVFormatContext and all its streams.
  * @param s context to free
  */
-function avformat_free_context(s: AVFormatContext);
+export function avformat_free_context(s: AVFormatContext) { throw new Error('NotImplemented'); }
  
 /**
  * Get the AVClass for AVFormatContext. It can be used in combination with
@@ -2035,7 +2045,7 @@ function avformat_free_context(s: AVFormatContext);
  *
  * @see av_opt_find().
  */
-function avformat_get_class(): AVClass;
+export function avformat_get_class(): AVClass { throw new Error('NotImplemented'); }
  
 /**
  * Get the AVClass for AVStream. It can be used in combination with
@@ -2043,7 +2053,7 @@ function avformat_get_class(): AVClass;
  *
  * @see av_opt_find().
  */
-function av_stream_get_class(): AVClass { throw new Error('NotImplemented'); }
+export function av_stream_get_class(): AVClass { throw new Error('NotImplemented'); }
  
 /**
  * Add a new stream to a media file.
@@ -2062,7 +2072,7 @@ function av_stream_get_class(): AVClass { throw new Error('NotImplemented'); }
  *
  * @return newly created stream or NULL on error.
  */
-function avformat_new_stream(s: AVFormatContext, c: AVCodec): AVStream;
+export function avformat_new_stream(s: AVFormatContext, c: AVCodec): AVStream { throw new Error('NotImplemented'); }
  
 /**
  * Wrap an existing array as stream side data.
@@ -2076,8 +2086,10 @@ function avformat_new_stream(s: AVFormatContext, c: AVCodec): AVStream;
  * @return zero on success, a negative AVERROR code on failure. On failure,
  *         the stream is unchanged and the data remains owned by the caller.
  */
-function av_stream_add_side_data(st: AVStream, type: AVPacketSideDataType { throw new Error('NotImplemented'); }
-                            data: Buffer, size: number): number;
+export function av_stream_add_side_data(st: AVStream, type: AVPacketSideDataType,
+                            data: Buffer, size: number): number {
+    throw new Error("NotImplemented");
+}
  
 /**
  * Allocate new information from stream.
@@ -2087,8 +2099,10 @@ function av_stream_add_side_data(st: AVStream, type: AVPacketSideDataType { thro
  * @param size side information size
  * @return pointer to fresh allocated data or NULL otherwise
  */
-function av_stream_new_side_data(stream: AVStream { throw new Error('NotImplemented'); }
-                                 type: AVPacketSideDataType, size: number): Buffer;
+export function av_stream_new_side_data(stream: AVStream, type: AVPacketSideDataType, size: number): Buffer { 
+    throw new Error('NotImplemented'); 
+}
+
 /**
  * Get side information from stream.
  *
@@ -2098,10 +2112,11 @@ function av_stream_new_side_data(stream: AVStream { throw new Error('NotImplemen
  *             or to zero if the desired side data is not present.
  * @return pointer to data if present or NULL otherwise
  */
-function av_stream_get_side_data(stream: AVStream { throw new Error('NotImplemented'); }
-                                 type: AVPacketSideDataType, size: number): Buffer;
+export function av_stream_get_side_data(stream: AVStream, type: AVPacketSideDataType, size: number): Buffer { 
+    throw new Error('NotImplemented'); 
+}
  
-function av_new_program(s: AVFormatContext, id: number): AVProgram { throw new Error('NotImplemented'); }
+export function av_new_program(s: AVFormatContext, id: number): AVProgram { throw new Error('NotImplemented'); }
  
 /**
  * @}
@@ -2124,8 +2139,14 @@ function av_new_program(s: AVFormatContext, id: number): AVProgram { throw new E
  * @return >= 0 in case of success, a negative AVERROR code in case of
  * failure
  */
-function avformat_alloc_output_context2(ctx: Out<AVFormatContext>, oformat: AVOutputFormat,
-                                   format_name: string, filename: string): number;
+export function avformat_alloc_output_context2(
+    ctx: Out<AVFormatContext>, 
+    oformat: AVOutputFormat, 
+    format_name: string, 
+    filename: string
+): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * @addtogroup lavf_decoding
@@ -2135,7 +2156,7 @@ function avformat_alloc_output_context2(ctx: Out<AVFormatContext>, oformat: AVOu
 /**
  * Find AVInputFormat based on the short name of the input format.
  */
-function av_find_input_format(short_name: string): AVInputFormat { throw new Error('NotImplemented'); }
+export function av_find_input_format(short_name: string): AVInputFormat { throw new Error('NotImplemented'); }
  
 /**
  * Guess the file format.
@@ -2144,7 +2165,7 @@ function av_find_input_format(short_name: string): AVInputFormat { throw new Err
  * @param is_opened Whether the file is already opened; determines whether
  *                  demuxers with or without AVFMT_NOFILE are probed.
  */
-function av_probe_input_format(pd: AVProbeData, is_opened: number): AVInputFormat { throw new Error('NotImplemented'); }
+export function av_probe_input_format(pd: AVProbeData, is_opened: number): AVInputFormat { throw new Error('NotImplemented'); }
  
 /**
  * Guess the file format.
@@ -2158,8 +2179,9 @@ function av_probe_input_format(pd: AVProbeData, is_opened: number): AVInputForma
  *                  If the score is <= AVPROBE_SCORE_MAX / 4 it is recommended
  *                  to retry with a larger probe buffer.
  */
-function av_probe_input_format2(pd: AVProbeData { throw new Error('NotImplemented'); }
-                                            is_opened: number, score_max: Ref<number>): AVInputFormat;
+export function av_probe_input_format2(pd: AVProbeData, is_opened: number, score_max: Ref<number>): AVInputFormat { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Guess the file format.
@@ -2168,8 +2190,9 @@ function av_probe_input_format2(pd: AVProbeData { throw new Error('NotImplemente
  *                  demuxers with or without AVFMT_NOFILE are probed.
  * @param score_ret The score of the best detection.
  */
-function av_probe_input_format3(pd: AVProbeData { throw new Error('NotImplemented'); }
-                                            is_opened: number, score_ret: Out<number>): AVInputFormat;
+export function av_probe_input_format3(pd: AVProbeData, is_opened: number, score_ret: Out<number>): AVInputFormat { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Probe a bytestream to determine the input format. Each time a probe returns
@@ -2187,17 +2210,26 @@ function av_probe_input_format3(pd: AVProbeData { throw new Error('NotImplemente
  *         the maximal score is AVPROBE_SCORE_MAX
  * AVERROR code otherwise
  */
-function av_probe_input_buffer2(pb: AVIOContext, fmt: Out<AVInputFormat> { throw new Error('NotImplemented'); }
-                           url: string, logctx: OpaquePtr,
-                           offset: number, max_probe_size: number): number;
+export function av_probe_input_buffer2(
+    pb: AVIOContext, 
+    fmt: Out<AVInputFormat>,
+    url: string, logctx: OpaquePtr,
+    offset: number, max_probe_size: number
+): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Like av_probe_input_buffer2() but returns 0 on success
  */
-function av_probe_input_buffer(pb: AVIOContext, fmt: Out<AVInputFormat> { throw new Error('NotImplemented'); }
-                          url: string, logctx: OpaquePtr,
-                          offset: number, max_probe_size: number): number;
- 
+export function av_probe_input_buffer(
+    pb: AVIOContext, fmt: Out<AVInputFormat>,
+    url: string, logctx: OpaquePtr,
+    offset: number, max_probe_size: number
+): number { 
+    throw new Error('NotImplemented'); 
+}
+
 /**
  * Open an input stream and read the header. The codecs are not opened.
  * The stream must be closed with avformat_close_input().
@@ -2217,8 +2249,10 @@ function av_probe_input_buffer(pb: AVIOContext, fmt: Out<AVInputFormat> { throw 
  *
  * @note If you want to use custom IO, preallocate the format context and set its pb field.
  */
-function avformat_open_input(ps: Ref<AVFormatContext>, url: string,
-                        fmt: AVInputFormat, options: Ref<AVDictionary>): number;
+export function avformat_open_input(ps: Ref<AVFormatContext>, url: string,
+                        fmt: AVInputFormat, options: Ref<AVDictionary>): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Read packets of a media file to get stream information. This
@@ -2241,7 +2275,9 @@ function avformat_open_input(ps: Ref<AVFormatContext>, url: string,
  * @todo Let the user decide somehow what information is needed so that
  *       we do not waste time getting stuff the user does not need.
  */
-function avformat_find_stream_info(ic: AVFormatContext, options: Ref<AVDictionary>): number;
+export function avformat_find_stream_info(ic: AVFormatContext, options: Ref<AVDictionary>): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Find the programs which belong to a given stream.
@@ -2253,9 +2289,9 @@ function avformat_find_stream_info(ic: AVFormatContext, options: Ref<AVDictionar
  * @return the next program which belongs to s, NULL if no program is found or
  *         the last program is not among the programs of ic.
  */
-function av_find_program_from_stream(ic: AVFormatContext, last: AVProgram, s: number): AVProgram { throw new Error('NotImplemented'); }
+export function av_find_program_from_stream(ic: AVFormatContext, last: AVProgram, s: number): AVProgram { throw new Error('NotImplemented'); }
  
-function av_program_add_stream_index(ac: AVFormatContext, progid: number, idx: number) { throw new Error('NotImplemented'); }
+export function av_program_add_stream_index(ac: AVFormatContext, progid: number, idx: number) { throw new Error('NotImplemented'); }
  
 /**
  * Find the "best" stream in the file.
@@ -2281,12 +2317,14 @@ function av_program_add_stream_index(ac: AVFormatContext, progid: number, idx: n
  * @note  If av_find_best_stream returns successfully and decoder_ret is not
  *        NULL, then *decoder_ret is guaranteed to be set to a valid AVCodec.
  */
-function av_find_best_stream(ic: AVFormatContext { throw new Error('NotImplemented'); }
+export function av_find_best_stream(ic: AVFormatContext,
                         type: AVMediaType,
                         wanted_stream_nb: number,
                         related_stream: number,
                         decoder_ret: Out<AVCodec>,
-                        flags: number): number;
+                        flags: number): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Return the next frame of a stream.
@@ -2315,7 +2353,7 @@ function av_find_best_stream(ic: AVFormatContext { throw new Error('NotImplement
  * @note pkt will be initialized, so it may be uninitialized, but it must not
  *       contain data that needs to be freed.
  */
-function av_read_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
+export function av_read_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
  
 /**
  * Seek to the keyframe at timestamp.
@@ -2330,8 +2368,10 @@ function av_read_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Er
  * @param flags flags which select direction and seeking mode
  * @return >= 0 on success
  */
-function av_seek_frame(s: AVFormatContext, stream_index: number, timestamp: number { throw new Error('NotImplemented'); }
-                  flags: number): number;
+export function av_seek_frame(s: AVFormatContext, stream_index: number, timestamp: number,
+                  flags: number): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Seek to timestamp ts.
@@ -2359,7 +2399,9 @@ function av_seek_frame(s: AVFormatContext, stream_index: number, timestamp: numb
  *
  * @note This is part of the new seek API which is still under construction.
  */
-function avformat_seek_file(s: AVFormatContext, stream_index: number, min_ts: number, ts: number, max_ts: number, flags: number): number;
+export function avformat_seek_file(s: AVFormatContext, stream_index: number, min_ts: number, ts: number, max_ts: number, flags: number): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Discard all internally buffered data. This can be useful when dealing with
@@ -2377,41 +2419,46 @@ function avformat_seek_file(s: AVFormatContext, stream_index: number, min_ts: nu
  * @param s media file handle
  * @return >=0 on success, error code otherwise
  */
-function avformat_flush(s: AVFormatContext): number;
+export function avformat_flush(s: AVFormatContext): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Start playing a network-based stream (e.g. RTSP stream) at the
  * current position.
  */
-function av_read_play(s: AVFormatContext): number { throw new Error('NotImplemented'); }
+export function av_read_play(s: AVFormatContext): number { throw new Error('NotImplemented'); }
  
 /**
  * Pause a network-based stream (e.g. RTSP stream).
  *
  * Use av_read_play() to resume it.
  */
-function av_read_pause(s: AVFormatContext): number { throw new Error('NotImplemented'); }
+export function av_read_pause(s: AVFormatContext): number { throw new Error('NotImplemented'); }
  
 /**
  * Close an opened input AVFormatContext. Free it and all its contents
  * and set *s to NULL.
  */
-void avformat_close_input(s: Ref<AVFormatContext>);
+export function avformat_close_input(s: Ref<AVFormatContext>) { 
+    throw new Error('NotImplemented'); 
+}
+
 /**
  * @}
  */
  
 ///< seek backward
-const AVSEEK_FLAG_BACKWARD = 1;
+export const AVSEEK_FLAG_BACKWARD = 1;
 
 ///< seeking based on position in bytes
-const AVSEEK_FLAG_BYTE =     2;
+export const AVSEEK_FLAG_BYTE =     2;
 
 ///< seek to any frame, even non-keyframes
-const AVSEEK_FLAG_ANY =      4;
+export const AVSEEK_FLAG_ANY =      4;
 
 ///< seeking based on frame number
-const AVSEEK_FLAG_FRAME =    8;
+export const AVSEEK_FLAG_FRAME =    8;
 
  
 /**
@@ -2420,10 +2467,10 @@ const AVSEEK_FLAG_FRAME =    8;
  */
  
 ///< stream parameters initialized in avformat_write_header
-const AVSTREAM_INIT_IN_WRITE_HEADER = 0;
+export const AVSTREAM_INIT_IN_WRITE_HEADER = 0;
 
 ///< stream parameters initialized in avformat_init_output
-const AVSTREAM_INIT_IN_INIT_OUTPUT =  1;
+export const AVSTREAM_INIT_IN_INIT_OUTPUT =  1;
 
  
 /**
@@ -2444,7 +2491,9 @@ const AVSTREAM_INIT_IN_INIT_OUTPUT =  1;
  * @see av_opt_find, av_dict_set, avio_open, av_oformat_next, avformat_init_output.
  * @av_warn_unused_result
  */
-function avformat_write_header(s: AVFormatContext, options: Ref<AVDictionary>): number;
+export function avformat_write_header(s: AVFormatContext, options: Ref<AVDictionary>): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Allocate the stream private data and initialize the codec, but do not write the header.
@@ -2466,7 +2515,9 @@ function avformat_write_header(s: AVFormatContext, options: Ref<AVDictionary>): 
  * @see av_opt_find, av_dict_set, avio_open, av_oformat_next, avformat_write_header.
  * @av_warn_unused_result
  */
-function avformat_init_output(s: AVFormatContext, options: Ref<AVDictionary>): number;
+export function avformat_init_output(s: AVFormatContext, options: Ref<AVDictionary>): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Write a packet to an output media file.
@@ -2505,7 +2556,7 @@ function avformat_init_output(s: AVFormatContext, options: Ref<AVDictionary>): n
  *
  * @see av_interleaved_write_frame()
  */
-function av_write_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
+export function av_write_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
  
 /**
  * Write a packet to an output media file ensuring correct interleaving.
@@ -2549,7 +2600,7 @@ function av_write_frame(s: AVFormatContext, pkt: AVPacket): number { throw new E
  *
  * @see av_write_frame(), AVFormatContext.max_interleave_delta
  */
-function av_interleaved_write_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
+export function av_interleaved_write_frame(s: AVFormatContext, pkt: AVPacket): number { throw new Error('NotImplemented'); }
  
 /**
  * Write an uncoded frame to an output media file.
@@ -2559,8 +2610,10 @@ function av_interleaved_write_frame(s: AVFormatContext, pkt: AVPacket): number {
  *
  * See av_interleaved_write_uncoded_frame() for details.
  */
-function av_write_uncoded_frame(s: AVFormatContext, stream_index: number { throw new Error('NotImplemented'); }
-                           frame: AVFrame): number;
+export function av_write_uncoded_frame(s: AVFormatContext, stream_index: number,
+                           frame: AVFrame): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Write an uncoded frame to an output media file.
@@ -2578,8 +2631,10 @@ function av_write_uncoded_frame(s: AVFormatContext, stream_index: number { throw
  *
  * @return  >=0 for success, a negative code on error
  */
-function av_interleaved_write_uncoded_frame(s: AVFormatContext, stream_index: number { throw new Error('NotImplemented'); }
-                                       frame: AVFrame): number;
+export function av_interleaved_write_uncoded_frame(s: AVFormatContext, stream_index: number,
+                                       frame: AVFrame): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Test whether a muxer supports uncoded frame.
@@ -2587,7 +2642,7 @@ function av_interleaved_write_uncoded_frame(s: AVFormatContext, stream_index: nu
  * @return  >=0 if an uncoded frame can be written to that muxer and stream,
  *          <0 if not
  */
-function av_write_uncoded_frame_query(s: AVFormatContext, stream_index: number): number { throw new Error('NotImplemented'); }
+export function av_write_uncoded_frame_query(s: AVFormatContext, stream_index: number): number { throw new Error('NotImplemented'); }
  
 /**
  * Write the stream trailer to an output media file and free the
@@ -2598,7 +2653,7 @@ function av_write_uncoded_frame_query(s: AVFormatContext, stream_index: number):
  * @param s media file handle
  * @return 0 if OK, AVERROR_xxx on error
  */
-function av_write_trailer(s: AVFormatContext): number { throw new Error('NotImplemented'); }
+export function av_write_trailer(s: AVFormatContext): number { throw new Error('NotImplemented'); }
  
 /**
  * Return the output format in the list of registered output formats
@@ -2612,14 +2667,16 @@ function av_write_trailer(s: AVFormatContext): number { throw new Error('NotImpl
  * @param mime_type if non-NULL checks if mime_type matches with the
  * MIME type of the registered formats
  */
-function av_guess_format(short_name: string, filename: string, mime_type: string): AVOutputFormat { throw new Error('NotImplemented'); }
+export function av_guess_format(short_name: string, filename: string, mime_type: string): AVOutputFormat { throw new Error('NotImplemented'); }
  
 /**
  * Guess the codec ID based upon muxer and filename.
  */
-function av_guess_codec(fmt: AVOutputFormat, short_name: string { throw new Error('NotImplemented'); }
+export function av_guess_codec(fmt: AVOutputFormat, short_name: string,
                               filename: string, mime_type: string,
-                              type: AVMediaType): AVCodecID;
+                              type: AVMediaType): AVCodecID { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get timing information for the data currently output.
@@ -2636,8 +2693,10 @@ function av_guess_codec(fmt: AVOutputFormat, short_name: string { throw new Erro
  * Note: some formats or devices may not allow to measure dts and wall
  * atomically.
  */
-function av_get_output_timestamp(s: AVFormatContext, stream: number { throw new Error('NotImplemented'); }
-                            dts: Out<number>, wall: Out<number>): number;
+export function av_get_output_timestamp(s: AVFormatContext, stream: number,
+                            dts: Out<number>, wall: Out<number>): number { 
+    throw new Error('NotImplemented'); 
+}
  
  
 /**
@@ -2663,7 +2722,7 @@ function av_get_output_timestamp(s: AVFormatContext, stream: number { throw new 
  *
  * @see av_hex_dump_log, av_pkt_dump2, av_pkt_dump_log2
  */
-function av_hex_dump(f: FILE, buf: Buffer, size: number) { throw new Error('NotImplemented'); }
+export function av_hex_dump(f: FILE, buf: Buffer, size: number) { throw new Error('NotImplemented'); }
  
 /**
  * Send a nice hexadecimal dump of a buffer to the log.
@@ -2677,7 +2736,7 @@ function av_hex_dump(f: FILE, buf: Buffer, size: number) { throw new Error('NotI
  *
  * @see av_hex_dump, av_pkt_dump2, av_pkt_dump_log2
  */
-function av_hex_dump_log(avcl: OpaquePtr, level: number, buf: Buffer, size: number) { throw new Error('NotImplemented'); }
+export function av_hex_dump_log(avcl: OpaquePtr, level: number, buf: Buffer, size: number) { throw new Error('NotImplemented'); }
  
 /**
  * Send a nice dump of a packet to the specified file stream.
@@ -2687,7 +2746,7 @@ function av_hex_dump_log(avcl: OpaquePtr, level: number, buf: Buffer, size: numb
  * @param dump_payload True if the payload must be displayed, too.
  * @param st AVStream that the packet belongs to
  */
-function av_pkt_dump2(f: FILE, pkt: AVPacket, dump_payload: number, st: AVStream) { throw new Error('NotImplemented'); }
+export function av_pkt_dump2(f: FILE, pkt: AVPacket, dump_payload: number, st: AVStream) { throw new Error('NotImplemented'); }
  
  
 /**
@@ -2701,8 +2760,10 @@ function av_pkt_dump2(f: FILE, pkt: AVPacket, dump_payload: number, st: AVStream
  * @param dump_payload True if the payload must be displayed, too.
  * @param st AVStream that the packet belongs to
  */
-function av_pkt_dump_log2(avcl: OpaquePtr, level: number, pkt: AVPacket, dump_payload: number { throw new Error('NotImplemented'); }
-                      st: AVStream);
+export function av_pkt_dump_log2(avcl: OpaquePtr, level: number, pkt: AVPacket, dump_payload: number,
+                      st: AVStream) { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get the AVCodecID for the given codec tag tag.
@@ -2712,7 +2773,9 @@ function av_pkt_dump_log2(avcl: OpaquePtr, level: number, pkt: AVPacket, dump_pa
  * in AVInputFormat.codec_tag and AVOutputFormat.codec_tag
  * @param tag  codec tag to match to a codec ID
  */
-function av_codec_get_id(tags: AVCodecTag[], tag: number): AVCodecID { throw new Error('NotImplemented'); }
+export function av_codec_get_id(tags: AVCodecTag[], tag: number): AVCodecID { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get the codec tag for the given codec id id.
@@ -2722,7 +2785,7 @@ function av_codec_get_id(tags: AVCodecTag[], tag: number): AVCodecID { throw new
  * in AVInputFormat.codec_tag and AVOutputFormat.codec_tag
  * @param id   codec ID to match to a codec tag
  */
-function av_codec_get_tag(tags: AVCodecTag[], id: AVCodecID): number { throw new Error('NotImplemented'); }
+export function av_codec_get_tag(tags: AVCodecTag[], id: AVCodecID): number { throw new Error('NotImplemented'); }
  
 /**
  * Get the codec tag for the given codec id.
@@ -2733,10 +2796,10 @@ function av_codec_get_tag(tags: AVCodecTag[], id: AVCodecID): number { throw new
  * @param tag A pointer to the found tag
  * @return 0 if id was not found in tags, > 0 if it was found
  */
-function av_codec_get_tag2(tags: AVCodecTag[], id: AVCodecID { throw new Error('NotImplemented'); }
-                      tag: Out<number>): number;
+export function av_codec_get_tag2(tags: AVCodecTag[], id: AVCodecID,
+                      tag: Out<number>): number { throw new Error('NotImplemented'); }
  
-function av_find_default_stream_index(s: AVFormatContext): number { throw new Error('NotImplemented'); }
+export function av_find_default_stream_index(s: AVFormatContext): number { throw new Error('NotImplemented'); }
  
 /**
  * Get the index for a specific timestamp.
@@ -2749,7 +2812,7 @@ function av_find_default_stream_index(s: AVFormatContext): number { throw new Er
  *              if AVSEEK_FLAG_ANY seek to any frame, only keyframes otherwise
  * @return < 0 if no such timestamp could be found
  */
-function av_index_search_timestamp(st: AVStream, timestamp: number, flags: number): number { throw new Error('NotImplemented'); }
+export function av_index_search_timestamp(st: AVStream, timestamp: number, flags: number): number { throw new Error('NotImplemented'); }
  
 /**
  * Get the index entry count for the given AVStream.
@@ -2757,7 +2820,9 @@ function av_index_search_timestamp(st: AVStream, timestamp: number, flags: numbe
  * @param st stream
  * @return the number of index entries in the stream
  */
-function avformat_index_get_entries_count(st: AVStream): number;
+export function avformat_index_get_entries_count(st: AVStream): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get the AVIndexEntry corresponding to the given index.
@@ -2770,7 +2835,9 @@ function avformat_index_get_entries_count(st: AVStream): number;
  *       until any function that takes the stream or the parent AVFormatContext
  *       as input argument is called.
  */
-function avformat_index_get_entry(st: AVStream, idx: number): AVIndexEntry;
+export function avformat_index_get_entry(st: AVStream, idx: number): AVIndexEntry { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get the AVIndexEntry corresponding to the given timestamp.
@@ -2787,17 +2854,21 @@ function avformat_index_get_entry(st: AVStream, idx: number): AVIndexEntry;
  *       until any function that takes the stream or the parent AVFormatContext
  *       as input argument is called.
  */
-function avformat_index_get_entry_from_timestamp(st: AVStream,
+export function avformat_index_get_entry_from_timestamp(st: AVStream,
                                                 wanted_timestamp: number,
-                                                flags: number): AVIndexEntry;
+                                                flags: number): AVIndexEntry { 
+    throw new Error('NotImplemented'); 
+}
 /**
  * Add an index entry into a sorted list. Update the entry if the list
  * already contains it.
  *
  * @param timestamp timestamp in the time base of the given stream
  */
-function av_add_index_entry(st: AVStream, pos: number, timestamp: number { throw new Error('NotImplemented'); }
-                       size: number, distance: number, flags: number): number;
+export function av_add_index_entry(st: AVStream, pos: number, timestamp: number,
+                       size: number, distance: number, flags: number): number { 
+    throw new Error('NotImplemented'); 
+}
  
  
 /**
@@ -2820,7 +2891,7 @@ function av_add_index_entry(st: AVStream, pos: number, timestamp: number { throw
  * @param url the URL to split
  * @nodeTODO 
  */
-function av_url_split { throw new Error('NotImplemented'); }
+export function av_url_split(
     proto: string,
     proto_size: number,
     authorization: string,
@@ -2831,7 +2902,9 @@ function av_url_split { throw new Error('NotImplemented'); }
     path: string,
     path_size: number,
     url: string
-);
+) { 
+    throw new Error('NotImplemented'); 
+}
  
  
 /**
@@ -2844,13 +2917,13 @@ function av_url_split { throw new Error('NotImplemented'); }
  * @param url       the URL to print, such as source or destination file
  * @param is_output Select whether the specified context is an input(0) or output(1)
  */
-function av_dump_format(ic: AVFormatContext { throw new Error('NotImplemented'); }
+export function av_dump_format(ic: AVFormatContext,
                     index: number,
                     url: string,
-                    is_output: number);
+                    is_output: number) { throw new Error('NotImplemented'); }
 
 ///< Allow multiple %d
-const AV_FRAME_FILENAME_FLAGS_MULTIPLE = 1;
+export const AV_FRAME_FILENAME_FLAGS_MULTIPLE = 1;
  
 /**
  * Return in 'buf' the path with '%d' replaced by a number.
@@ -2865,16 +2938,16 @@ const AV_FRAME_FILENAME_FLAGS_MULTIPLE = 1;
  * @param flags AV_FRAME_FILENAME_FLAGS_*
  * @return 0 if OK, -1 on format error
  */
-function av_get_frame_filename2 { throw new Error('NotImplemented'); }
+export function av_get_frame_filename2(
     buf: string, buf_size: number,
     path: string, number: number, 
     flags: number
-): number;
+): number { throw new Error('NotImplemented'); };
  
-function av_get_frame_filename { throw new Error('NotImplemented'); }
+export function av_get_frame_filename(
     buf: string, buf_size: number,
     path: string, number: number
-): number;
+): number { throw new Error('NotImplemented'); };
  
 /**
  * Check whether filename actually is a numbered sequence generator.
@@ -2882,7 +2955,7 @@ function av_get_frame_filename { throw new Error('NotImplemented'); }
  * @param filename possible numbered sequence string
  * @return 1 if a valid numbered sequence string, 0 otherwise
  */
-function av_filename_number_test(filename: string): number { throw new Error('NotImplemented'); }
+export function av_filename_number_test(filename: string): number { throw new Error('NotImplemented'); }
  
 /**
  * Generate an SDP for an RTP session.
@@ -2901,7 +2974,7 @@ function av_filename_number_test(filename: string): number { throw new Error('No
  * @param size the size of the buffer
  * @return 0 if OK, AVERROR_xxx on error
  */
-function av_sdp_create(ac: AVFormatContext[], n_files: number, buf: Buffer, size: number): number { throw new Error('NotImplemented'); }
+export function av_sdp_create(ac: AVFormatContext[], n_files: number, buf: Buffer, size: number): number { throw new Error('NotImplemented'); }
  
 /**
  * Return a positive value if the given filename has one of the given
@@ -2910,7 +2983,7 @@ function av_sdp_create(ac: AVFormatContext[], n_files: number, buf: Buffer, size
  * @param filename   file name to check against the given extensions
  * @param extensions a comma-separated list of filename extensions
  */
-function av_match_ext(filename: string, extensions: string): number { throw new Error('NotImplemented'); }
+export function av_match_ext(filename: string, extensions: string): number { throw new Error('NotImplemented'); }
  
 /**
  * Test if the given container can store a codec.
@@ -2922,8 +2995,10 @@ function av_match_ext(filename: string, extensions: string): number { throw new 
  * @return 1 if codec with ID codec_id can be stored in ofmt, 0 if it cannot.
  *         A negative number if this information is not available.
  */
-function avformat_query_codec(ofmt: AVOutputFormat, codec_id: AVCodecID,
-                         std_compliance: number): number;
+export function avformat_query_codec(ofmt: AVOutputFormat, codec_id: AVCodecID,
+                         std_compliance: number): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * @defgroup riff_fourcc RIFF FourCCs
@@ -2940,22 +3015,30 @@ function avformat_query_codec(ofmt: AVOutputFormat, codec_id: AVCodecID,
 /**
  * @return the table mapping RIFF FourCCs for video to libavcodec AVCodecID.
  */
-function avformat_get_riff_video_tags(): AVCodecTag[];
+export function avformat_get_riff_video_tags(): AVCodecTag[] { 
+    throw new Error('NotImplemented'); 
+}
 
 /**
  * @return the table mapping RIFF FourCCs for audio to AVCodecID.
  */
-function avformat_get_riff_audio_tags(): AVCodecTag[];
+export function avformat_get_riff_audio_tags(): AVCodecTag[] { 
+    throw new Error('NotImplemented'); 
+}
 
 /**
  * @return the table mapping MOV FourCCs for video to libavcodec AVCodecID.
  */
-function avformat_get_mov_video_tags(): AVCodecTag[];
+export function avformat_get_mov_video_tags(): AVCodecTag[] { 
+    throw new Error('NotImplemented'); 
+}
 
 /**
  * @return the table mapping MOV FourCCs for audio to AVCodecID.
  */
-function avformat_get_mov_audio_tags(): AVCodecTag[];
+export function avformat_get_mov_audio_tags(): AVCodecTag[] { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * @}
@@ -2978,7 +3061,7 @@ function avformat_get_mov_audio_tags(): AVCodecTag[];
  * @param frame the frame with the aspect ratio to be determined
  * @return the guessed (valid) sample_aspect_ratio, 0/1 if no idea
  */
-function av_guess_sample_aspect_ratio(format: AVFormatContext, stream: AVStream, frame: AVFrame): AVRational { throw new Error('NotImplemented'); }
+export function av_guess_sample_aspect_ratio(format: AVFormatContext, stream: AVStream, frame: AVFrame): AVRational { throw new Error('NotImplemented'); }
  
 /**
  * Guess the frame rate, based on both the container and codec information.
@@ -2988,7 +3071,7 @@ function av_guess_sample_aspect_ratio(format: AVFormatContext, stream: AVStream,
  * @param frame the frame for which the frame rate should be determined, may be NULL
  * @return the guessed (valid) frame rate, 0/1 if no idea
  */
-function av_guess_frame_rate(ctx: AVFormatContext, stream: AVStream, frame: AVFrame): AVRational { throw new Error('NotImplemented'); }
+export function av_guess_frame_rate(ctx: AVFormatContext, stream: AVStream, frame: AVFrame): AVRational { throw new Error('NotImplemented'); }
  
 /**
  * Check if the stream st contained in s is matched by the stream specifier
@@ -3003,10 +3086,14 @@ function av_guess_frame_rate(ctx: AVFormatContext, stream: AVStream, frame: AVFr
  *
  * @note  A stream specifier can match several streams in the format.
  */
-function avformat_match_stream_specifier(s: AVFormatContext, st: AVStream,
-                                    spec: string): number;
+export function avformat_match_stream_specifier(s: AVFormatContext, st: AVStream,
+                                    spec: string): number { 
+    throw new Error('NotImplemented'); 
+}
  
-function avformat_queue_attached_pictures(s: AVFormatContext): number;
+export function avformat_queue_attached_pictures(s: AVFormatContext): number { 
+    throw new Error('NotImplemented'); 
+}
  
 enum AVTimebaseSource {
     AVFMT_TBCF_AUTO = -1,
@@ -3028,13 +3115,15 @@ enum AVTimebaseSource {
  * @param ist      reference input stream to copy timings from
  * @param copy_tb  define from where the stream codec timebase needs to be imported
  */
-function avformat_transfer_internal_stream_timing_info(ofmt: AVOutputFormat,
+export function avformat_transfer_internal_stream_timing_info(ofmt: AVOutputFormat,
                                                   ost: AVStream, ist: AVStream,
-                                                  copy_tb: AVTimebaseSource): number;
+                                                  copy_tb: AVTimebaseSource): number { 
+    throw new Error('NotImplemented'); 
+}
  
 /**
  * Get the internal codec timebase from a stream.
  *
  * @param st  input stream to extract the timebase from
  */
-function av_stream_get_codec_timebase(st: AVStream): AVRational { throw new Error('NotImplemented'); }
+export function av_stream_get_codec_timebase(st: AVStream): AVRational { throw new Error('NotImplemented'); }

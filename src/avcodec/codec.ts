@@ -18,8 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVClass, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
-import { OpaquePtr, Ref } from "../helpers";
+import { AVChannelLayout, AVClass, AVHWDeviceType, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
+import { NotImplemented, OpaquePtr, Ref } from "../helpers";
+import { AVCodecID } from "./codec_id";
 
 /**
  * @addtogroup lavc_core
@@ -211,13 +212,6 @@ export interface AVCodec {
     supported_samplerates: number[];       ///< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
     sample_fmts: AVSampleFormat[]; ///< array of supported sample formats, or NULL if unknown, array is terminated by -1
 
-    /**
-     * @deprecated use ch_layouts instead
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channel_layouts: number[];         ///< array of support channel layouts, or NULL if unknown. array is terminated by 0
-
     priv_class: AVClass;              ///< AVClass for the private context
     profiles: AVProfile[];              ///< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
 
@@ -248,7 +242,7 @@ export interface AVCodec {
  * @return the next registered codec or NULL when the iteration is
  *         finished
  */
-export function av_codec_iterate(opaque: Ref<OpaquePtr>): AVCodec {};
+export function av_codec_iterate(opaque: Ref<OpaquePtr>): AVCodec { throw new NotImplemented(); }
 
 /**
  * Find a registered decoder with a matching codec ID.
@@ -256,7 +250,7 @@ export function av_codec_iterate(opaque: Ref<OpaquePtr>): AVCodec {};
  * @param id AVCodecID of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-export function avcodec_find_decoder(id: AVCodecID): AVCodec {};
+export function avcodec_find_decoder(id: AVCodecID): AVCodec { throw new NotImplemented(); }
 
 /**
  * Find a registered decoder with the specified name.
@@ -264,7 +258,7 @@ export function avcodec_find_decoder(id: AVCodecID): AVCodec {};
  * @param name name of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-export function avcodec_find_decoder_by_name(name: string): AVCodec {};
+export function avcodec_find_decoder_by_name(name: string): AVCodec { throw new NotImplemented(); }
 
 /**
  * Find a registered encoder with a matching codec ID.
@@ -272,7 +266,7 @@ export function avcodec_find_decoder_by_name(name: string): AVCodec {};
  * @param id AVCodecID of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-export function avcodec_find_encoder(id: AVCodecID): AVCodec {};
+export function avcodec_find_encoder(id: AVCodecID): AVCodec { throw new NotImplemented(); }
 
 /**
  * Find a registered encoder with the specified name.
@@ -280,16 +274,16 @@ export function avcodec_find_encoder(id: AVCodecID): AVCodec {};
  * @param name name of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-export function avcodec_find_encoder_by_name(name: string): AVCodec {};
+export function avcodec_find_encoder_by_name(name: string): AVCodec { throw new NotImplemented(); }
 /**
  * @return a non-zero number if codec is an encoder, zero otherwise
  */
-export function av_codec_is_encoder(codec: AVCodec): number {};
+export function av_codec_is_encoder(codec: AVCodec): number { throw new NotImplemented(); }
 
 /**
  * @return a non-zero number if codec is a decoder, zero otherwise
  */
-export function av_codec_is_decoder(codec: AVCodec): number {};
+export function av_codec_is_decoder(codec: AVCodec): number { throw new NotImplemented(); }
 
 /**
  * Return a name for the specified profile, if available.
@@ -298,7 +292,7 @@ export function av_codec_is_decoder(codec: AVCodec): number {};
  * @param profile the profile value for which a name is requested
  * @return A name for the profile if found, NULL otherwise.
  */
-export function av_get_profile_name(codec: AVCodec, profile: number): string {};
+export function av_get_profile_name(codec: AVCodec, profile: number): string { throw new NotImplemented(); }
 
 /**
  * The codec supports this format via the hw_device_ctx interface.
@@ -370,7 +364,7 @@ export interface AVCodecHWConfig {
  * descriptor; all other values return NULL.  If the codec does not support
  * any hardware configurations then it will always return NULL.
  */
-export function avcodec_get_hw_config(codec: AVCodec, index: number): AVCodecHWConfig {};
+export function avcodec_get_hw_config(codec: AVCodec, index: number): AVCodecHWConfig { throw new NotImplemented(); }
 
 /**
  * @}

@@ -236,7 +236,7 @@ export interface AVHWFramesContext {
  * @return The type from enum AVHWDeviceType, or AV_HWDEVICE_TYPE_NONE if
  *         not found.
  */
-export function av_hwdevice_find_type_by_name(name: string): AVHWDeviceType {}
+export function av_hwdevice_find_type_by_name(name: string): AVHWDeviceType { throw new Error('NotImplemented'); }
 
 /** Get the string name of an AVHWDeviceType.
  *
@@ -244,7 +244,7 @@ export function av_hwdevice_find_type_by_name(name: string): AVHWDeviceType {}
  * @return Pointer to a static string containing the name, or NULL if the type
  *         is not valid.
  */
-export function av_hwdevice_get_type_name(type: AVHWDeviceType): string {};
+export function av_hwdevice_get_type_name(type: AVHWDeviceType): string { throw new Error('NotImplemented'); }
 
 /**
  * Iterate over supported device types.
@@ -254,7 +254,7 @@ export function av_hwdevice_get_type_name(type: AVHWDeviceType): string {};
  * @return The next usable device type from enum AVHWDeviceType, or
  *         AV_HWDEVICE_TYPE_NONE if there are no more.
  */
-export function av_hwdevice_iterate_types(prev: AVHWDeviceType): AVHWDeviceType {};
+export function av_hwdevice_iterate_types(prev: AVHWDeviceType): AVHWDeviceType { throw new Error('NotImplemented'); }
 
 /**
  * Allocate an AVHWDeviceContext for a given hardware type.
@@ -263,7 +263,7 @@ export function av_hwdevice_iterate_types(prev: AVHWDeviceType): AVHWDeviceType 
  * @return a reference to the newly created AVHWDeviceContext on success or NULL
  *         on failure.
  */
-export function av_hwdevice_ctx_alloc(type: AVHWDeviceType): AVBuffer {};
+export function av_hwdevice_ctx_alloc(type: AVHWDeviceType): AVBuffer { throw new Error('NotImplemented'); }
 
 /**
  * Finalize the device context before use. This function must be called after
@@ -273,7 +273,7 @@ export function av_hwdevice_ctx_alloc(type: AVHWDeviceType): AVBuffer {};
  * @param ref a reference to the AVHWDeviceContext
  * @return 0 on success, a negative AVERROR code on failure
  */
-export function av_hwdevice_ctx_init(ref: AVBuffer): number {};
+export function av_hwdevice_ctx_init(ref: AVBuffer): number { throw new Error('NotImplemented'); }
 
 /**
  * Open a device of the specified type and create an AVHWDeviceContext for it.
@@ -301,7 +301,7 @@ export function av_hwdevice_ctx_init(ref: AVBuffer): number {};
  * @return 0 on success, a negative AVERROR code on failure.
  */
 export function av_hwdevice_ctx_create(device_ctx: Out<AVBuffer>, type: AVHWDeviceType,
-                        device: string, opts: AVDictionary, flags: number): number {};
+                        device: string, opts: AVDictionary, flags: number): number { throw new Error('NotImplemented'); }
 
 /**
  * Create a new device of the specified type from an existing device.
@@ -326,7 +326,7 @@ export function av_hwdevice_ctx_create(device_ctx: Out<AVBuffer>, type: AVHWDevi
  */
 export function av_hwdevice_ctx_create_derived(dst_ctx: Out<AVBuffer>,
                                 type: AVHWDeviceType,
-                                src_ctx: AVBuffer, flags: number): number {};
+                                src_ctx: AVBuffer, flags: number): number { throw new Error('NotImplemented'); }
 
 /**
  * Create a new device of the specified type from an existing device.
@@ -344,10 +344,15 @@ export function av_hwdevice_ctx_create_derived(dst_ctx: Out<AVBuffer>,
  * @param flags   Currently unused; should be set to zero.
  * @return        Zero on success, a negative AVERROR code on failure.
  */
-export function av_hwdevice_ctx_create_derived_opts(dst_ctx: Out<AVBuffer>,
-                                        type: AVHWDeviceType,
-                                        src_ctx: AVBuffer,
-                                        options: AVDictionary, int flags): number {};
+export function av_hwdevice_ctx_create_derived_opts(
+    dst_ctx: Out<AVBuffer>,
+    type: AVHWDeviceType,
+    src_ctx: AVBuffer,
+    options: AVDictionary, 
+    flags: number
+): number { 
+    throw new Error('NotImplemented'); 
+}
 
 /**
  * Allocate an AVHWFramesContext tied to a given device context.
@@ -358,7 +363,7 @@ export function av_hwdevice_ctx_create_derived_opts(dst_ctx: Out<AVBuffer>,
  * @return a reference to the newly created AVHWFramesContext on success or NULL
  *         on failure.
  */
-export function av_hwframe_ctx_alloc(device_ctx: AVBuffer): AVBuffer {};
+export function av_hwframe_ctx_alloc(device_ctx: AVBuffer): AVBuffer { throw new Error('NotImplemented'); }
 
 /**
  * Finalize the context before use. This function must be called after the
@@ -368,7 +373,7 @@ export function av_hwframe_ctx_alloc(device_ctx: AVBuffer): AVBuffer {};
  * @param ref a reference to the AVHWFramesContext
  * @return 0 on success, a negative AVERROR code on failure
  */
-export function av_hwframe_ctx_init(ref: AVBuffer): number {};
+export function av_hwframe_ctx_init(ref: AVBuffer): number { throw new Error('NotImplemented'); }
 
 /**
  * Allocate a new frame attached to the given AVHWFramesContext.
@@ -379,7 +384,7 @@ export function av_hwframe_ctx_init(ref: AVBuffer): number {};
  * @param flags currently unused, should be set to zero
  * @return 0 on success, a negative AVERROR code on failure
  */
-export function av_hwframe_get_buffer(hwframe_ctx: AVBuffer, frame: AVFrame, flags: number): number {};
+export function av_hwframe_get_buffer(hwframe_ctx: AVBuffer, frame: AVFrame, flags: number): number { throw new Error('NotImplemented'); }
 
 /**
  * Copy data to or from a hw surface. At least one of dst/src must have an
@@ -410,7 +415,7 @@ export function av_hwframe_get_buffer(hwframe_ctx: AVBuffer, frame: AVFrame, fla
  * @param flags currently unused, should be set to zero
  * @return 0 on success, a negative AVERROR error code on failure.
  */
-export function av_hwframe_transfer_data(dst: AVFrame, src: AVFrame, flags: number): number {};
+export function av_hwframe_transfer_data(dst: AVFrame, src: AVFrame, flags: number): number { throw new Error('NotImplemented'); }
 
 export enum AVHWFrameTransferDirection {
     /**
@@ -441,7 +446,7 @@ export enum AVHWFrameTransferDirection {
  */
 export function av_hwframe_transfer_get_formats(hwframe_ctx: AVBuffer,
                                     dir: AVHWFrameTransferDirection,
-                                    formats: AVPixelFormat[], flags: number): number {};
+                                    formats: AVPixelFormat[], flags: number): number { throw new Error('NotImplemented'); }
 
 
 /**
@@ -489,7 +494,7 @@ export interface AVHWFramesConstraints {
  * @return The newly created HW-specific configuration structure on
  *         success or NULL on failure.
  */
-export function av_hwdevice_hwconfig_alloc(device_ctx: AVBuffer): OpaquePtr {};
+export function av_hwdevice_hwconfig_alloc(device_ctx: AVBuffer): OpaquePtr { throw new Error('NotImplemented'); }
 
 /**
  * Get the constraints on HW frames given a device and the HW-specific
@@ -504,7 +509,7 @@ export function av_hwdevice_hwconfig_alloc(device_ctx: AVBuffer): OpaquePtr {};
  *         on the device, or NULL if not available.
  */
 export function av_hwdevice_get_hwframe_constraints(ref: AVBuffer,
-                                                        hwconfig: OpaquePtr): AVHWFramesConstraints {};
+                                                        hwconfig: OpaquePtr): AVHWFramesConstraints { throw new Error('NotImplemented'); }
 
 /**
  * Free an AVHWFrameConstraints structure.
@@ -579,7 +584,7 @@ export const AV_HWFRAME_MAP_DIRECT   = 1 << 3;
  * @param flags Some combination of AV_HWFRAME_MAP_* flags.
  * @return Zero on success, negative AVERROR code on failure.
  */
-export function av_hwframe_map(dst: AVFrame, src: AVFrame, flags: number): number {};
+export function av_hwframe_map(dst: AVFrame, src: AVFrame, flags: number): number { throw new Error('NotImplemented'); }
 
 
 /**
@@ -603,4 +608,4 @@ export function av_hwframe_ctx_create_derived(derived_frame_ctx: Out<AVBuffer>,
                                 format: AVPixelFormat,
                                 derived_device_ctx: AVBuffer,
                                 source_frame_ctx: AVBuffer,
-                                flags: number): number {};
+                                flags: number): number { throw new Error('NotImplemented'); }

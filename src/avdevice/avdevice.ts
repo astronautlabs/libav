@@ -16,9 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVClass, AVDictionary, AVPixelFormat, AVRational, AVSampleFormat, MKBETAG } from '../avutil';
+import { AVClass, AVDictionary, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat, MKBETAG } from '../avutil';
 import { AVCodecID } from '../avcodec';
-import { OpaquePtr, Out, Ref } from '../helpers';
+import { NotImplemented, OpaquePtr, Out, Ref } from '../helpers';
+import { AVFormatContext, AVInputFormat, AVOutputFormat } from '../avformat';
 
 /**
  * @file
@@ -47,22 +48,22 @@ import { OpaquePtr, Out, Ref } from '../helpers';
 /**
  * Return the LIBAVDEVICE_VERSION_INT constant.
  */
-export function avdevice_version(): number {};
+export function avdevice_version(): number { throw new NotImplemented(); }
 
 /**
  * Return the libavdevice build-time configuration.
  */
-export function avdevice_configuration(): string {};
+export function avdevice_configuration(): string { throw new NotImplemented(); }
 
 /**
  * Return the libavdevice license.
  */
-export function avdevice_license(): string {};
+export function avdevice_license(): string { throw new NotImplemented(); }
 
 /**
  * Initialize libavdevice and register all the input and output devices.
  */
-export function avdevice_register_all(): void {};
+export function avdevice_register_all(): void { throw new NotImplemented(); }
 
 /**
  * Audio input devices iterator.
@@ -71,7 +72,7 @@ export function avdevice_register_all(): void {};
  * if d is non-NULL, returns the next registered input audio/video device after d
  * or NULL if d is the last one.
  */
-export function av_input_audio_device_next(d: AVInputFormat): AVInputFormat {};
+export function av_input_audio_device_next(d: AVInputFormat): AVInputFormat { throw new NotImplemented(); }
 
 /**
  * Video input devices iterator.
@@ -80,7 +81,7 @@ export function av_input_audio_device_next(d: AVInputFormat): AVInputFormat {};
  * if d is non-NULL, returns the next registered input audio/video device after d
  * or NULL if d is the last one.
  */
-export function av_input_video_device_next(d: AVInputFormat): AVInputFormat {};
+export function av_input_video_device_next(d: AVInputFormat): AVInputFormat { throw new NotImplemented(); }
 
 /**
  * Audio output devices iterator.
@@ -89,7 +90,7 @@ export function av_input_video_device_next(d: AVInputFormat): AVInputFormat {};
  * if d is non-NULL, returns the next registered output audio/video device after d
  * or NULL if d is the last one.
  */
-export function av_output_audio_device_next(d: AVOutputFormat): AVOutputFormat {};
+export function av_output_audio_device_next(d: AVOutputFormat): AVOutputFormat { throw new NotImplemented(); }
 
 /**
  * Video output devices iterator.
@@ -98,7 +99,7 @@ export function av_output_audio_device_next(d: AVOutputFormat): AVOutputFormat {
  * if d is non-NULL, returns the next registered output audio/video device after d
  * or NULL if d is the last one.
  */
-export function av_output_video_device_next(d: AVOutputFormat): AVOutputFormat {};
+export function av_output_video_device_next(d: AVOutputFormat): AVOutputFormat { throw new NotImplemented(); }
 
 export interface AVDeviceRect {
     x: number;      /**< x coordinate of top left corner */
@@ -299,7 +300,7 @@ export enum AVDevToAppMessageType {
  */
 export function avdevice_app_to_dev_control_message(s: AVFormatContext,
                                         type: AVAppToDevMessageType,
-                                        data: OpaquePtr, data_size: number): number {};
+                                        data: OpaquePtr, data_size: number): number { throw new NotImplemented(); }
 
 /**
  * Send control message from device to application.
@@ -313,7 +314,7 @@ export function avdevice_app_to_dev_control_message(s: AVFormatContext,
  */
 export function avdevice_dev_to_app_control_message(s: AVFormatContext,
                                         type: AVDevToAppMessageType,
-                                        data: OpaquePtr, data_size: number): number {};
+                                        data: OpaquePtr, data_size: number): number { throw new NotImplemented(); }
 
 /**
  * Following API allows user to probe device capabilities (supported codecs,
@@ -435,7 +436,7 @@ export interface AVDeviceCapabilitiesQuery {
  * @attribute_deprecated
  */
 export function avdevice_capabilities_create(caps: Out<AVDeviceCapabilitiesQuery>, s: AVFormatContext,
-                                device_options: Ref<AVDictionary>): number {};
+                                device_options: Ref<AVDictionary>): number { throw new NotImplemented(); }
 
 /**
  * Free resources created by avdevice_capabilities_create()
@@ -445,7 +446,7 @@ export function avdevice_capabilities_create(caps: Out<AVDeviceCapabilitiesQuery
  * @if FF_API_DEVICE_CAPABILITIES
  * @attribute_deprecated
  */
-export function avdevice_capabilities_free(caps: Ref<AVDeviceCapabilitiesQuery>, s: AVFormatContext): void {};
+export function avdevice_capabilities_free(caps: Ref<AVDeviceCapabilitiesQuery>, s: AVFormatContext): void { throw new NotImplemented(); }
 
 
 /**
@@ -480,14 +481,14 @@ export interface AVDeviceInfoList {
  * @param[out] device_list list of autodetected devices.
  * @return count of autodetected devices, negative on error.
  */
-export function avdevice_list_devices(s: AVFormatContext, device_list: AVDeviceInfoList[]): number {};
+export function avdevice_list_devices(s: AVFormatContext, device_list: AVDeviceInfoList[]): number { throw new NotImplemented(); }
 
 /**
  * Convenient function to free result of avdevice_list_devices().
  *
  * @param devices device list to be freed.
  */
-export function avdevice_free_list_devices(device_list: Ref<AVDeviceInfoList[]>): void {};
+export function avdevice_free_list_devices(device_list: Ref<AVDeviceInfoList[]>): void { throw new NotImplemented(); }
 
 /**
  * List devices.
@@ -507,9 +508,9 @@ export function avdevice_free_list_devices(device_list: Ref<AVDeviceInfoList[]>)
  * @note device argument takes precedence over device_name when both are set.
  */
 export function avdevice_list_input_sources(device: AVInputFormat, device_name: string,
-                                device_options: AVDictionary, device_list: Out<AVDeviceInfoList[]>): number {};
+                                device_options: AVDictionary, device_list: Out<AVDeviceInfoList[]>): number { throw new NotImplemented(); }
 export function avdevice_list_output_sinks(device: AVOutputFormat,device_name: string,
-                            device_options: AVDictionary, device_list: Out<AVDeviceInfoList[]>): number {};
+                            device_options: AVDictionary, device_list: Out<AVDeviceInfoList[]>): number { throw new NotImplemented(); }
 
 /**
  * @}

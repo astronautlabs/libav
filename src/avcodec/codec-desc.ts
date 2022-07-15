@@ -18,6 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+import { AVMediaType } from "../avutil";
+import { NotImplemented } from "../helpers";
+import { AVProfile } from "./codec";
+import { AVCodecID } from "./codec_id";
+
 /**
  * @addtogroup lavc_core
  * @{
@@ -97,7 +102,7 @@ export const AV_CODEC_PROP_TEXT_SUB =      (1 << 17);
 /**
  * @return descriptor for given codec ID or NULL if no descriptor exists.
  */
-export function avcodec_descriptor_get(id: AVCodecID): AVCodecDescriptor {};
+export function avcodec_descriptor_get(id: AVCodecID): AVCodecDescriptor { throw new NotImplemented(); }
 
 /**
  * Iterate over all codec descriptors known to libavcodec.
@@ -106,13 +111,13 @@ export function avcodec_descriptor_get(id: AVCodecID): AVCodecDescriptor {};
  *
  * @return next descriptor or NULL after the last descriptor
  */
-export function avcodec_descriptor_next(prev: AVCodecDescriptor): AVCodecDescriptor {};
+export function avcodec_descriptor_next(prev: AVCodecDescriptor): AVCodecDescriptor { throw new NotImplemented(); }
 
 /**
  * @return codec descriptor with the given name or NULL if no such descriptor
  *         exists.
  */
-export function avcodec_descriptor_get_by_name(name: string): AVCodecDescriptor {};
+export function avcodec_descriptor_get_by_name(name: string): AVCodecDescriptor { throw new NotImplemented(); }
 
 /**
  * @}

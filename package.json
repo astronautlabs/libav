@@ -4,13 +4,16 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "gyp:configure": "node-gyp configure",
     "install": "node-gyp rebuild"
   },
   "author": "Astronaut Labs, LLC",
   "license": "LGPL-2.1-or-later",
   "gypfile": true,
   "devDependencies": {
-    "node-addon-api": "^5.0.0"
+    "node-addon-api": "^5.0.0",
+    "typescript": "^4.7.4"
   }
 }

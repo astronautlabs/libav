@@ -1,8 +1,31 @@
-#include <libavutil/avutil.h>
+#include "../common.h"
+
+extern "C" {
+    #include <libavutil/avutil.h>
+}
 
 #include "buffer.h"
 #include "../libav.h"
 #include "../helpers.h"
+
+void NAVBuffer::Init(Napi::Env env, Napi::Object exports) {
+    auto func = DefineClass(env, "AVBuffer", {
+        InstanceAccessor("size", &NAVBuffer::GetSize, nullptr),
+        InstanceAccessor("data", &NAVBuffer::GetData, nullptr),
+        InstanceAccessor("refCount", &NAVBuffer::GetRefCount, nullptr),
+        InstanceAccessor("writable", &NAVBuffer::GetIsWritable, nullptr),
+        InstanceMethod<&NAVBuffer::Free>("free"),
+        InstanceMethod<&NAVBuffer::MakeWritable>("makeWritable"),
+        InstanceMethod<&NAVBuffer::Realloc>("realloc")
+    });
+
+    auto constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    
+    LibAvAddon::Self(env)->AVBuffer = constructor;
+
+    exports.Set("NAVBuffer", constructor->Value());
+}
 
 NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
     Napi::ObjectWrap<NAVBuffer>(callback)
@@ -68,24 +91,6 @@ void NAVBuffer::Disown(void *opaque, uint8_t *data) {
     buffer->handle = nullptr;
 }
 
-void NAVBuffer::Init(Napi::Env env, Napi::Object exports) {
-    auto func = DefineClass(env, "AVBuffer", {
-        InstanceAccessor("size", &NAVBuffer::GetSize, nullptr),
-        InstanceAccessor("data", &NAVBuffer::GetData, nullptr),
-        InstanceAccessor("refCount", &NAVBuffer::GetRefCount, nullptr),
-        InstanceAccessor("writable", &NAVBuffer::GetIsWritable, nullptr),
-        InstanceMethod<&NAVBuffer::Free>("free"),
-        StaticMethod<&NAVBuffer::Alloc>("alloc")
-    });
-
-    auto constructor = new Napi::FunctionReference();
-    *constructor = Napi::Persistent(func);
-    
-    LibAvAddon::Self(env)->AVBuffer = constructor;
-
-    exports.Set("NAVBufferRef", constructor);
-}
-
 Napi::Value NAVBuffer::GetRefCount(const Napi::CallbackInfo& info) {
     if (!this->handle)
         return Napi::Number::New(info.Env(), 0);
@@ -99,6 +104,57 @@ Napi::Value NAVBuffer::GetIsWritable(const Napi::CallbackInfo& info) {
     
     return Napi::Boolean::New(info.Env(), av_buffer_is_writable(this->handle) == 1);
 }
+
+Napi::Value NAVBuffer::MakeWritable(const Napi::CallbackInfo& info) {
+    if (!this->handle) {
+        Napi::TypeError::New(info.Env(), "Cannot make buffer writable after it has been freed");
+        return info.Env().Undefined();
+    }
+
+    if (av_buffer_is_writable(this->handle))
+        return info.Env().Undefined();
+    
+    if (av_buffer_make_writable(&this->handle) < 0) {
+        Napi::TypeError::New(info.Env(), "Failure while making buffer writable").ThrowAsJavaScriptException();
+        return info.Env().Undefined();
+    }
+
+    ownedArrayBuffer.Unref();
+    ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>();
+    return info.Env().Undefined();
+}
+
+Napi::Value NAVBuffer::Realloc(const Napi::CallbackInfo& info) {
+    auto size = info[0].As<Napi::Number>().Int64Value();
+    auto handle = this->handle;
+
+    if (size < 0) {
+        Napi::TypeError::New(info.Env(), "Size cannot be negative").ThrowAsJavaScriptException();
+        return info.Env().Undefined();
+    }
+    
+    if (av_buffer_realloc(&this->handle, size) < 0) {
+        Napi::TypeError::New(info.Env(), "Error while reallocating").ThrowAsJavaScriptException();
+        return info.Env().Undefined();
+    }
+
+    ownedArrayBuffer.Unref();
+    ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>();
+    return info.Env().Undefined();
+}
+
+Napi::Value NAVBuffer::Replace(const Napi::CallbackInfo& info) {
+    auto other = Napi::ObjectWrap<NAVBuffer>::Unwrap(info[0].As<Napi::Object>());
+
+    if (this == other || this->handle->buffer == other->handle->buffer)
+        return info.Env().Undefined();
+    
+    av_buffer_replace(&this->handle, other->handle);
+    ownedArrayBuffer.Unref();
+    ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>();
+    return info.Env().Undefined();
+}
+
 
 Napi::Value NAVBuffer::GetSize(const Napi::CallbackInfo& info) {
     if (!this->handle) {
@@ -124,6 +180,7 @@ Napi::Value NAVBuffer::Free(const Napi::CallbackInfo& info) {
         
     this->ownedArrayBuffer.Unref();
     this->ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>();
+    return info.Env().Undefined();
 }
 
 void NAVBuffer::Finalize(Napi::Env env) {
@@ -132,45 +189,62 @@ void NAVBuffer::Finalize(Napi::Env env) {
     }
 }
 
-Napi::Value NAVBuffer::Alloc(const Napi::CallbackInfo& info) {
-    auto size = info[0].As<Napi::Number>().Int64Value();
-    auto zero = false;
+void NAVBufferPool::Init(Napi::Env env, Napi::Object exports) {
+    auto func = DefineClass(env, "AVBufferPool", {
+        InstanceAccessor("freed", &NAVBufferPool::IsFreed, nullptr),
+        InstanceMethod<&NAVBufferPool::Free>("free"),
+        InstanceMethod<&NAVBufferPool::Get>("get")
+    });
 
-    if (info.Length() > 1)
-        zero = info[1].As<Napi::Boolean>().Value();
-
-    if (size < 0) {
-        Napi::TypeError::New(info.Env(), "Size cannot be negative").ThrowAsJavaScriptException();
-        return;
-    }
-
-    AVBufferRef *buf_ref;
+    auto constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
     
-    if (zero)
-        buf_ref = av_buffer_allocz(size);
-    else
-        buf_ref = av_buffer_alloc(size);
+    LibAvAddon::Self(env)->AVBuffer = constructor;
 
-    if (!buf_ref) {
-        Napi::TypeError::New(info.Env(), "Failed to allocate buffer").ThrowAsJavaScriptException();
-        return;
-    }
+    exports.Set("NAVBufferPool", constructor->Value());
 
-    return LibAvAddon::Self(info.Env())->AVBuffer->New({ Napi::External<AVBufferRef>::New(info.Env(), buf_ref) });
 }
 
-Napi::Value nlavu_av_buffer_create(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_default_free(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_ref(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_unref(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_is_writable(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_get_opaque(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_get_ref_count(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_make_writable(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_realloc(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_replace(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_pool_init(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_pool_init2(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_pool_uninit(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_pool_get(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_buffer_pool_buffer_get_opaque(const Napi::CallbackInfo& callback);
+NAVBufferPool::NAVBufferPool(const Napi::CallbackInfo& info):
+    Napi::ObjectWrap<NAVBufferPool>(info)
+{
+    auto size = info[0].As<Napi::Number>().Int64Value();
+    
+    if (size < 0) {
+        Napi::TypeError::New(info.Env(), "Size cannot be negative");
+        return;
+    }
+
+    this->handle = av_buffer_pool_init(size, nullptr);
+}
+
+void NAVBufferPool::Finalize(Napi::Env env) {
+    if (this->handle)
+        av_buffer_pool_uninit(&this->handle);
+}
+
+Napi::Value NAVBufferPool::Free(const Napi::CallbackInfo& info) {
+    av_buffer_pool_uninit(&this->handle);
+    return info.Env().Undefined();
+}
+
+Napi::Value NAVBufferPool::Get(const Napi::CallbackInfo& info) {
+    if (this->handle == nullptr) {
+        Napi::TypeError::New(info.Env(), "Cannot retrieve a new buffer from a pool which has been marked as freed.");
+        return info.Env().Undefined();
+    }
+
+    auto buffer = av_buffer_pool_get(this->handle);
+    if (!buffer) {
+        Napi::TypeError::New(info.Env(), "Failed to get buffer from buffer pool");
+        return info.Env().Undefined();
+    }
+
+    return LibAvAddon::Self(info.Env())->AVBuffer->New({ 
+        Napi::External<AVBufferRef>::New(info.Env(), buffer)
+    });
+}
+
+Napi::Value NAVBufferPool::IsFreed(const Napi::CallbackInfo& info) {
+    return Napi::Boolean::New(info.Env(), handle == nullptr);
+}

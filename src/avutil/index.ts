@@ -1,3 +1,4 @@
+export * from './avutil';
 export * from './buffer';
 export * from './dict';
 export * from './frame';
@@ -7,3 +8,4 @@ export * from './macros';
 export * from './pixfmt';
 export * from './rational';
 export * from './samplefmt';
+export * from './channel-layout';

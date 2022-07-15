@@ -1,5 +1,7 @@
 #include <napi.h>
-#include <libavutil/rational.h>
+extern "C" {
+    #include <libavutil/rational.h>
+}
 
 static inline Napi::Value NRational(napi_env env, AVRational rational) {
     auto obj = Napi::Object::New(env);

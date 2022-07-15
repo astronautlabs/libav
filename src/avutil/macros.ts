@@ -46,7 +46,7 @@ export const FFMIN3 = (a: number, b: number, c: number) => FFMIN(FFMIN(a, b), c)
 export const MKTAGn = (a: number, b: number, c: number, d: number) => (a | (b << 8) | (c << 16) | (d << 24));
 export const MKBETAGn = (a: number, b: number, c: number, d: number) => (d | (c << 8) | (b << 16) | (a << 24));
 
-export const ASCII_CHAR(str: string): number {
+export const ASCII_CHAR = (str: string): number => {
     return Buffer.from(str)[0];
 }
 

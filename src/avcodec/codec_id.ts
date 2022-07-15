@@ -18,6 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+import { AVMediaType, AVSampleFormat } from "../avutil";
+import { NotImplemented } from "../helpers";
+
 /**
  * @addtogroup lavc_core
  * @{
@@ -574,13 +577,13 @@ export enum AVCodecID {
 /**
  * Get the type of the given codec.
  */
-export function avcodec_get_type(codec_id: AVCodecID): AVMediaType {};
+export function avcodec_get_type(codec_id: AVCodecID): AVMediaType { throw new NotImplemented(); }
 
 /**
  * Get the name of a codec.
  * @return  a static string identifying the codec; never NULL
  */
-export function avcodec_get_name(id: AVCodecID): string {};
+export function avcodec_get_name(id: AVCodecID): string { throw new NotImplemented(); }
 
 /**
  * Return codec bits per sample.
@@ -588,7 +591,7 @@ export function avcodec_get_name(id: AVCodecID): string {};
  * @param[in] codec_id the codec
  * @return Number of bits per sample or zero if unknown for the given codec.
  */
-export function av_get_bits_per_sample(codec_id: AVCodecID): number {};
+export function av_get_bits_per_sample(codec_id: AVCodecID): number { throw new NotImplemented(); }
 
 /**
  * Return codec bits per sample.
@@ -598,7 +601,7 @@ export function av_get_bits_per_sample(codec_id: AVCodecID): number {};
  * @param[in] codec_id the codec
  * @return Number of bits per sample or zero if unknown for the given codec.
  */
-export function av_get_exact_bits_per_sample(codec_id: AVCodecID): number {};
+export function av_get_exact_bits_per_sample(codec_id: AVCodecID): number { throw new NotImplemented(); }
 
 /**
  * Return a name for the specified profile, if available.
@@ -611,7 +614,7 @@ export function av_get_exact_bits_per_sample(codec_id: AVCodecID): number {};
  *       supported by a specific decoder or encoder implementation, this
  *       function searches the list of profiles from the AVCodecDescriptor
  */
-export function avcodec_profile_name(codec_id: AVCodecID, profile: number): string {};
+export function avcodec_profile_name(codec_id: AVCodecID, profile: number): string { throw new NotImplemented(); }
 
 /**
  * Return the PCM codec associated with a sample format.
@@ -619,4 +622,4 @@ export function avcodec_profile_name(codec_id: AVCodecID, profile: number): stri
  *            -1 (or anything else) for native
  * @return  AV_CODEC_ID_PCM_* or AV_CODEC_ID_NONE
  */
-export function av_get_pcm_codec(fmt: AVSampleFormat, be: number): AVCodecID {};
+export function av_get_pcm_codec(fmt: AVSampleFormat, be: number): AVCodecID { throw new NotImplemented(); }

@@ -16,8 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { OpaquePtr, Ref } from "../helpers";
+import { NotImplemented, OpaquePtr, Ref } from "../helpers";
+import { AVPictureType } from "./avutil";
 import { AVBuffer } from "./buffer";
+import { AVChannelLayout } from "./channel-layout";
 import { AVDictionary } from "./dict";
 import { AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic } from "./pixfmt";
 import { AVRational } from "./rational";
@@ -524,14 +526,6 @@ export interface AVFrame {
     sample_rate: number;
 
     /**
-     * Channel layout of the audio data.
-     * @deprecated use ch_layout instead
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channel_layout: number;
-
-    /**
      * AVBuffer references backing the data for this frame. All the pointers in
      * data and extended_data must point inside one of the buffers in buf or
      * extended_buf. This array must be filled contiguously -- if buf[i] is
@@ -633,16 +627,6 @@ export interface AVFrame {
     decode_error_flags: number;
 
     /**
-     * number of audio channels, only used for audio.
-     * - encoding: unused
-     * - decoding: Read by user.
-     * @deprecated use ch_layout instead
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channels: number;
-
-    /**
      * size of the corresponding packet containing the compressed
      * frame.
      * It is set to a negative value if unknown.
@@ -712,7 +696,7 @@ export interface AVFrame {
  * @attribute_deprecated
  */
 
-export function av_get_colorspace_name(val: AVColorSpace): string {};
+export function av_get_colorspace_name(val: AVColorSpace): string { throw new NotImplemented(); }
 
 /**
  * Allocate an AVFrame and set its fields to default values.  The resulting
@@ -724,7 +708,7 @@ export function av_get_colorspace_name(val: AVColorSpace): string {};
  * must be allocated through other means, e.g. with av_frame_get_buffer() or
  * manually.
  */
-export function av_frame_alloc(): AVFrame {};
+export function av_frame_alloc(): AVFrame { throw new NotImplemented(); }
 
 /**
  * Free the frame and any dynamically allocated objects in it,
@@ -733,7 +717,7 @@ export function av_frame_alloc(): AVFrame {};
  *
  * @param frame frame to be freed. The pointer will be set to NULL.
  */
-export function av_frame_free(frame: Ref<AVFrame>): void {};
+export function av_frame_free(frame: Ref<AVFrame>): void { throw new NotImplemented(); }
 
 /**
  * Set up a new reference to the data described by the source frame.
@@ -750,7 +734,7 @@ export function av_frame_free(frame: Ref<AVFrame>): void {};
  *
  * @return 0 on success, a negative AVERROR on error
  */
-export function av_frame_ref(dst: AVFrame, src: AVFrame): number {};
+export function av_frame_ref(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Create a new frame that references the same data as src.
@@ -759,12 +743,12 @@ export function av_frame_ref(dst: AVFrame, src: AVFrame): number {};
  *
  * @return newly created AVFrame on success, NULL on error.
  */
-export function av_frame_clone(src: AVFrame): AVFrame {};
+export function av_frame_clone(src: AVFrame): AVFrame { throw new NotImplemented(); }
 
 /**
  * Unreference all the buffers referenced by frame and reset the frame fields.
  */
-export function av_frame_unref(frame: AVFrame): void {};
+export function av_frame_unref(frame: AVFrame): void { throw new NotImplemented(); }
 
 /**
  * Move everything contained in src to dst and reset src.
@@ -773,7 +757,7 @@ export function av_frame_unref(frame: AVFrame): void {};
  *           or deallocating its contents. Call av_frame_unref(dst) manually
  *           before calling this function to ensure that no memory is leaked.
  */
-export function av_frame_move_ref(dst: AVFrame, src: AVFrame): void {};
+export function av_frame_move_ref(dst: AVFrame, src: AVFrame): void { throw new NotImplemented(); }
 
 /**
  * Allocate new buffer(s) for audio or video data.
@@ -798,7 +782,7 @@ export function av_frame_move_ref(dst: AVFrame, src: AVFrame): void {};
  *
  * @return 0 on success, a negative AVERROR on error.
  */
-export function av_frame_get_buffer(frame: AVFrame, align: number): number {};
+export function av_frame_get_buffer(frame: AVFrame, align: number): number { throw new NotImplemented(); }
 
 /**
  * Check if the frame data is writable.
@@ -812,7 +796,7 @@ export function av_frame_get_buffer(frame: AVFrame, align: number): number {};
  *
  * @see av_frame_make_writable(), av_buffer_is_writable()
  */
-export function av_frame_is_writable(frame: AVFrame): number {};
+export function av_frame_is_writable(frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Ensure that the frame data is writable, avoiding data copy if possible.
@@ -825,7 +809,7 @@ export function av_frame_is_writable(frame: AVFrame): number {};
  * @see av_frame_is_writable(), av_buffer_is_writable(),
  * av_buffer_make_writable()
  */
-export function av_frame_make_writable(frame: AVFrame): number {};
+export function av_frame_make_writable(frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Copy the frame data from src to dst.
@@ -838,7 +822,7 @@ export function av_frame_make_writable(frame: AVFrame): number {};
  *
  * @return >= 0 on success, a negative AVERROR on error.
  */
-export function av_frame_copy(dst: AVFrame, src: AVFrame): number {};
+export function av_frame_copy(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Copy only "metadata" fields from src to dst.
@@ -848,7 +832,7 @@ export function av_frame_copy(dst: AVFrame, src: AVFrame): number {};
  * aspect ratio (for video), but not width/height or channel layout.
  * Side data is also copied.
  */
-export function av_frame_copy_props(dst: AVFrame, src: AVFrame): number {};
+export function av_frame_copy_props(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Get the buffer reference a given data plane is stored in.
@@ -858,7 +842,7 @@ export function av_frame_copy_props(dst: AVFrame, src: AVFrame): number {};
  * @return the buffer reference that contains the plane or NULL if the input
  * frame is not valid.
  */
-export function av_frame_get_plane_buffer(frame: AVFrame, plane: number): AVBuffer {};
+export function av_frame_get_plane_buffer(frame: AVFrame, plane: number): AVBuffer { throw new NotImplemented(); }
 
 /**
  * Add a new side data to a frame.
@@ -871,7 +855,7 @@ export function av_frame_get_plane_buffer(frame: AVFrame, plane: number): AVBuff
  */
 export function av_frame_new_side_data(frame: AVFrame,
                                         type: AVFrameSideDataType,
-                                        size: number): AVFrameSideData {};
+                                        size: number): AVFrameSideData { throw new NotImplemented(); }
 
 /**
  * Add a new side data to a frame from an existing AVBufferRef
@@ -887,19 +871,19 @@ export function av_frame_new_side_data(frame: AVFrame,
  */
 export function av_frame_new_side_data_from_buf(frame: AVFrame,
                                                 type: AVFrameSideDataType,
-                                                buf: AVBuffer): AVFrameSideData {};
+                                                buf: AVBuffer): AVFrameSideData { throw new NotImplemented(); }
 
 /**
  * @return a pointer to the side data of a given type on success, NULL if there
  * is no side data with such type in this frame.
  */
 export function av_frame_get_side_data(frame: AVFrame,
-                                        type: AVFrameSideDataType): AVFrameSideData {};
+                                        type: AVFrameSideDataType): AVFrameSideData { throw new NotImplemented(); }
 
 /**
  * Remove and free all side data instances of the given type.
  */
-export function av_frame_remove_side_data(frame: AVFrame, type: AVFrameSideDataType): void {};
+export function av_frame_remove_side_data(frame: AVFrame, type: AVFrameSideDataType): void { throw new NotImplemented(); }
 
 /**
  * Flags for frame cropping.
@@ -931,15 +915,9 @@ export const AV_FRAME_CROP_UNALIGNED     = 1 << 0;
  * @return >= 0 on success, a negative AVERROR on error. If the cropping fields
  * were invalid, AVERROR(ERANGE) is returned, and nothing is changed.
  */
-export function av_frame_apply_cropping(frame: AVFrame, flags: number): number {};
+export function av_frame_apply_cropping(frame: AVFrame, flags: number): number { throw new NotImplemented(); }
 
 /**
  * @return a string identifying the side data type
  */
-export function av_frame_side_data_name(type: AVFrameSideDataType): string {};
-
-/**
- * @}
- */
-
-#endif /* AVUTIL_FRAME_H */
+export function av_frame_side_data_name(type: AVFrameSideDataType): string { throw new NotImplemented(); }

@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { OpaquePtr, Ref } from "../helpers";
+import { OpaquePtr } from "../helpers";
 
 /**
  * @file
@@ -116,6 +116,40 @@ export declare class AVBuffer {
      * than 1 (meaning native code still has a reference to this buffer)
      */
     free();
+
+    /**
+     * Make a writable buffer from this buffer, avoiding a copy. If the buffer
+     * is referenced only once (ie writable is true), then the current instance 
+     * will be returned without further action. If the buffer is referenced multiple 
+     * times, then a copy of this buffer will be made and returned.
+     */
+    makeWritable(): AVBuffer;
+
+    
+    /**
+     * Reallocate a given buffer.
+     *
+     * @param buf  a buffer reference to reallocate. On success, buf will be
+     *             unreferenced and a new reference with the required size will be
+     *             written in its place. On failure buf will be left untouched. *buf
+     *             may be NULL, then a new buffer is allocated.
+     * @param size required new buffer size.
+     * @return 0 on success, a negative AVERROR on failure.
+     *
+     * @note the buffer is actually reallocated with av_realloc() only if it was
+     * initially allocated through av_buffer_realloc(NULL) and there is only one
+     * reference to it (i.e. the one passed to this function). In all other cases
+     * a new buffer is allocated and the data is copied.
+     */
+    realloc(size: number);
+
+    /**
+     * Ensure this buffer refers to the same data as the other buffer. When the 
+     * buffers are already equivalent, do nothing.
+     *
+     * @param other The buffer to share data with
+     */
+    replace(other: AVBuffer);
 }
 
 /**
@@ -123,54 +157,6 @@ export declare class AVBuffer {
  * reference.
  */
 export const AV_BUFFER_FLAG_READONLY = (1 << 0);
-
-/**
- * Create a writable reference from a given buffer reference, avoiding data copy
- * if possible.
- *
- * @param buf buffer reference to make writable. On success, buf is either left
- *            untouched, or it is unreferenced and a new writable AVBufferRef is
- *            written in its place. On failure, buf is left untouched.
- * @return 0 on success, a negative AVERROR on failure.
- */
-export function av_buffer_make_writable(buf: Ref<AVBuffer>): number {};
-
-/**
- * Reallocate a given buffer.
- *
- * @param buf  a buffer reference to reallocate. On success, buf will be
- *             unreferenced and a new reference with the required size will be
- *             written in its place. On failure buf will be left untouched. *buf
- *             may be NULL, then a new buffer is allocated.
- * @param size required new buffer size.
- * @return 0 on success, a negative AVERROR on failure.
- *
- * @note the buffer is actually reallocated with av_realloc() only if it was
- * initially allocated through av_buffer_realloc(NULL) and there is only one
- * reference to it (i.e. the one passed to this function). In all other cases
- * a new buffer is allocated and the data is copied.
- */
-export function av_buffer_realloc(buf: Ref<AVBuffer>, size: number): number {};
-
-/**
- * Ensure dst refers to the same data as src.
- *
- * When *dst is already equivalent to src, do nothing. Otherwise unreference dst
- * and replace it with a new reference to src.
- *
- * @param dst Pointer to either a valid buffer reference or NULL. On success,
- *            this will point to a buffer reference equivalent to src. On
- *            failure, dst will be left untouched.
- * @param src A buffer reference to replace dst with. May be NULL, then this
- *            function is equivalent to av_buffer_unref(dst).
- * @return 0 on success
- *         AVERROR(ENOMEM) on memory allocation failure.
- */
-export function av_buffer_replace(dst: Ref<AVBuffer>, src: AVBuffer): number {};
-
-/**
- * @}
- */
 
 /**
  * @defgroup lavu_bufferpool AVBufferPool
@@ -182,91 +168,23 @@ export function av_buffer_replace(dst: Ref<AVBuffer>, src: AVBuffer): number {};
  * Frequently allocating and freeing large buffers may be slow. AVBufferPool is
  * meant to solve this in cases when the caller needs a set of buffers of the
  * same size (the most obvious use case being buffers for raw video or audio
- * frames).
- *
- * At the beginning, the user must call av_buffer_pool_init() to create the
- * buffer pool. Then whenever a buffer is needed, call av_buffer_pool_get() to
- * get a reference to a new buffer, similar to av_buffer_alloc(). This new
- * reference works in all aspects the same way as the one created by
- * av_buffer_alloc(). However, when the last reference to this buffer is
- * unreferenced, it is returned to the pool instead of being freed and will be
- * reused for subsequent av_buffer_pool_get() calls.
- *
- * When the caller is done with the pool and no longer needs to allocate any new
- * buffers, av_buffer_pool_uninit() must be called to mark the pool as freeable.
- * Once all the buffers are released, it will automatically be freed.
- *
- * Allocating and releasing buffers with this API is thread-safe as long as
- * either the default alloc callback is used, or the user-supplied one is
+ * frames). Allocating and releasing buffers with this API is thread-safe as long 
+ * as either the default alloc callback is used, or the user-supplied one is
  * thread-safe.
  */
+export declare class AVBufferPool {
+    constructor(bufferSize: number, allocator?: (size: number) => AVBuffer);
 
-/**
- * The buffer pool. This structure is opaque and not meant to be accessed
- * directly. It is allocated with av_buffer_pool_init() and freed with
- * av_buffer_pool_uninit().
- */
-export type AVBufferPool = OpaquePtr;
+    /**
+     * Mark the pool as being available for freeing. It will actually be freed only
+     * once all the allocated buffers associated with the pool are released. Thus it
+     * is safe to call this function while some of the allocated buffers are still
+     * in use.
+     */
+    free();
 
-/**
- * Allocate and initialize a buffer pool.
- *
- * @param size size of each buffer in this pool
- * @param alloc a function that will be used to allocate new buffers when the
- * pool is empty. May be NULL, then the default allocator will be used
- * (av_buffer_alloc()).
- * @return newly created buffer pool on success, NULL on error.
- */
-export function av_buffer_pool_init(size: number, alloc: (size: number) => AVBuffer): AVBufferPool {};
-
-/**
- * Allocate and initialize a buffer pool with a more complex allocator.
- *
- * @param size size of each buffer in this pool
- * @param opaque arbitrary user data used by the allocator
- * @param alloc a function that will be used to allocate new buffers when the
- *              pool is empty. May be NULL, then the default allocator will be
- *              used (av_buffer_alloc()).
- * @param pool_free a function that will be called immediately before the pool
- *                  is freed. I.e. after av_buffer_pool_uninit() is called
- *                  by the caller and all the frames are returned to the pool
- *                  and freed. It is intended to uninitialize the user opaque
- *                  data. May be NULL.
- * @return newly created buffer pool on success, NULL on error.
- */
-export function av_buffer_pool_init2(
-    size: number, opaque: OpaquePtr,
-    alloc: (opaque: OpaquePtr, size: number) => AVBuffer,
-    pool_free: (opaque: OpaquePtr) => void
-): AVBufferPool {}
-
-/**
- * Mark the pool as being available for freeing. It will actually be freed only
- * once all the allocated buffers associated with the pool are released. Thus it
- * is safe to call this function while some of the allocated buffers are still
- * in use.
- *
- * @param pool pointer to the pool to be freed. It will be set to NULL.
- */
-export function av_buffer_pool_uninit(pool: Ref<AVBufferPool>) {};
-
-/**
- * Allocate a new AVBuffer, reusing an old buffer from the pool when available.
- * This function may be called simultaneously from multiple threads.
- *
- * @return a reference to the new buffer on success, NULL on error.
- */
-export function av_buffer_pool_get(pool: AVBufferPool): AVBuffer {};
-
-/**
- * Query the original opaque parameter of an allocated buffer in the pool.
- *
- * @param ref a buffer reference to a buffer returned by av_buffer_pool_get.
- * @return the opaque parameter set by the buffer allocator function of the
- *         buffer pool.
- *
- * @note the opaque parameter of ref is used by the buffer pool implementation,
- * therefore you have to use this function to access the original opaque
- * parameter of an allocated buffer.
- */
-export function av_buffer_pool_buffer_get_opaque(ref: AVBuffer): OpaquePtr {};
+    /**
+     * Allocate a new AVBuffer, reusing an old buffer from the pool when available.
+     */
+    get(): AVBuffer;
+}

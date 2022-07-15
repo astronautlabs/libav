@@ -2,7 +2,7 @@
 #include "avutil.h"
 #include "buffer.h"
 
-static Napi::Object nlavu_init(Napi::Env env, Napi::Object exports) {
+Napi::Object nlavu_init(Napi::Env env, Napi::Object exports) {
 
     // avutil.ts
 
@@ -20,4 +20,5 @@ static Napi::Object nlavu_init(Napi::Env env, Napi::Object exports) {
     // buffer.ts
     
     NAVBuffer::Init(env, exports);
+    NAVBufferPool::Init(env, exports);
 }

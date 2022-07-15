@@ -17,7 +17,7 @@
  */
 
 import { AVClass } from "../avutil/log";
-import { OpaquePtr, Out, Ref } from "../helpers";
+import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
 import { AVIODirEntry, AVIOInterruptCB } from "./avio";
 import { AVDictionary } from "../avutil";
 
@@ -126,7 +126,7 @@ export interface URLProtocol {
  * AVERROR code in case of failure
  */
 export function ffurl_alloc(puc: Out<URLContext>, filename: string, flags: number,
-                int_cb: AVIOInterruptCB): number {};
+                int_cb: AVIOInterruptCB): number { throw new NotImplemented(); }
 
 /**
  * Connect an URLContext that has been allocated by ffurl_alloc
@@ -136,7 +136,7 @@ export function ffurl_alloc(puc: Out<URLContext>, filename: string, flags: numbe
  * This parameter will be destroyed and replaced with a dict containing options
  * that were not found. May be NULL.
  */
-export function ffurl_connect(uc: URLContext, options: Ref<AVDictionary>): number {};
+export function ffurl_connect(uc: URLContext, options: Ref<AVDictionary>): number { throw new NotImplemented(); }
 
 /**
  * Create an URLContext for accessing to the resource indicated by
@@ -159,7 +159,7 @@ export function ffurl_connect(uc: URLContext, options: Ref<AVDictionary>): numbe
 export function ffurl_open_whitelist(puc: Out<URLContext>, filename: string, flags: number,
                 int_cb: AVIOInterruptCB, options: Ref<AVDictionary>,
                 whitelist: string, blacklist: string,
-                parent: URLContext): number {};
+                parent: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Accept an URLContext c on an URLContext s
@@ -168,7 +168,7 @@ export function ffurl_open_whitelist(puc: Out<URLContext>, filename: string, fla
  * @param  c client context, must be unallocated.
  * @return >= 0 on success, ff_neterrno() on failure.
  */
-export function ffurl_accept(s: URLContext, c: Out<URLContext>): number {};
+export function ffurl_accept(s: URLContext, c: Out<URLContext>): number { throw new NotImplemented(); }
 
 /**
  * Perform one step of the protocol handshake to accept a new client.
@@ -182,7 +182,7 @@ export function ffurl_accept(s: URLContext, c: Out<URLContext>): number {};
  * @return >= 0 on success or a negative value corresponding
  *         to an AVERROR code on failure
  */
-export function ffurl_handshake(c: URLContext): number {};
+export function ffurl_handshake(c: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Read up to size bytes from the resource accessed by h, and store
@@ -193,7 +193,7 @@ export function ffurl_handshake(c: URLContext): number {};
  * indicates that it is not possible to read more from the accessed
  * resource (except if the value of the size argument is also zero).
  */
-export function ffurl_read(h: URLContext, buf: Buffer, size: number): number {};
+export function ffurl_read(h: URLContext, buf: Buffer, size: number): number { throw new NotImplemented(); }
 
 /**
  * Read as many bytes as possible (up to size), calling the
@@ -202,7 +202,7 @@ export function ffurl_read(h: URLContext, buf: Buffer, size: number): number {};
  * unnecessary, if the return value is < size then it is
  * certain there was either an error or the end of file was reached.
  */
-export function ffurl_read_complete(h: URLContext, buf: Buffer, size: number): number {};
+export function ffurl_read_complete(h: URLContext, buf: Buffer, size: number): number { throw new NotImplemented(); }
 
 /**
  * Write size bytes from buf to the resource accessed by h.
@@ -210,7 +210,7 @@ export function ffurl_read_complete(h: URLContext, buf: Buffer, size: number): n
  * @return the number of bytes actually written, or a negative value
  * corresponding to an AVERROR code in case of failure
  */
-export function ffurl_write(h: URLContext, buf: Buffer, size: number): number {};
+export function ffurl_write(h: URLContext, buf: Buffer, size: number): number { throw new NotImplemented(); }
 
 /**
  * Change the position that will be used by the next read/write
@@ -226,7 +226,7 @@ export function ffurl_write(h: URLContext, buf: Buffer, size: number): number {}
  * the beginning of the file. You can use this feature together with
  * SEEK_CUR to read the current file position.
  */
-export function ffurl_seek(h: URLContext, pos: number, whence: number): number {};
+export function ffurl_seek(h: URLContext, pos: number, whence: number): number { throw new NotImplemented(); }
 
 /**
  * Close the resource accessed by the URLContext h, and free the
@@ -235,15 +235,15 @@ export function ffurl_seek(h: URLContext, pos: number, whence: number): number {
  * @return a negative value if an error condition occurred, 0
  * otherwise
  */
-export function ffurl_closep(h: Out<URLContext>): number {}
-export function ffurl_close(h: URLContext): number {}
+export function ffurl_closep(h: Out<URLContext>): number { throw new NotImplemented(); }
+export function ffurl_close(h: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Return the filesize of the resource accessed by h, AVERROR(ENOSYS)
  * if the operation is not supported by h, or another negative value
  * corresponding to an AVERROR error code in case of failure.
  */
-export function ffurl_size(h: URLContext): number {};
+export function ffurl_size(h: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Return the file descriptor associated with this URL. For RTP, this
@@ -251,21 +251,21 @@ export function ffurl_size(h: URLContext): number {};
  *
  * @return the file descriptor associated with this URL, or <0 on error.
  */
-export function ffurl_get_file_handle(h: URLContext): number {}
+export function ffurl_get_file_handle(h: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Return the file descriptors associated with this URL.
  *
  * @return 0 on success or <0 on error.
  */
-export function ffurl_get_multi_file_handle(h: URLContext, handles: Out<number[]>, numhandles: Out<number>): number {}
+export function ffurl_get_multi_file_handle(h: URLContext, handles: Out<number[]>, numhandles: Out<number>): number { throw new NotImplemented(); }
 
 /**
  * Return the current short seek threshold value for this URL.
  *
  * @return threshold (>0) on success or <=0 on error.
  */
-export function ffurl_get_short_seek(h: URLContext): number {}
+export function ffurl_get_short_seek(h: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Signal the URLContext that we are done reading or writing the stream.
@@ -277,17 +277,17 @@ export function ffurl_get_short_seek(h: URLContext): number {}
  * @return a negative value if an error condition occurred, 0
  * otherwise
  */
-export function ffurl_shutdown(h: URLContext, flags: number): number {}
+export function ffurl_shutdown(h: URLContext, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Check if the user has requested to interrupt a blocking function
  * associated with cb.
  */
-export function ff_check_interrupt(cb: AVIOInterruptCB): number {}
+export function ff_check_interrupt(cb: AVIOInterruptCB): number { throw new NotImplemented(); }
 
 /* udp.c */
-export function ff_udp_set_remote_url(h: URLContext, uri: string): number {}
-export function ff_udp_get_local_port(h: URLContext): number {}
+export function ff_udp_set_remote_url(h: URLContext, uri: string): number { throw new NotImplemented(); }
+export function ff_udp_get_local_port(h: URLContext): number { throw new NotImplemented(); }
 
 /**
  * Assemble a URL string from components. This is the reverse operation
@@ -316,6 +316,7 @@ export function ff_url_join(
     port: number, fmt: string, 
     ...args
 ): number {
+    throw new NotImplemented();
     // @nodeTODO av_printf_format(7, 8)
 };
 
@@ -329,7 +330,7 @@ export function ff_url_join(
  * @param handle_dos_paths handle DOS paths for file or unspecified protocol
  */
 export function ff_make_absolute_url2(buf: Buffer, size: number, base: string,
-                        rel: string, handle_dos_paths: number): number {};
+                        rel: string, handle_dos_paths: number): number { throw new NotImplemented(); }
 
 /**
  * Convert a relative url into an absolute url, given a base url.
@@ -338,16 +339,16 @@ export function ff_make_absolute_url2(buf: Buffer, size: number, base: string,
  * HAVE_DOS_PATHS config variable.
  */
 export function ff_make_absolute_url(buf: Buffer, size: number, base: string,
-                        rel: string): number {};
+                        rel: string): number { throw new NotImplemented(); }
 
 /**
  * Allocate directory entry with default values.
  *
  * @return entry or NULL on error
  */
-export function ff_alloc_dir_entry(): AVIODirEntry {};
+export function ff_alloc_dir_entry(): AVIODirEntry { throw new NotImplemented(); }
 
-export function ff_urlcontext_child_class_iterate(iter: Ref<OpaquePtr>): AVClass {};
+export function ff_urlcontext_child_class_iterate(iter: Ref<OpaquePtr>): AVClass { throw new NotImplemented(); }
 
 /**
  * Construct a list of protocols matching a given whitelist and/or blacklist.
@@ -362,7 +363,7 @@ export function ff_urlcontext_child_class_iterate(iter: Ref<OpaquePtr>): AVClass
  * @return a NULL-terminated array of matching protocols. The array must be
  * freed by the caller.
  */
-export function ffurl_get_protocols(whitelist: string, blacklist: string): Ref<URLProtocol[]> {};
+export function ffurl_get_protocols(whitelist: string, blacklist: string): Ref<URLProtocol[]> { throw new NotImplemented(); }
 
 export interface URLComponents {
     /**< whole URL, for reference */
@@ -419,6 +420,7 @@ export interface URLComponents {
  *          malformed.
  */
 export function ff_url_decompose(uc: URLComponents, url: string, length: number): number {
+    throw new NotImplemented();
     // @nodeTODO: changed this to length
 };
 
@@ -431,7 +433,7 @@ export function ff_url_decompose(uc: URLComponents, url: string, length: number)
  * @param url_dst new url to resource if the operation succeeded
  * @return >=0 on success or negative on error.
  */
-export function ffurl_move(url_src: string, url_dst: string): number {};
+export function ffurl_move(url_src: string, url_dst: string): number { throw new NotImplemented(); }
 
 /**
  * Delete a resource.
@@ -439,4 +441,4 @@ export function ffurl_move(url_src: string, url_dst: string): number {};
  * @param url resource to be deleted.
  * @return >=0 on success or negative on error.
  */
-export function ffurl_delete(url: string): number {};
+export function ffurl_delete(url: string): number { throw new NotImplemented(); }

@@ -18,8 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVRational } from "../avutil";
-import { Ref } from "../helpers";
+import { AVChannelLayout, AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVMediaType, AVRational } from "../avutil";
+import { NotImplemented, Ref } from "../helpers";
+import { AVCodecID } from "./codec_id";
 
 /**
  * @addtogroup lavc_core
@@ -145,25 +146,6 @@ export interface AVCodecParameters {
      * Video only. Number of delayed frames.
      */
     video_delay: number;
- 
-
-    /**
-     * Audio only. The channel layout bitmask. May be 0 if the channel layout is
-     * unknown or unspecified, otherwise the number of bits set must be equal to
-     * the channels field.
-     * @deprecated use ch_layout
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channel_layout: number;
-
-    /**
-     * Audio only. The number of audio channels.
-     * @deprecated use ch_layout.nb_channels
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channels: number;
 
     /**
      * Audio only. The number of audio samples per second.
@@ -211,13 +193,13 @@ export interface AVCodecParameters {
  * (unknown/invalid/0). The returned struct must be freed with
  * avcodec_parameters_free().
  */
-export function avcodec_parameters_alloc(): AVCodecParameters {};
+export function avcodec_parameters_alloc(): AVCodecParameters { throw new NotImplemented(); }
  
 /**
  * Free an AVCodecParameters instance and everything associated with it and
  * write NULL to the supplied pointer.
  */
-export function avcodec_parameters_free(par: Ref<AVCodecParameters>): void {};
+export function avcodec_parameters_free(par: Ref<AVCodecParameters>): void { throw new NotImplemented(); }
  
 /**
  * Copy the contents of src to dst. Any allocated fields in dst are freed and
@@ -225,13 +207,13 @@ export function avcodec_parameters_free(par: Ref<AVCodecParameters>): void {};
  *
  * @return >= 0 on success, a negative AVERROR code on failure.
  */
-export function avcodec_parameters_copy(dst: AVCodecParameters, src: AVCodecParameters): number {};
+export function avcodec_parameters_copy(dst: AVCodecParameters, src: AVCodecParameters): number { throw new NotImplemented(); }
  
 /**
  * This function is the same as av_get_audio_frame_duration(), except it works
  * with AVCodecParameters instead of an AVCodecContext.
  */
-export function av_get_audio_frame_duration2(par: AVCodecParameters, frame_bytes: number): number {};
+export function av_get_audio_frame_duration2(par: AVCodecParameters, frame_bytes: number): number { throw new NotImplemented(); }
  
 /**
  * @}

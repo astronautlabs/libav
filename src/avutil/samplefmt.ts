@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { Out, Ref } from "../helpers"
+import { NotImplemented, Out, Ref } from "../helpers"
 
 /**
  * @addtogroup lavu_audio
@@ -72,13 +72,13 @@ export enum AVSampleFormat {
  * Return the name of sample_fmt, or NULL if sample_fmt is not
  * recognized.
  */
-export function av_get_sample_fmt_name(sample_fmt: AVSampleFormat): string {};
+export function av_get_sample_fmt_name(sample_fmt: AVSampleFormat): string { throw new NotImplemented(); }
 
 /**
  * Return a sample format corresponding to name, or AV_SAMPLE_FMT_NONE
  * on error.
  */
-export function av_get_sample_fmt(name: string): AVSampleFormat {};
+export function av_get_sample_fmt(name: string): AVSampleFormat { throw new NotImplemented(); }
 
 /**
  * Return the planar<->packed alternative form of the given sample format, or
@@ -86,7 +86,7 @@ export function av_get_sample_fmt(name: string): AVSampleFormat {};
  * requested planar/packed format, the format returned is the same as the
  * input.
  */
-export function av_get_alt_sample_fmt(sample_fmt: AVSampleFormat, planar: number): AVSampleFormat {};
+export function av_get_alt_sample_fmt(sample_fmt: AVSampleFormat, planar: number): AVSampleFormat { throw new NotImplemented(); }
 
 /**
  * Get the packed alternative form of the given sample format.
@@ -97,7 +97,7 @@ export function av_get_alt_sample_fmt(sample_fmt: AVSampleFormat, planar: number
  * @return  the packed alternative form of the given sample format or
          AV_SAMPLE_FMT_NONE on error.
 */
-export function av_get_packed_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFormat {};
+export function av_get_packed_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFormat { throw new NotImplemented(); }
 
 /**
  * Get the planar alternative form of the given sample format.
@@ -108,7 +108,7 @@ export function av_get_packed_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFo
  * @return  the planar alternative form of the given sample format or
          AV_SAMPLE_FMT_NONE on error.
 */
-export function av_get_planar_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFormat {};
+export function av_get_planar_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFormat { throw new NotImplemented(); }
 
 /**
  * Generate a string corresponding to the sample format with
@@ -122,7 +122,7 @@ export function av_get_planar_sample_fmt(sample_fmt: AVSampleFormat): AVSampleFo
  * @return the pointer to the filled buffer or NULL if sample_fmt is
  * unknown or in case of other errors
  */
-export function av_get_sample_fmt_string(buf: Ref<string>, buf_size: number, sample_fmt: AVSampleFormat): string {};
+export function av_get_sample_fmt_string(buf: Ref<string>, buf_size: number, sample_fmt: AVSampleFormat): string { throw new NotImplemented(); }
 
 /**
  * Return number of bytes per sample.
@@ -131,7 +131,7 @@ export function av_get_sample_fmt_string(buf: Ref<string>, buf_size: number, sam
  * @return number of bytes per sample or zero if unknown for the given
  * sample format
  */
-export function av_get_bytes_per_sample(sample_fmt: AVSampleFormat): number {};
+export function av_get_bytes_per_sample(sample_fmt: AVSampleFormat): number { throw new NotImplemented(); }
 
 /**
  * Check if the sample format is planar.
@@ -139,7 +139,7 @@ export function av_get_bytes_per_sample(sample_fmt: AVSampleFormat): number {};
  * @param sample_fmt the sample format to inspect
  * @return 1 if the sample format is planar, 0 if it is interleaved
  */
-export function av_sample_fmt_is_planar(sample_fmt: AVSampleFormat): number {};
+export function av_sample_fmt_is_planar(sample_fmt: AVSampleFormat): number { throw new NotImplemented(); }
 
 /**
  * Get the required buffer size for the given audio parameters.
@@ -152,7 +152,7 @@ export function av_sample_fmt_is_planar(sample_fmt: AVSampleFormat): number {};
  * @return              required buffer size, or negative error code on failure
  */
 export function av_samples_get_buffer_size(linesize: Out<number>, nb_channels: number, nb_samples: number,
-                            sample_fmt: AVSampleFormat, align: number): number {};
+                            sample_fmt: AVSampleFormat, align: number): number { throw new NotImplemented(); }
 
 /**
  * @}
@@ -195,7 +195,7 @@ export function av_samples_get_buffer_size(linesize: Out<number>, nb_channels: n
 export function av_samples_fill_arrays(audio_data: Ref<Buffer[]>, linesize: Out<number>,
                         buf: Buffer,
                         nb_channels: number, nb_samples: number,
-                        sample_fmt: AVSampleFormat, align: number): number {};
+                        sample_fmt: AVSampleFormat, align: number): number { throw new NotImplemented(); }
 
 /**
  * Allocate a samples buffer for nb_samples samples, and fill data pointers and
@@ -217,7 +217,7 @@ export function av_samples_fill_arrays(audio_data: Ref<Buffer[]>, linesize: Out<
  * @see av_samples_alloc_array_and_samples()
  */
 export function av_samples_alloc(audio_data: Ref<Buffer[]>, linesize: Out<number>, nb_channels: number,
-                    nb_samples: number, sample_fmt: AVSampleFormat, align: number): number {};
+                    nb_samples: number, sample_fmt: AVSampleFormat, align: number): number { throw new NotImplemented(); }
 
 /**
  * Allocate a data pointers array, samples buffer for nb_samples
@@ -229,7 +229,7 @@ export function av_samples_alloc(audio_data: Ref<Buffer[]>, linesize: Out<number
  * @see av_samples_alloc()
  */
 export function av_samples_alloc_array_and_samples(audio_data: Out<Buffer[]>, linesize: Out<number>, nb_channels: number,
-                                    nb_samples: number, sample_fmt: AVSampleFormat, align: number): number {};
+                                    nb_samples: number, sample_fmt: AVSampleFormat, align: number): number { throw new NotImplemented(); }
 
 /**
  * Copy samples from src to dst.
@@ -244,7 +244,7 @@ export function av_samples_alloc_array_and_samples(audio_data: Out<Buffer[]>, li
  */
 export function av_samples_copy(dst: Ref<Buffer[]>, src: Buffer[], dst_offset: number,
                     src_offset: number, nb_samples: number, nb_channels: number,
-                    sample_fmt: AVSampleFormat): number {};
+                    sample_fmt: AVSampleFormat): number { throw new NotImplemented(); }
 
 /**
  * Fill an audio buffer with silence.
@@ -256,7 +256,7 @@ export function av_samples_copy(dst: Ref<Buffer[]>, src: Buffer[], dst_offset: n
  * @param sample_fmt  audio sample format
  */
 export function av_samples_set_silence(audio_data: Buffer[], offset: number, nb_samples: number,
-                        nb_channels: number, sample_fmt: AVSampleFormat): number {};
+                        nb_channels: number, sample_fmt: AVSampleFormat): number { throw new NotImplemented(); }
 
 /**
  * @}

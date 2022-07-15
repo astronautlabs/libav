@@ -19,7 +19,7 @@
  */
 
 import { AVClass, AVDictionary } from "../avutil";
-import { OpaquePtr, Out, Ref } from "../helpers";
+import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
 import { URLContext } from "./url";
 
  
@@ -339,7 +339,7 @@ export interface AVIOContext {
  *
  * @return Name of the protocol or NULL.
  */
-export function avio_find_protocol_name(url: string): string {};
+export function avio_find_protocol_name(url: string): string { throw new NotImplemented(); }
  
 /**
  * Return AVIO_FLAG_* access flags corresponding to the access permissions
@@ -353,7 +353,7 @@ export function avio_find_protocol_name(url: string): string {};
  * unless you are sure that no other processes are accessing the
  * checked resource.
  */
-export function avio_check(url: string, flags: number): number {};
+export function avio_check(url: string, flags: number): number { throw new NotImplemented(); }
  
 /**
  * Open directory for reading.
@@ -365,7 +365,7 @@ export function avio_check(url: string, flags: number): number {};
  *                containing options that were not found. May be NULL.
  * @return >=0 on success or negative on error.
  */
-export function avio_open_dir(s: Out<AVIODirContext>, url: string, options: Ref<AVDictionary>): number {};
+export function avio_open_dir(s: Out<AVIODirContext>, url: string, options: Ref<AVDictionary>): number { throw new NotImplemented(); }
  
 /**
  * Get next directory entry.
@@ -378,7 +378,7 @@ export function avio_open_dir(s: Out<AVIODirContext>, url: string, options: Ref<
  * @return >=0 on success or negative on error. End of list is not considered an
  *             error.
  */
-export function avio_read_dir(s: AVIODirContext, next: Out<AVIODirEntry>): number {};
+export function avio_read_dir(s: AVIODirContext, next: Out<AVIODirEntry>): number { throw new NotImplemented(); }
  
 /**
  * Close directory.
@@ -389,14 +389,14 @@ export function avio_read_dir(s: AVIODirContext, next: Out<AVIODirEntry>): numbe
  * @param s         directory read context.
  * @return >=0 on success or negative on error.
  */
-export function avio_close_dir(s: Ref<AVIODirContext>): number {};
+export function avio_close_dir(s: Ref<AVIODirContext>): number { throw new NotImplemented(); }
  
 /**
  * Free entry allocated by avio_read_dir().
  *
  * @param entry entry to be freed.
  */
-export function avio_free_directory_entry(entry: Ref<AVIODirEntry>) {};
+export function avio_free_directory_entry(entry: Ref<AVIODirEntry>) { throw new NotImplemented(); }
  
 /**
  * Allocate and initialize an AVIOContext for buffered I/O. It must be later
@@ -429,7 +429,7 @@ export function avio_alloc_context(
                   read_packet: (opaque: OpaquePtr, buf: Buffer, buf_size: number) => number,
                   write_packet: (opaque: OpaquePtr, buf: Buffer, buf_size: number) => number,
                   seek: (opaque: OpaquePtr, offset: number, whence: number) => number
-): AVIOContext {};
+): AVIOContext { throw new NotImplemented(); }
  
 /**
  * Free the supplied IO context and everything associated with it.
@@ -453,7 +453,7 @@ export function avio_wb16(s: AVIOContext, val: number) {}
  * Write a NULL-terminated string.
  * @return number of bytes written.
  */
-export function avio_put_str(s: AVIOContext, str: string) {};
+export function avio_put_str(s: AVIOContext, str: string) { throw new NotImplemented(); }
  
 /**
  * Convert an UTF-8 string to UTF-16LE and write it.
@@ -462,7 +462,7 @@ export function avio_put_str(s: AVIOContext, str: string) {};
  *
  * @return number of bytes written.
  */
-export function avio_put_str16le(s: AVIOContext, str: string): number {};
+export function avio_put_str16le(s: AVIOContext, str: string): number { throw new NotImplemented(); }
  
 /**
  * Convert an UTF-8 string to UTF-16BE and write it.
@@ -471,7 +471,7 @@ export function avio_put_str16le(s: AVIOContext, str: string): number {};
  *
  * @return number of bytes written.
  */
-export function avio_put_str16be(s: AVIOContext, str: string): number {};
+export function avio_put_str16be(s: AVIOContext, str: string): number { throw new NotImplemented(); }
  
 /**
  * Mark the written bytestream as a specific type.
@@ -483,7 +483,7 @@ export function avio_put_str16be(s: AVIOContext, str: string): number {};
  *             applicable
  * @param type the kind of data written starting at the current pos
  */
-export function avio_write_marker(s: AVIOContext, time: number, type: AVIODataMarkerType) {};
+export function avio_write_marker(s: AVIOContext, time: number, type: AVIODataMarkerType) { throw new NotImplemented(); }
  
 /**
  * ORing this as the "whence" parameter to a seek function causes it to
@@ -504,13 +504,13 @@ export const AVSEEK_FORCE = 0x20000;
  * fseek() equivalent for AVIOContext.
  * @return new position or AVERROR.
  */
-export function avio_seek(s: AVIOContext, offset: number, whence: number): number {};
+export function avio_seek(s: AVIOContext, offset: number, whence: number): number { throw new NotImplemented(); }
  
 /**
  * Skip given number of bytes forward
  * @return new position or AVERROR.
  */
-export function avio_skip(s: AVIOContext, offset: number): number {};
+export function avio_skip(s: AVIOContext, offset: number): number { throw new NotImplemented(); }
  
 /**
  * ftell() equivalent for AVIOContext.
@@ -518,39 +518,39 @@ export function avio_skip(s: AVIOContext, offset: number): number {};
  */
 export function avio_tell(s: AVIOContext): number
 {
-    return avio_seek(s, 0, SEEK_CUR);
+    return avio_seek(s, 0, 1/*SEEK_CUR*/);
 }
  
 /**
  * Get the filesize.
  * @return filesize or AVERROR
  */
-export function avio_size(s: AVIOContext): number {};
+export function avio_size(s: AVIOContext): number { throw new NotImplemented(); }
  
 /**
  * Similar to feof() but also returns nonzero on read errors.
  * @return non zero if and only if at end of file or a read error happened when reading.
  */
-export function avio_feof(s: AVIOContext): number {};
+export function avio_feof(s: AVIOContext): number { throw new NotImplemented(); }
  
 /**
  * Writes a formatted string to the context taking a va_list.
  * @return number of bytes written, < 0 on error.
  */
-export function avio_vprintf(s: AVIOContext, fmt: string, ...ap): number {};
+export function avio_vprintf(s: AVIOContext, fmt: string, ...ap): number { throw new NotImplemented(); }
  
 /**
  * Writes a formatted string to the context.
  * @return number of bytes written, < 0 on error.
  */
-export function avio_printf(s: AVIOContext, fmt: string, ...args): number {};
+export function avio_printf(s: AVIOContext, fmt: string, ...args): number { throw new NotImplemented(); }
  
 /**
  * Write a NULL terminated array of strings to the context.
  * Usually you don't need to use this function directly but its macro wrapper,
  * avio_print.
  */
-export function avio_print_string_array(s: AVIOContext, strings: string[]) {};
+export function avio_print_string_array(s: AVIOContext, strings: string[]) { throw new NotImplemented(); }
  
 /**
  * Write strings (const char *) to the context.
@@ -573,13 +573,13 @@ export function avio_print(s, ...args) {
  * reported file position to that of the underlying stream. This does not
  * read new data, and does not perform any seeks.
  */
-export function avio_flush(s: AVIOContext) {};
+export function avio_flush(s: AVIOContext) { throw new NotImplemented(); }
  
 /**
  * Read size bytes from AVIOContext into buf.
  * @return number of bytes read or AVERROR
  */
-export function avio_read(s: AVIOContext, buf: Buffer, size: number): number {};
+export function avio_read(s: AVIOContext, buf: Buffer, size: number): number { throw new NotImplemented(); }
  
 /**
  * Read size bytes from AVIOContext into buf. Unlike avio_read(), this is allowed
@@ -588,7 +588,7 @@ export function avio_read(s: AVIOContext, buf: Buffer, size: number): number {};
  * Useful to reduce latency in certain cases.
  * @return number of bytes read or AVERROR
  */
-export function avio_read_partial(s: AVIOContext, buf: Buffer, size: number): number {};
+export function avio_read_partial(s: AVIOContext, buf: Buffer, size: number): number { throw new NotImplemented(); }
  
 /**
  * @name Functions for reading from AVIOContext
@@ -597,15 +597,15 @@ export function avio_read_partial(s: AVIOContext, buf: Buffer, size: number): nu
  * @note return 0 if EOF, so you cannot use it if EOF handling is
  *       necessary
  */
-export function avio_r8  (s: AVIOContext): number {}
-export function avio_rl16(s: AVIOContext): number {}
-export function avio_rl24(s: AVIOContext): number {}
-export function avio_rl32(s: AVIOContext): number {}
-export function avio_rl64(s: AVIOContext): number {}
-export function avio_rb16(s: AVIOContext): number {}
-export function avio_rb24(s: AVIOContext): number {}
-export function avio_rb32(s: AVIOContext): number {}
-export function avio_rb64(s: AVIOContext): number {}
+export function avio_r8  (s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rl16(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rl24(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rl32(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rl64(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rb16(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rb24(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rb32(s: AVIOContext): number { throw new NotImplemented(); }
+export function avio_rb64(s: AVIOContext): number { throw new NotImplemented(); }
 
 /**
  * @}
@@ -623,7 +623,7 @@ export function avio_rb64(s: AVIOContext): number {}
  * If reading ends on EOF or error, the return value will be one more than
  * bytes actually read.
  */
-export function avio_get_str(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number {};
+export function avio_get_str(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number { throw new NotImplemented(); }
  
 /**
  * Read a UTF-16 string from pb and convert it to UTF-8.
@@ -631,8 +631,8 @@ export function avio_get_str(pb: AVIOContext, maxlen: number, buf: Buffer, bufle
  * encountered or maxlen bytes have been read.
  * @return number of bytes read (is always <= maxlen)
  */
-export function avio_get_str16le(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number {};
-export function avio_get_str16be(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number {};
+export function avio_get_str16le(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number { throw new NotImplemented(); }
+export function avio_get_str16be(pb: AVIOContext, maxlen: number, buf: Buffer, buflen: number): number { throw new NotImplemented(); }
  
  
 /**
@@ -691,7 +691,7 @@ export const AVIO_FLAG_DIRECT = 0x8000
  * @return >= 0 in case of success, a negative value corresponding to an
  * AVERROR code in case of failure
  */
-export function avio_open(s: Out<AVIOContext>, url: string, flags: number): number {};
+export function avio_open(s: Out<AVIOContext>, url: string, flags: number): number { throw new NotImplemented(); }
  
 /**
  * Create and initialize a AVIOContext for accessing the
@@ -712,7 +712,7 @@ export function avio_open(s: Out<AVIOContext>, url: string, flags: number): numb
  * AVERROR code in case of failure
  */
 export function avio_open2(s: Out<AVIOContext>, url: string, flags: number,
-               int_cb: AVIOInterruptCB, options: Ref<AVDictionary>): number {};
+               int_cb: AVIOInterruptCB, options: Ref<AVDictionary>): number { throw new NotImplemented(); }
  
 /**
  * Close the resource accessed by the AVIOContext s and free it.
@@ -724,7 +724,7 @@ export function avio_open2(s: Out<AVIOContext>, url: string, flags: number,
  * @return 0 on success, an AVERROR < 0 on error.
  * @see avio_closep
  */
-export function avio_close(s: AVIOContext): number {};
+export function avio_close(s: AVIOContext): number { throw new NotImplemented(); }
  
 /**
  * Close the resource accessed by the AVIOContext *s, free it
@@ -737,7 +737,7 @@ export function avio_close(s: AVIOContext): number {};
  * @return 0 on success, an AVERROR < 0 on error.
  * @see avio_close
  */
-export function avio_closep(s: Out<AVIOContext>): number {};
+export function avio_closep(s: Out<AVIOContext>): number { throw new NotImplemented(); }
  
  
 /**
@@ -746,7 +746,7 @@ export function avio_closep(s: Out<AVIOContext>): number {};
  * @param s new IO context
  * @return zero if no error.
  */
-export function avio_open_dyn_buf(s: Out<AVIOContext>): number {};
+export function avio_open_dyn_buf(s: Out<AVIOContext>): number { throw new NotImplemented(); }
  
 /**
  * Return the written size and a pointer to the buffer.
@@ -758,7 +758,7 @@ export function avio_open_dyn_buf(s: Out<AVIOContext>): number {};
  * @param pbuffer pointer to a byte buffer
  * @return the length of the byte buffer
  */
-export function avio_get_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number {};
+export function avio_get_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number { throw new NotImplemented(); }
  
 /**
  * Return the written size and a pointer to the buffer. The buffer
@@ -769,7 +769,7 @@ export function avio_get_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number {
  * @param pbuffer pointer to a byte buffer
  * @return the length of the byte buffer
  */
-export function avio_close_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number {};
+export function avio_close_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number { throw new NotImplemented(); }
  
 /**
  * Iterate through names of available protocols.
@@ -782,14 +782,14 @@ export function avio_close_dyn_buf(s: AVIOContext, pbuffer: Out<Buffer>): number
  *
  * @return A static string containing the name of current protocol or NULL
  */
-export function avio_enum_protocols(opaque: Ref<OpaquePtr>, output: number): string {};
+export function avio_enum_protocols(opaque: Ref<OpaquePtr>, output: number): string { throw new NotImplemented(); }
  
 /**
  * Get AVClass by names of available protocols.
  *
  * @return A AVClass of input protocol name or NULL
  */
-export function avio_protocol_get_class(name: string): AVClass {};
+export function avio_protocol_get_class(name: string): AVClass { throw new NotImplemented(); }
  
 /**
  * Pause and resume playing - only meaningful if using a network streaming
@@ -798,7 +798,7 @@ export function avio_protocol_get_class(name: string): AVClass {};
  * @param h     IO context from which to call the read_pause function pointer
  * @param pause 1 for pause, 0 for resume
  */
-export function avio_pause(h: AVIOContext, pause: number): number {};
+export function avio_pause(h: AVIOContext, pause: number): number { throw new NotImplemented(); }
  
 /**
  * Seek to a given timestamp relative to some component stream.
@@ -820,7 +820,7 @@ export function avio_pause(h: AVIOContext, pause: number): number {};
  * @see AVInputFormat::read_seek
  */
 export function avio_seek_time(h: AVIOContext, stream_index: number,
-                       timestamp: number, flags: number): number {};
+                       timestamp: number, flags: number): number { throw new NotImplemented(); }
  
 /* Avoid a warning. The header can not be included because it breaks c++. */
 export type AVBPrint = OpaquePtr; // @nodeTODO 
@@ -831,7 +831,7 @@ export type AVBPrint = OpaquePtr; // @nodeTODO
  * @return 0 for success (max_size bytes read or EOF reached), negative error
  * code otherwise
  */
-export function avio_read_to_bprint(h: AVIOContext, pb: AVBPrint, max_size: number): number {};
+export function avio_read_to_bprint(h: AVIOContext, pb: AVBPrint, max_size: number): number { throw new NotImplemented(); }
  
 /**
  * Accept and allocate a client context on a server context.
@@ -840,7 +840,7 @@ export function avio_read_to_bprint(h: AVIOContext, pb: AVBPrint, max_size: numb
  * @return   >= 0 on success or a negative value corresponding
  *           to an AVERROR on failure
  */
-export function avio_accept(s: AVIOContext, c: Out<AVIOContext>): number {};
+export function avio_accept(s: AVIOContext, c: Out<AVIOContext>): number { throw new NotImplemented(); }
  
 /**
  * Perform one step of the protocol handshake to accept a new client.
@@ -861,4 +861,4 @@ export function avio_accept(s: AVIOContext, c: Out<AVIOContext>): number {};
  *           > 0 if the handshake progressed, but is not complete
  *           < 0 for an AVERROR code
  */
-export function avio_handshake(c: AVIOContext): number {}
+export function avio_handshake(c: AVIOContext): number { throw new NotImplemented(); }

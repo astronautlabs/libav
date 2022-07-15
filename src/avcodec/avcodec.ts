@@ -18,11 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVBuffer, AVChromaLocation, AVClass, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVFrame, AVRational, AVSampleFormat } from "../avutil";
+import { AVBuffer, AVChannelLayout, AVChromaLocation, AVClass, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVDictionary, AVFrame, AVMediaType, AVRational, AVSampleFormat } from "../avutil";
 import { AVPixelFormat } from "../avutil";
-import { OpaquePtr, Out, Ref } from "../helpers";
-import { AVFieldOrder } from "./codec-par";
+import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
+import { AVCodec } from "./codec";
+import { AVCodecDescriptor } from "./codec-desc";
+import { AVCodecParameters, AVFieldOrder } from "./codec-par";
+import { AVCodecID } from "./codec_id";
 import { AVAudioServiceType, AVDiscard } from "./defs";
+import { AVPacket, AVPacketSideData } from "./packet";
 
 /**
  * @file
@@ -1238,15 +1242,6 @@ export interface AVCodecContext {
      */
     sample_rate: number;
 
-
-    /**
-     * number of audio channels
-     * @deprecated use ch_layout.nb_channels
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channels: number;
-
     /**
      * audio sample format
      * - encoding: Set by user.
@@ -1289,27 +1284,6 @@ export interface AVCodecContext {
      * - decoding: unused
      */
     cutoff: number;
-
-
-    /**
-     * Audio channel layout.
-     * - encoding: set by user.
-     * - decoding: set by user, may be overwritten by libavcodec.
-     * @deprecated use ch_layout
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    channel_layout: number;
-
-    /**
-     * Request decoder to use this channel layout if it can (0 for default)
-     * - encoding: unused
-     * - decoding: Set by user.
-     * @deprecated use "downmix" codec private option
-     * @if FF_API_OLD_CHANNEL_LAYOUT
-     * @attribute_deprecated
-     */
-    request_channel_layout: number;
 
     /**
      * Type of service that the audio stream conveys.
@@ -2367,17 +2341,17 @@ export interface AVSubtitle {
 /**
  * Return the LIBAVCODEC_VERSION_INT constant.
  */
-export function avcodec_version(): number {};
+export function avcodec_version(): number { throw new NotImplemented(); }
 
 /**
  * Return the libavcodec build-time configuration.
  */
-export function avcodec_configuration(): string {};
+export function avcodec_configuration(): string { throw new NotImplemented(); }
 
 /**
  * Return the libavcodec license.
  */
-export function avcodec_license(): string {};
+export function avcodec_license(): string { throw new NotImplemented(); }
 
 /**
  * Allocate an AVCodecContext and set its fields to default values. The
@@ -2392,13 +2366,13 @@ export function avcodec_license(): string {};
  *
  * @return An AVCodecContext filled with default values or NULL on failure.
  */
-export function avcodec_alloc_context3(codec: AVCodec): AVCodecContext {};
+export function avcodec_alloc_context3(codec: AVCodec): AVCodecContext { throw new NotImplemented(); }
 
 /**
  * Free the codec context and everything associated with it and write NULL to
  * the provided pointer.
  */
-export function avcodec_free_context(avctx: Ref<AVCodecContext>): void {};
+export function avcodec_free_context(avctx: Ref<AVCodecContext>): void { throw new NotImplemented(); }
 
 /**
  * Get the AVClass for AVCodecContext. It can be used in combination with
@@ -2406,7 +2380,7 @@ export function avcodec_free_context(avctx: Ref<AVCodecContext>): void {};
  *
  * @see av_opt_find().
  */
-export function avcodec_get_class(): AVClass {};
+export function avcodec_get_class(): AVClass { throw new NotImplemented(); }
 
 
 /**
@@ -2414,7 +2388,7 @@ export function avcodec_get_class(): AVClass {};
  * @if FF_API_GET_FRAME_CLASS
  * @attribute_deprecated
  */
-export function avcodec_get_frame_class(): AVClass {};
+export function avcodec_get_frame_class(): AVClass { throw new NotImplemented(); }
 
 /**
  * Get the AVClass for AVSubtitleRect. It can be used in combination with
@@ -2422,7 +2396,7 @@ export function avcodec_get_frame_class(): AVClass {};
  *
  * @see av_opt_find().
  */
-export function avcodec_get_subtitle_rect_class(): AVClass {};
+export function avcodec_get_subtitle_rect_class(): AVClass { throw new NotImplemented(); }
 
 /**
  * Fill the parameters struct based on the values from the supplied codec
@@ -2432,7 +2406,7 @@ export function avcodec_get_subtitle_rect_class(): AVClass {};
  * @return >= 0 on success, a negative AVERROR code on failure
  */
 export function avcodec_parameters_from_context(par: AVCodecParameters,
-                                    codec: AVCodecContext): number {};
+                                    codec: AVCodecContext): number { throw new NotImplemented(); }
 
 /**
  * Fill the codec context based on the values from the supplied codec
@@ -2443,7 +2417,7 @@ export function avcodec_parameters_from_context(par: AVCodecParameters,
  * @return >= 0 on success, a negative AVERROR code on failure.
  */
 export function avcodec_parameters_to_context(codec: AVCodecContext,
-                                par: AVCodecParameters): number {};
+                                par: AVCodecParameters): number { throw new NotImplemented(); }
 
 /**
  * Initialize the AVCodecContext to use the given AVCodec. Prior to using this
@@ -2480,7 +2454,7 @@ export function avcodec_parameters_to_context(codec: AVCodecContext,
  * @see avcodec_alloc_context3(), avcodec_find_decoder(), avcodec_find_encoder(),
  *      av_dict_set(), av_opt_find().
  */
-export function avcodec_open2(avctx: AVCodecContext, codec: AVCodec, options: Ref<AVDictionary>): number {};
+export function avcodec_open2(avctx: AVCodecContext, codec: AVCodec, options: Ref<AVDictionary>): number { throw new NotImplemented(); }
 
 /**
  * Close a given AVCodecContext and free all the data associated with it
@@ -2495,14 +2469,14 @@ export function avcodec_open2(avctx: AVCodecContext, codec: AVCodec, options: Re
  * multiple times is not supported anymore -- use multiple codec contexts
  * instead.
  */
-export function avcodec_close(avctx: AVCodecContext): number {};
+export function avcodec_close(avctx: AVCodecContext): number { throw new NotImplemented(); }
 
 /**
  * Free all allocated data in the given subtitle struct.
  *
  * @param sub AVSubtitle to free.
  */
-export function avsubtitle_free(sub: AVSubtitle): void {};
+export function avsubtitle_free(sub: AVSubtitle): void { throw new NotImplemented(); }
 
 /**
  * @}
@@ -2518,14 +2492,14 @@ export function avsubtitle_free(sub: AVSubtitle): void {};
  * it can be called by custom get_buffer2() implementations for decoders without
  * AV_CODEC_CAP_DR1 set.
  */
-export function avcodec_default_get_buffer2(s: AVCodecContext, frame: AVFrame, flags: number): number {};
+export function avcodec_default_get_buffer2(s: AVCodecContext, frame: AVFrame, flags: number): number { throw new NotImplemented(); }
 
 /**
  * The default callback for AVCodecContext.get_encode_buffer(). It is made public so
  * it can be called by custom get_encode_buffer() implementations for encoders without
  * AV_CODEC_CAP_DR1 set.
  */
-export function avcodec_default_get_encode_buffer(s: AVCodecContext, pkt: AVPacket, flags: number): number {};
+export function avcodec_default_get_encode_buffer(s: AVCodecContext, pkt: AVPacket, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Modify width and height values so that they will result in a memory
@@ -2534,7 +2508,7 @@ export function avcodec_default_get_encode_buffer(s: AVCodecContext, pkt: AVPack
  *
  * May only be used if a codec with AV_CODEC_CAP_DR1 has been opened.
  */
-export function avcodec_align_dimensions(s: AVCodecContext, width: Ref<number>, height: Ref<number>): void {};
+export function avcodec_align_dimensions(s: AVCodecContext, width: Ref<number>, height: Ref<number>): void { throw new NotImplemented(); }
 
 /**
  * Modify width and height values so that they will result in a memory
@@ -2545,7 +2519,7 @@ export function avcodec_align_dimensions(s: AVCodecContext, width: Ref<number>, 
  * @param linesize_align Note: size is AV_NUM_DATA_POINTERS
  */
 export function avcodec_align_dimensions2(s: AVCodecContext, width: Ref<number>, height: Ref<number>,
-                            linesize_align: number[]): void {};
+                            linesize_align: number[]): void { throw new NotImplemented(); }
 
 /**
  * Converts AVChromaLocation to swscale x/y chroma position.
@@ -2556,7 +2530,7 @@ export function avcodec_align_dimensions2(s: AVCodecContext, width: Ref<number>,
  * @param xpos  horizontal chroma sample position
  * @param ypos  vertical   chroma sample position
  */
-export function avcodec_enum_to_chroma_pos(xpos: Ref<number>, ypos: Ref<number>, pos: AVChromaLocation): number {};
+export function avcodec_enum_to_chroma_pos(xpos: Ref<number>, ypos: Ref<number>, pos: AVChromaLocation): number { throw new NotImplemented(); }
 
 /**
  * Converts swscale x/y chroma position to AVChromaLocation.
@@ -2567,7 +2541,7 @@ export function avcodec_enum_to_chroma_pos(xpos: Ref<number>, ypos: Ref<number>,
  * @param xpos  horizontal chroma sample position
  * @param ypos  vertical   chroma sample position
  */
-export function avcodec_chroma_pos_to_enum(xpos: number, ypos: number): AVChromaLocation {};
+export function avcodec_chroma_pos_to_enum(xpos: number, ypos: number): AVChromaLocation { throw new NotImplemented(); }
 
 /**
  * Decode a subtitle message.
@@ -2598,7 +2572,7 @@ export function avcodec_chroma_pos_to_enum(xpos: number, ypos: number): AVChroma
  */
 export function avcodec_decode_subtitle2(avctx: AVCodecContext, sub: AVSubtitle,
                             got_sub_ptr: Ref<number>,
-                            avpkt: AVPacket): number {};
+                            avpkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Supply raw packet data as input to a decoder.
@@ -2646,7 +2620,7 @@ export function avcodec_decode_subtitle2(avctx: AVCodecContext, sub: AVSubtitle,
  *      AVERROR(ENOMEM):   failed to add packet to internal queue, or similar
  *      other errors: legitimate decoding errors
  */
-export function avcodec_send_packet(avctx: AVCodecContext, avpkt: AVPacket): number {};
+export function avcodec_send_packet(avctx: AVCodecContext, avpkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Return decoded output data from a decoder.
@@ -2669,7 +2643,7 @@ export function avcodec_send_packet(avctx: AVCodecContext, avpkt: AVPacket): num
  *                               when flag AV_CODEC_FLAG_DROPCHANGED is set.
  *      other negative values: legitimate decoding errors
  */
-export function avcodec_receive_frame(avctx: AVCodecContext, frame: AVFrame): number {};
+export function avcodec_receive_frame(avctx: AVCodecContext, frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Supply a raw video or audio frame to the encoder. Use avcodec_receive_packet()
@@ -2705,7 +2679,7 @@ export function avcodec_receive_frame(avctx: AVCodecContext, frame: AVFrame): nu
  *      AVERROR(ENOMEM):   failed to add packet to internal queue, or similar
  *      other errors: legitimate encoding errors
  */
-export function avcodec_send_frame(avctx: AVCodecContext, frame: AVFrame): number {};
+export function avcodec_send_frame(avctx: AVCodecContext, frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Read encoded data from the encoder.
@@ -2722,7 +2696,7 @@ export function avcodec_send_frame(avctx: AVCodecContext, frame: AVFrame): numbe
  *      AVERROR(EINVAL):   codec not opened, or it is a decoder
  *      other errors: legitimate encoding errors
  */
-export function avcodec_receive_packet(avctx: AVCodecContext, avpkt: AVPacket): number {};
+export function avcodec_receive_packet(avctx: AVCodecContext, avpkt: AVPacket): number { throw new NotImplemented(); }
 
 /**
  * Create and return a AVHWFramesContext with values adequate for hardware
@@ -2824,7 +2798,7 @@ export function avcodec_receive_packet(avctx: AVCodecContext, avpkt: AVPacket): 
 export function avcodec_get_hw_frames_parameters(avctx: AVCodecContext,
                                     device_ref: AVBuffer,
                                     hw_pix_fmt: AVPixelFormat,
-                                    out_frames_ref: Out<AVBuffer>): number {};
+                                    out_frames_ref: Out<AVBuffer>): number { throw new NotImplemented(); }
 
 
 
@@ -3044,9 +3018,9 @@ export interface AVCodecParser {
  * @return the next registered codec parser or NULL when the iteration is
  *         finished
  */
-export function av_parser_iterate(opaque: OpaquePtr): AVCodecParser {};
+export function av_parser_iterate(opaque: OpaquePtr): AVCodecParser { throw new NotImplemented(); }
 
-export function av_parser_init(codec_id: number): AVCodecParserContext {};
+export function av_parser_init(codec_id: number): AVCodecParserContext { throw new NotImplemented(); }
 
 /**
  * Parse a packet.
@@ -3084,9 +3058,9 @@ export function av_parser_parse2(s: AVCodecParserContext,
                     poutbuf: Out<Buffer>, poutbuf_size: Out<number>,
                     buf: Buffer, buf_size: number,
                     pts: number, dts: number,
-                    pos: number): number {};
+                    pos: number): number { throw new NotImplemented(); }
 
-export function av_parser_close(s: AVCodecParserContext): void {};
+export function av_parser_close(s: AVCodecParserContext): void { throw new NotImplemented(); }
 
 /**
  * @}
@@ -3098,7 +3072,7 @@ export function av_parser_close(s: AVCodecParserContext): void {};
  * @{
  */
 
-export function avcodec_encode_subtitle(avctx: AVCodecContext, buf: Buffer, buf_size: number, sub: AVSubtitle): number {};
+export function avcodec_encode_subtitle(avctx: AVCodecContext, buf: Buffer, buf_size: number, sub: AVSubtitle): number { throw new NotImplemented(); }
 
 /**
  * @}
@@ -3125,7 +3099,7 @@ export function avcodec_encode_subtitle(avctx: AVCodecContext, buf: Buffer, buf_
  * pixel format pix_fmt, or 0 if no associated fourCC code can be
  * found.
  */
-export function avcodec_pix_fmt_to_codec_tag(pix_fmt: AVPixelFormat): number;
+export function avcodec_pix_fmt_to_codec_tag(pix_fmt: AVPixelFormat): number { throw new NotImplemented(); }
 
 /**
  * Find the best pixel format to convert to given a certain source pixel
@@ -3146,15 +3120,15 @@ export function avcodec_pix_fmt_to_codec_tag(pix_fmt: AVPixelFormat): number;
  */
 export function avcodec_find_best_pix_fmt_of_list(pix_fmt_list: AVPixelFormat,
                                             src_pix_fmt: AVPixelFormat,
-                                            has_alpha: number, loss_ptr: Out<number>): AVPixelFormat {};
+                                            has_alpha: number, loss_ptr: Out<number>): AVPixelFormat { throw new NotImplemented(); }
 
-export function avcodec_default_get_format(s: AVCodecContext, fmt: Out<AVPixelFormat>): AVPixelFormat {};
+export function avcodec_default_get_format(s: AVCodecContext, fmt: Out<AVPixelFormat>): AVPixelFormat { throw new NotImplemented(); }
 
 /**
  * @}
  */
 
-export function avcodec_string(buf: Ref<string>, buf_size: number, enc: AVCodecContext, encode: number): void {};
+export function avcodec_string(buf: Ref<string>, buf_size: number, enc: AVCodecContext, encode: number): void { throw new NotImplemented(); }
 
 export function avcodec_default_execute(
     c: AVCodecContext, 
@@ -3163,14 +3137,14 @@ export function avcodec_default_execute(
     ret: Out<number>, 
     count: number, 
     size: number
-): number {};
+): number { throw new NotImplemented(); }
 export function avcodec_default_execute2(
     c: AVCodecContext, 
     func: (c2: AVCodecContext, arg2: OpaquePtr, n1: number, n2: number) => number, 
     arg: OpaquePtr, 
     ret: Out<number>, 
     count: number
-): number {};
+): number { throw new NotImplemented(); }
 
 //FIXME func typedef
 
@@ -3199,7 +3173,7 @@ export function avcodec_default_execute2(
  */
 export function avcodec_fill_audio_frame(frame: AVFrame, nb_channels: number,
                             sample_fmt: AVSampleFormat, buf: Buffer,
-                            buf_size: number, align: number): number {}
+                            buf_size: number, align: number): number { throw new NotImplemented(); }
 
 /**
  * Reset the internal codec state / flush internal buffers. Should be called
@@ -3225,7 +3199,7 @@ export function avcodec_flush_buffers(avctx: AVCodecContext): void {}
  * @return             frame duration, in samples, if known. 0 if not able to
  *                     determine.
  */
-export function av_get_audio_frame_duration(avctx: AVCodecContext, frame_bytes: number): number {};
+export function av_get_audio_frame_duration(avctx: AVCodecContext, frame_bytes: number): number { throw new NotImplemented(); }
 
 /* memory */
 
@@ -3237,17 +3211,17 @@ export function av_get_audio_frame_duration(avctx: AVCodecContext, frame_bytes: 
  * be 0-initialized so that no uninitialized data will ever appear.
  * @nodeTODO call signature is probably not right
  */
-export function av_fast_padded_malloc(ptr: OpaquePtr,  size: Out<number>, min_size: number): void {};
+export function av_fast_padded_malloc(ptr: OpaquePtr,  size: Out<number>, min_size: number): void { throw new NotImplemented(); }
 
 /**
  * Same behaviour av_fast_padded_malloc except that buffer will always
  * be 0-initialized after call.
  * @nodeTODO call signature is probably not right
  */
-export function av_fast_padded_mallocz(ptr: OpaquePtr, size: Out<number>, min_size: number): void {};
+export function av_fast_padded_mallocz(ptr: OpaquePtr, size: Out<number>, min_size: number): void { throw new NotImplemented(); }
 
 /**
  * @return a positive value if s is open (i.e. avcodec_open2() was called on it
  * with no corresponding avcodec_close()), 0 otherwise.
  */
-export function avcodec_is_open(s: AVCodecContext): void {};
+export function avcodec_is_open(s: AVCodecContext): void { throw new NotImplemented(); }

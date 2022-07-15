@@ -104,7 +104,7 @@ export function av_cmp_q(a: AVRational, b: AVRational): number {
  * @return `a` in floating-point form
  * @see av_d2q()
  */
-export function av_q2d(AVRational a): number {
+export function av_q2d(a: AVRational): number {
     return a.num / a.den;
 }
 
@@ -120,7 +120,7 @@ export function av_q2d(AVRational a): number {
  * @param[in]      max Maximum allowed values for `dst_num` & `dst_den`
  * @return 1 if the operation is exact, 0 otherwise
  */
-export function av_reduce(dst_num: Out<number>, dst_den: Out<number>, num: number, den: number, max: number): number {};
+export function av_reduce(dst_num: Out<number>, dst_den: Out<number>, num: number, den: number, max: number): number { throw new Error('NotImplemented'); }
 
 /**
  * Multiply two rationals.
@@ -128,7 +128,7 @@ export function av_reduce(dst_num: Out<number>, dst_den: Out<number>, num: numbe
  * @param c Second rational
  * @return b*c
  */
-export function av_mul_q(b: AVRational, c: AVRational): AVRational {};
+export function av_mul_q(b: AVRational, c: AVRational): AVRational { throw new Error('NotImplemented'); }
 
 /**
  * Divide one rational by another.
@@ -136,7 +136,7 @@ export function av_mul_q(b: AVRational, c: AVRational): AVRational {};
  * @param c Second rational
  * @return b/c
  */
-export function av_div_q(b: AVRational, c: AVRational): AVRational {};
+export function av_div_q(b: AVRational, c: AVRational): AVRational { throw new Error('NotImplemented'); }
 
 /**
  * Add two rationals.
@@ -144,7 +144,7 @@ export function av_div_q(b: AVRational, c: AVRational): AVRational {};
  * @param c Second rational
  * @return b+c
  */
-export function av_add_q(b: AVRational, c: AVRational): AVRational {};
+export function av_add_q(b: AVRational, c: AVRational): AVRational { throw new Error('NotImplemented'); }
 
 /**
  * Subtract one rational from another.
@@ -152,7 +152,7 @@ export function av_add_q(b: AVRational, c: AVRational): AVRational {};
  * @param c Second rational
  * @return b-c
  */
-export function av_sub_q(b: AVRational, c: AVRational): AVRational {};
+export function av_sub_q(b: AVRational, c: AVRational): AVRational { throw new Error('NotImplemented'); }
 
 /**
  * Invert a rational.
@@ -175,7 +175,7 @@ export function av_inv_q(q: AVRational ): AVRational
  * @return `d` in AVRational form
  * @see av_q2d()
  */
-export function av_d2q(d: number, max: number): AVRational {};
+export function av_d2q(d: number, max: number): AVRational { throw new Error('NotImplemented'); }
 
 /**
  * Find which of the two rationals is closer to another rational.
@@ -187,7 +187,7 @@ export function av_d2q(d: number, max: number): AVRational {};
  *         - -1 if `q2` is nearer to `q` than `q1`
  *         - 0 if they have the same distance
  */
-export function av_nearer_q(q: AVRational, q1: AVRational, q2: AVRational): number {};
+export function av_nearer_q(q: AVRational, q1: AVRational, q2: AVRational): number { throw new Error('NotImplemented'); }
 
 /**
  * Find the value in a list of rationals nearest a given reference rational.
@@ -196,7 +196,7 @@ export function av_nearer_q(q: AVRational, q1: AVRational, q2: AVRational): numb
  * @param q_list Array of rationals terminated by `{0, 0}`
  * @return Index of the nearest value found in the array
  */
-export function av_find_nearest_q_idx(q: AVRational, q_list: AVRational[]): number {};
+export function av_find_nearest_q_idx(q: AVRational, q_list: AVRational[]): number { throw new Error('NotImplemented'); }
 
 /**
  * Convert an AVRational to a IEEE 32-bit `float` expressed in fixed-point
@@ -207,10 +207,10 @@ export function av_find_nearest_q_idx(q: AVRational, q_list: AVRational[]): numb
  *         integer.
  * @note The returned value is platform-indepedant.
  */
-export function av_q2intfloat(q: AVRational): number {};
+export function av_q2intfloat(q: AVRational): number { throw new Error('NotImplemented'); }
 
 /**
  * Return the best rational so that a and b are multiple of it.
  * If the resulting denominator is larger than max_den, return def.
  */
-export function av_gcd_q(a: AVRational, b: AVRational, max_den: number, def: AVRational): AVRational {};
+export function av_gcd_q(a: AVRational, b: AVRational, max_den: number, def: AVRational): AVRational { throw new Error('NotImplemented'); }

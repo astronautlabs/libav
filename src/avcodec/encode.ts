@@ -19,6 +19,7 @@
  */
 
 import { AVFrame } from "../avutil";
+import { NotImplemented } from "../helpers";
 import { AVCodecContext } from "./avcodec";
 import { AVPacket } from "./packet";
 
@@ -31,14 +32,14 @@ import { AVPacket } from "./packet";
  *         AVERROR_EOF if end of stream has been reached, so no more data
  *                     will be available
  */
-export function ff_encode_get_frame(avctx: AVCodecContext, frame: AVFrame): number {};
+export function ff_encode_get_frame(avctx: AVCodecContext, frame: AVFrame): number { throw new NotImplemented(); }
 
 /**
  * Get a buffer for a packet. This is a wrapper around
  * AVCodecContext.get_encode_buffer() and should be used instead calling get_encode_buffer()
  * directly.
  */
-export function ff_get_encode_buffer(avctx: AVCodecContext, avpkt: AVPacket, size: number, flags: number): number {};
+export function ff_get_encode_buffer(avctx: AVCodecContext, avpkt: AVPacket, size: number, flags: number): number { throw new NotImplemented(); }
 
 /**
  * Check AVPacket size and allocate data.
@@ -53,10 +54,10 @@ export function ff_get_encode_buffer(avctx: AVCodecContext, avpkt: AVPacket, siz
  * @param size    an upper bound of the size of the packet to encode
  * @return        non negative on success, negative error code on failure
  */
-export function ff_alloc_packet(avctx: AVCodecContext, avpkt: AVPacket, size: number): number {};
+export function ff_alloc_packet(avctx: AVCodecContext, avpkt: AVPacket, size: number): number { throw new NotImplemented(); }
 
 /*
  * Perform encoder initialization and validation.
  * Called when opening the encoder, before the AVCodec.init() call.
  */
-export function ff_encode_preinit(avctx: AVCodecContext): number {};
+export function ff_encode_preinit(avctx: AVCodecContext): number { throw new NotImplemented(); }

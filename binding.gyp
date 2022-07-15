@@ -2,20 +2,10 @@
   "targets": [{
     "target_name" : "libav",
     'sources' : [ 
-      "src/bitstream/bitbuffer.cpp",
-      "src/bitstream/reader.cpp",
-      
-      "src/receiver/receiver_main.cpp",
-      "src/receiver/receiver.cpp",
-      "src/receiver/receiver_api.cpp",
-
-      "src/sender/sender_main.cpp",
-      "src/sender/sender.cpp",
-      "src/sender/sender_api.cpp",
-
-      "src/init.cpp",
-      "src/packet_payload.cpp",
-      "src/packet_sequence.cpp"
+      "native/avutil/avutil.cpp",
+      "native/avutil/buffer.cpp",
+      "native/avutil/index.cpp",
+      "native/libav.cpp"
     ],
     'cflags!': [ '-fno-exceptions' ],
     'cflags_cc!': [ '-fno-exceptions' ],
@@ -33,75 +23,42 @@
     },
     "include_dirs" : [
       "<!(node -p \"require('node-addon-api').include_dir\")",
-      "D:/dev/ffmpeg/ffmpeg",
-      "<!(node -p \"require('@astronautlabs/rtp').build_include_dir\")"
+      "D:/dev/ffmpeg/ffmpeg"
     ],
     'dependencies': [
         '<!(node -p \"require(\'node-addon-api\').gyp\")'
     ],
+    'defines': [
+      '__STDC_CONSTANT_MACROS'
+    ],
     "conditions": [
-      ['OS=="linux"', {
-        'link_settings' : {
-          "libraries": [
-            "<!(node -p \"require('@astronautlabs/rtp').build_dir\")/src/libjrtp.a"
-          ],
-          "ldflags" : [
-            "-lm -ldl -lpthread"
-	        ]
-        },
-      }],
       ['OS=="win"', {
-        "cflags" : [
-          '/GL-'
-        ],
         "configurations": {
           "Release": {
             "msvs_settings": {
               "VCCLCompilerTool": {
                 "RuntimeTypeInfo": "true",
-                "ExceptionHandling": 1,
-                'AdditionalOptions': [ ],
-                'RuntimeLibrary': 2
-              },
-              "VCLinkerTool": {
-                  "AdditionalLibraryDirectories": [
-                      "<!(node -p \"require('@astronautlabs/rtp').release_library_dir\")"
-                  ]
-              }
-            }
-          },
-          "Debug": {
-            "msvs_settings": {
-              "VCCLCompilerTool": {
-                "RuntimeTypeInfo": "true",
-                "ExceptionHandling": 1,
-                'AdditionalOptions': [ ],
-                'RuntimeLibrary': 3
-              },
-              "VCLinkerTool": {
-                  "AdditionalLibraryDirectories": [
-                      "<!(node -p \"require('@astronautlabs/rtp').debug_library_dir\")"
-                  ]
+                "ExceptionHandling": 1
               }
             }
           }
         },
-        'link_settings' : {
-            "libraries": [
-                "jrtplib.lib",
-                "Ws2_32.lib"
-            ],
-        }
-      }],
-      ['OS=="mac"', {
-        'cflags+': ['-fvisibility=hidden'],
-        "link_settings": {
-          "libraries": [
-            '-F/Library/Frameworks',
-            '-framework', 'DeckLinkAPI'
+        "libraries": [
+            "-lD:/dev/ffmpeg/ffmpeg/libavutil/avutil",
+            "-lD:/dev/ffmpeg/ffmpeg/libavformat/avformat",
+            "-lD:/dev/ffmpeg/ffmpeg/libavcodec/avcodec",
+            "-lD:/dev/ffmpeg/ffmpeg/libavdevice/avdevice",
+            "-lD:/dev/ffmpeg/ffmpeg/libavfilter/avfilter"
+        ],
+        "copies": [
+            {
+              "destination": "build/Release/",
+              "files": [
+                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll"
+              ]
+            }
           ]
-        }
-      }],
+      }]
     ]
   }]
 }

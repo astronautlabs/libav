@@ -17,6 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+import { NotImplemented } from "../helpers";
+
 /**
  * @file
  * @ingroup libavc
@@ -139,7 +141,7 @@ export interface AVCPBProperties {
  *
  * @return the newly allocated struct or NULL on failure
  */
-export function av_cpb_properties_alloc(size: number): AVCPBProperties {};
+export function av_cpb_properties_alloc(size: number): AVCPBProperties { throw new NotImplemented(); }
 
 /**
  * This structure supplies correlation between a packet timestamp and a wall clock
@@ -161,4 +163,4 @@ export interface AVProducerReferenceTime {
  * @param v size of extradata in bytes
  * @return number of bytes written to the buffer.
  */
-export function av_xiphlacing(s: Buffer, v: number): number {};
+export function av_xiphlacing(s: Buffer, v: number): number { throw new NotImplemented(); }
