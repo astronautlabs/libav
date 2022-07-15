@@ -12,6 +12,7 @@ public:
     static LibAvAddon *Self(const Napi::CallbackInfo &call);
 
     Napi::FunctionReference *AVBuffer;
+    Napi::FunctionReference *AVBufferPool;
 };
 
 #endif // __LIBAV_H

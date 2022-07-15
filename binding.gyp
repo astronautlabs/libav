@@ -41,6 +41,14 @@
                 "ExceptionHandling": 1
               }
             }
+          },
+          "Debug": {
+            "msvs_settings": {
+              "VCCLCompilerTool": {
+                "RuntimeTypeInfo": "true",
+                "ExceptionHandling": 1
+              }
+            }
           }
         },
         "libraries": [
@@ -53,6 +61,16 @@
         "copies": [
             {
               "destination": "build/Release/",
+              "files": [
+                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
+                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll"
+              ]
+            },
+            {
+              "destination": "build/Debug/",
               "files": [
                 "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll",
                 "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",

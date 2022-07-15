@@ -2,7 +2,7 @@
 #include "avutil.h"
 #include "buffer.h"
 
-Napi::Object nlavu_init(Napi::Env env, Napi::Object exports) {
+void nlavu_init(Napi::Env env, Napi::Object exports) {
 
     // avutil.ts
 
