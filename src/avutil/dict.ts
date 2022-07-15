@@ -80,122 +80,52 @@ export const AV_DICT_APPEND =         32;
 /**< Allow to store several equal keys in the dictionary */
 export const AV_DICT_MULTIKEY =       64;
 
-export interface AVDictionaryEntry {
+export declare class AVDictionaryEntry {
     key: string;
     value: string;
 };
 
-export type AVDictionary = OpaquePtr;
+export declare class AVDictionary {
+    constructor();
 
-/**
- * Get a dictionary entry with matching key.
- *
- * The returned entry key or value must not be changed, or it will
- * cause undefined behavior.
- *
- * To iterate through all the dictionary entries, you can set the matching key
- * to the null string "" and set the AV_DICT_IGNORE_SUFFIX flag.
- *
- * @param prev Set to the previous matching element to find the next.
- *             If set to NULL the first matching element is returned.
- * @param key matching key
- * @param flags a collection of AV_DICT_* flags controlling how the entry is retrieved
- * @return found entry or NULL in case no matching entry was found in the dictionary
- */
-export function av_dict_get(m: AVDictionary, key: string,
-                                prev: AVDictionaryEntry, flags: number): AVDictionaryEntry { throw new NotImplemented(); }
+    /**
+     * Get a dictionary entry with matching key.
+     *
+     * To iterate through all the dictionary entries, you can set the matching key
+     * to the null string "" and set the AV_DICT_IGNORE_SUFFIX flag.
+     *
+     * @param prev Set to the previous matching element to find the next.
+     *             If set to NULL the first matching element is returned.
+     * @param key matching key
+     * @param flags a collection of AV_DICT_* flags controlling how the entry is retrieved
+     * @return found entry or undefined in case no matching entry was found in the dictionary
+     */
+    get(key: string, prev?: AVDictionaryEntry, flags?: number): AVDictionaryEntry;
 
-/**
- * Get number of entries in dictionary.
- *
- * @param m dictionary
- * @return  number of entries in dictionary
- */
-export function av_dict_count(m: AVDictionary): number { throw new NotImplemented(); }
+    
+    /**
+     * Set the given key, overwriting an existing entry.
+     *
+     * Warning: Adding a new entry to a dictionary invalidates all existing entries
+     * previously returned with av_dict_get.
+     *
+     * @param key key to add to the dictionary
+     * @param value value to add. Passing null will cause an existing entry to be deleted.
+     * @return True on success
+     */
+    set(key: string, value: string, flags?: number): boolean;
 
-/**
- * Set the given entry in *pm, overwriting an existing entry.
- *
- * Note: If AV_DICT_DONT_STRDUP_KEY or AV_DICT_DONT_STRDUP_VAL is set,
- * these arguments will be freed on error.
- *
- * Warning: Adding a new entry to a dictionary invalidates all existing entries
- * previously returned with av_dict_get.
- *
- * @param pm pointer to a pointer to a dictionary struct. If *pm is NULL
- * a dictionary struct is allocated and put in *pm.
- * @param key entry key to add to *pm (will either be av_strduped or added as a new key depending on flags)
- * @param value entry value to add to *pm (will be av_strduped or added as a new key depending on flags).
- *        Passing a NULL value will cause an existing entry to be deleted.
- * @return >= 0 on success otherwise an error code <0
- */
-export function av_dict_set(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number { throw new NotImplemented(); }
+    /**
+     * Copy entries from one AVDictionary into another.
+     * @param flags flags to use when setting entries in the destination dictionary
+     * @note metadata is read using the AV_DICT_IGNORE_SUFFIX flag
+     */
+    copy(destination: AVDictionary, flags?: number);
 
-/**
- * Convenience wrapper for av_dict_set that converts the value to a string
- * and stores it.
- *
- * Note: If AV_DICT_DONT_STRDUP_KEY is set, key will be freed on error.
- */
-export function av_dict_set_int(pm: Ref<AVDictionary>, key: string, value: string, flags: number): number { throw new NotImplemented(); }
-
-/**
- * Parse the key/value pairs list and add the parsed entries to a dictionary.
- *
- * In case of failure, all the successfully set entries are stored in
- * *pm. You may need to manually free the created dictionary.
- *
- * @param key_val_sep  a 0-terminated list of characters used to separate
- *                     key from value
- * @param pairs_sep    a 0-terminated list of characters used to separate
- *                     two pairs from each other
- * @param flags        flags to use when adding to dictionary.
- *                     AV_DICT_DONT_STRDUP_KEY and AV_DICT_DONT_STRDUP_VAL
- *                     are ignored since the key/value tokens will always
- *                     be duplicated.
- * @return             0 on success, negative AVERROR code on failure
- */
-export function av_dict_parse_string(pm: Ref<AVDictionary>, str: string,
-                        key_val_sep: string, pairs_sep: string,
-                        flags: number): number { throw new NotImplemented(); }
-
-/**
- * Copy entries from one AVDictionary struct into another.
- * @param dst pointer to a pointer to a AVDictionary struct. If *dst is NULL,
- *            this function will allocate a struct for you and put it in *dst
- * @param src pointer to source AVDictionary struct
- * @param flags flags to use when setting entries in *dst
- * @note metadata is read using the AV_DICT_IGNORE_SUFFIX flag
- * @return 0 on success, negative AVERROR code on failure. If dst was allocated
- *           by this function, callers should free the associated memory.
- */
-export function av_dict_copy(dst: Ref<AVDictionary>, src: AVDictionary, flags: number): number { throw new NotImplemented(); }
-
-/**
- * Free all the memory allocated for an AVDictionary struct
- * and all keys and values.
- */
-export function av_dict_free(m: Ref<AVDictionary>): void { throw new NotImplemented(); }
-
-/**
- * Get dictionary entries as a string.
- *
- * Create a string containing dictionary's entries.
- * Such string may be passed back to av_dict_parse_string().
- * @note String is escaped with backslashes ('\').
- *
- * @param[in]  m             dictionary
- * @param[out] buffer        Pointer to buffer that will be allocated with string containg entries.
- *                           Buffer must be freed by the caller when is no longer needed.
- * @param[in]  key_val_sep   character used to separate key from value
- * @param[in]  pairs_sep     character used to separate two pairs from each other
- * @return                   >= 0 on success, negative on error
- * @warning Separators cannot be neither '\\' nor '\0'. They also cannot be the same.
- */
-export function av_dict_get_string(
-    m: AVDictionary, buffer: Out<string>,
-    key_val_sep: string, pairs_sep: string
-): number {
-    throw new NotImplemented();
-    // @nodeTODO key_val_sep and pairs_sep are char, not string
-};
+    /**
+     * Clear all keys
+     */
+    clear();
+    readonly count: number;
+    readonly keys: string[];
+}

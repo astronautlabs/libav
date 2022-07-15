@@ -214,9 +214,7 @@ void NAVBufferPool::Init(Napi::Env env, Napi::Object exports) {
     *constructor = Napi::Persistent(func);
     
     LibAvAddon::Self(env)->AVBufferPool = constructor;
-
     exports.Set("AVBufferPool", constructor->Value());
-
 }
 
 NAVBufferPool::NAVBufferPool(const Napi::CallbackInfo& info):

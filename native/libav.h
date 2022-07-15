@@ -1,7 +1,7 @@
-
 #ifndef __LIBAV_H
 #define __LIBAV_H
 
+#include "common.h"
 #include <napi.h>
 
 class LibAvAddon : public Napi::Addon<LibAvAddon>
@@ -13,6 +13,8 @@ public:
 
     Napi::FunctionReference *AVBuffer;
     Napi::FunctionReference *AVBufferPool;
+    Napi::FunctionReference *AVDictionary;
+    Napi::FunctionReference *AVDictionaryEntry;
 };
 
 #endif // __LIBAV_H
