@@ -134,7 +134,7 @@ Napi::Value NAVFrame::GetPlaneBuffer(const Napi::CallbackInfo& info) {
         return info.Env().Undefined();
     }
 
-    return NAVBuffer::FromHandle(info.Env(), buffer, true);
+    return NAVBuffer::FromHandleWrapped(info.Env(), buffer, true);
 }
 
 Napi::Value NAVFrame::AddSideData(const Napi::CallbackInfo& info) {

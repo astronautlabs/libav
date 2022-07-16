@@ -1,20 +1,35 @@
-#include "../common.h"
-
 #include <napi.h>
+
+#include "../common.h"
+#include "../resource.h"
 
 extern "C" {
     #include <libavutil/buffer.h>
 }
 
-class NAVBuffer : public Napi::ObjectWrap<NAVBuffer> {
+void *GetRegisterableBufferHandle(void *bufferRef);
+
+class NAVBuffer : public NAVResource<NAVBuffer, AVBufferRef, GetRegisterableBufferHandle> {
     public:
         NAVBuffer(const Napi::CallbackInfo& info);
-        static void Init(Napi::Env env, Napi::Object exports);
-        virtual void Finalize(Napi::Env env);
 
-        static Napi::Value FromHandle(const Napi::Env env, AVBufferRef *ref, bool refIsOwned);
+        inline static std::string ExportName() { return "AVBuffer"; }
+        inline static Napi::Function ClassDefinition(const Napi::Env &env) {
+            return DefineClass(env, "AVBuffer", {
+                InstanceAccessor("size", &NAVBuffer::GetSize, nullptr),
+                InstanceAccessor("data", &NAVBuffer::GetData, nullptr),
+                InstanceAccessor("refCount", &NAVBuffer::GetRefCount, nullptr),
+                InstanceAccessor("writable", &NAVBuffer::GetIsWritable, nullptr),
+                InstanceMethod<&NAVBuffer::Free>("free"),
+                InstanceMethod<&NAVBuffer::MakeWritable>("makeWritable"),
+                InstanceMethod<&NAVBuffer::Realloc>("realloc")
+            });
+        }
+
+        virtual void Free();
+        virtual void RefHandle();
+
     private:
-        AVBufferRef *handle;
         Napi::Reference<Napi::ArrayBuffer> ownedArrayBuffer;
         Napi::Value GetSize(const Napi::CallbackInfo& info);
         Napi::Value GetData(const Napi::CallbackInfo& info);

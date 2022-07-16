@@ -36,7 +36,7 @@ public:
         resourceMap[(void*)handle] = (void*)resource;
     }
 
-    template <class ResourceT, class HandleT>
+    template <class HandleT>
     void UnregisterResource(const HandleT *handle) {
         resourceMap.erase((void*)handle);
     }
@@ -49,7 +49,7 @@ public:
         return (*iter).second;
     }
 
-    inline Napi::FunctionReference *RegisterConstructor(std::string name, Napi::Function ctor) {
+    inline void RegisterConstructor(std::string name, Napi::Function ctor) {
         auto ctorRef = new Napi::FunctionReference();
         *ctorRef = Napi::Persistent(ctor);
         constructorMap[name] = ctorRef;
@@ -66,8 +66,8 @@ public:
     template<class ResourceT>
     static ResourceT* Construct(
         const Napi::Env &env, 
-        std::string ctorName, 
-        std::initializer_list<napi_value> &args
+        const std::string ctorName, 
+        const std::initializer_list<napi_value> &args
     ) {
         return ResourceT::template Unwrap(
             assert_valid(Self(env)->GetConstructor(ctorName))

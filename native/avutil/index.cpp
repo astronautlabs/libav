@@ -21,7 +21,7 @@ void nlavu_init(Napi::Env env, Napi::Object exports) {
 
     // buffer.ts
     
-    NAVBuffer::Init(env, exports);
+    NAVBuffer::Register(env, exports);
     NAVBufferPool::Init(env, exports);
     NAVDictionary::Init(env, exports);
     NAVDictionaryEntry::Init(env, exports);

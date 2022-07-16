@@ -2,8 +2,18 @@
 #   define __RESOURCE_H__
 
 #include <napi.h>
+#include "libav.h"
 
-template<class SelfT, class HandleT>
+void* DefaultGetRegisterableHandle(void *handle);
+
+/**
+ * Base class for all resource classes in libav-node.
+ * - GetRegisterableHandle is used to translate the handle that gets associated with the NAVResource* object
+ *   into the one that is used for registering the resource into the resource map. This is useful for example 
+ *   for AVBuffer and AVBufferRef- AVBufferRef* is the handle on the NAVBuffer resource class, but AVBuffer*
+ *   is the pointer used for the resource registration map.
+ */
+template<class SelfT, class HandleT, void *(*GetRegisterableHandle)(void *) = DefaultGetRegisterableHandle>
 class NAVResource : public Napi::ObjectWrap<SelfT> {
     public:
         NAVResource(const Napi::CallbackInfo& info):
@@ -12,8 +22,14 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         }
 
         bool ConstructFromHandle(const Napi::CallbackInfo& info) {
-            if (info.Length() === 1 && info[0].IsExternal()) {
+            if (info.Length() == 1 && info[0].IsExternal()) {
                 this->handle = info[0].As<Napi::External<HandleT>>().Data();
+
+                LibAvAddon::Self(info.Env())->RegisterResource(
+                    GetRegisterableHandle((void*)handle), 
+                    this
+                );
+
                 return true;
             }
 
@@ -24,19 +40,19 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         // static virtual std::string ExportName() = 0;
 
         static void Register(Napi::Env env, Napi::Object exports) {
-            auto defn = ClassDefinition();
-
-            auto constructor = new Napi::FunctionReference();
-            *constructor = Napi::Persistent(func);
+            Napi::Function ctor = SelfT::template ClassDefinition(env);
+            std::string exportName = SelfT::template ExportName();
             
-            LibAvAddon::Self(env)->AVBuffer = constructor;
-
-            exports.Set(SelfT::template ExportName(), constructor->Value());
-
+            LibAvAddon::Self(env)->RegisterConstructor(exportName, ctor);
+            exports.Set(exportName, ctor);
+            
         }
 
         virtual void Finalize(Napi::Env env) {
-            Free();
+            if (this->handle) {
+                LibAvAddon::Self(env)->UnregisterResource(GetRegisterableHandle((void*)handle));
+                Free();
+            }
         }
 
         /**
@@ -49,9 +65,16 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
          */
         virtual void RefHandle() = 0;
 
-        static SelfT *FromHandle(const Napi::Env env, HandleT *ref, bool refIsOwned) {
-            SelfT *instance = LibAvAddon::Self(env)->Construct(env, SelfT::template ExportName(), { 
-                Napi::External<HandleT>::New(env, ref)
+        static SelfT *FromHandle(const Napi::Env env, HandleT *handle, bool refIsOwned) {
+            SelfT *instance = LibAvAddon::Self(env)->GetResource<SelfT>(
+                GetRegisterableBufferHandle(handle)
+            );
+
+            if (instance)
+                return instance;
+
+            instance = LibAvAddon::Self(env)->Construct<SelfT>(env, SelfT::template ExportName(), { 
+                Napi::External<HandleT>::New(env, handle)
             });
 
             if (!refIsOwned)
@@ -60,7 +83,7 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
             return instance;
         }
 
-        static SelfT *FromHandleWrapped(const Napi::Env env, HandleT *ref, bool refIsOwned) {
+        static Napi::Value FromHandleWrapped(const Napi::Env env, HandleT *ref, bool refIsOwned) {
             return FromHandle(env, ref, refIsOwned)->Value();
         }
         

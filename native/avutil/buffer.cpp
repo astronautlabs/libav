@@ -8,28 +8,24 @@ extern "C" {
 #include "../libav.h"
 #include "../helpers.h"
 
-void NAVBuffer::Init(Napi::Env env, Napi::Object exports) {
-    auto func = DefineClass(env, "AVBuffer", {
-        InstanceAccessor("size", &NAVBuffer::GetSize, nullptr),
-        InstanceAccessor("data", &NAVBuffer::GetData, nullptr),
-        InstanceAccessor("refCount", &NAVBuffer::GetRefCount, nullptr),
-        InstanceAccessor("writable", &NAVBuffer::GetIsWritable, nullptr),
-        InstanceMethod<&NAVBuffer::Free>("free"),
-        InstanceMethod<&NAVBuffer::MakeWritable>("makeWritable"),
-        InstanceMethod<&NAVBuffer::Realloc>("realloc")
-    });
-
-    auto constructor = new Napi::FunctionReference();
-    *constructor = Napi::Persistent(func);
-    
-    LibAvAddon::Self(env)->AVBuffer = constructor;
-
-    exports.Set("AVBuffer", constructor->Value());
+void *GetRegisterableBufferHandle(void *bufferRef) {
+    return (void*)((AVBufferRef*)bufferRef)->buffer;
 }
 
 NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
-    Napi::ObjectWrap<NAVBuffer>(callback)
+    NAVResource(callback)
 {
+    if (ConstructFromHandle(callback)) {
+        if (!ownedArrayBuffer.IsEmpty())
+            ownedArrayBuffer.Unref();
+        ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>::New(
+            Napi::ArrayBuffer::New(callback.Env(), this->handle->data, this->handle->size),
+            1
+        );
+
+        return;
+    }
+    
     if (callback[0].IsNumber()) {
         auto size = callback[0].As<Napi::Number>().Int64Value();
         auto zero = false;
@@ -96,20 +92,12 @@ NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
     }
 }
 
-Napi::Value NAVBuffer::FromHandle(const Napi::Env env, AVBufferRef *ref, bool refIsOwned) {
-    auto addon = LibAvAddon::Self(env);
-    auto buffer = addon->GetResource<NAVBuffer, AVBuffer>(ref->buffer);
+void NAVBuffer::Free() {
+    av_buffer_unref(&handle);
+}
 
-    if (buffer)
-        return buffer->Value();
-
-    if (!refIsOwned)
-        ref = av_buffer_ref(ref);
-    
-    buffer = NAVBuffer::Unwrap(addon->AVBuffer->New({ Napi::External<AVBufferRef>::New(env, ref) }));
-
-    addon->RegisterResource(ref->buffer, buffer);
-    return buffer->Value();
+void NAVBuffer::RefHandle() {
+    handle = av_buffer_ref(handle);
 }
 
 void NAVBuffer::Disown(void *opaque, uint8_t *data) {
@@ -216,13 +204,6 @@ Napi::Value NAVBuffer::Free(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-void NAVBuffer::Finalize(Napi::Env env) {
-    if (this->handle) {
-        LibAvAddon::Self(env)->UnregisterResource<NAVBuffer, AVBuffer>(this->handle->buffer);
-        av_buffer_unref(&this->handle);
-    }
-}
-
 void NAVBufferPool::Init(Napi::Env env, Napi::Object exports) {
     auto func = DefineClass(env, "AVBufferPool", {
         InstanceAccessor("freed", &NAVBufferPool::IsFreed, nullptr),
@@ -272,7 +253,7 @@ Napi::Value NAVBufferPool::Get(const Napi::CallbackInfo& info) {
         return info.Env().Undefined();
     }
 
-    return NAVBuffer::FromHandle(info.Env(), buffer, true);
+    return NAVBuffer::FromHandleWrapped(info.Env(), buffer, true);
 }
 
 Napi::Value NAVBufferPool::IsFreed(const Napi::CallbackInfo& info) {
