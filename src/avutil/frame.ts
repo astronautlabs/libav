@@ -220,12 +220,12 @@ export enum AVActiveFormatDescription {
  * sizeof(AVFrameSideData) is not a part of the public ABI, so new fields may be added
  * to the end with a minor bump.
  */
-export interface AVFrameSideData {
-    type: AVFrameSideDataType;
-    data: Buffer;
-    size: number;
-    metadata: AVDictionary;
-    buf: AVBuffer;
+export declare class AVFrameSideData {
+    readonly type: AVFrameSideDataType;
+    readonly data: Buffer;
+    readonly size: number;
+    readonly metadata: AVDictionary;
+    readonly buf: AVBuffer;
 }
 
 /**
@@ -341,7 +341,9 @@ export const FF_DECODE_ERROR_DECODE_SLICES =       8;
  * C structure field name for fields accessible through AVOptions. The AVClass
  * for AVFrame can be obtained from avcodec_get_frame_class()
  */
-export interface AVFrame {
+export declare class AVFrame {
+    constructor();
+
     /**
      * pointer to the picture/channel planes.
      * This might be different from the first allocated byte. For video,
@@ -686,17 +688,6 @@ export interface AVFrame {
      */
     ch_layout: AVChannelLayout;
 }
-
-
-/**
- * Get the name of a colorspace.
- * @return a static string identifying the colorspace; can be NULL.
- * @deprecated use av_color_space_name()
- * @if FF_API_COLORSPACE_NAME
- * @attribute_deprecated
- */
-
-export function av_get_colorspace_name(val: AVColorSpace): string { throw new NotImplemented(); }
 
 /**
  * Allocate an AVFrame and set its fields to default values.  The resulting

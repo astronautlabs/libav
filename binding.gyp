@@ -5,6 +5,7 @@
       "native/avutil/avutil.cpp",
       "native/avutil/buffer.cpp",
       "native/avutil/dict.cpp",
+      "native/avutil/frame.cpp",
       "native/avutil/index.cpp",
       "native/libav.cpp"
     ],

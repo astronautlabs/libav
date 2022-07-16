@@ -30,8 +30,6 @@ void NAVBuffer::Init(Napi::Env env, Napi::Object exports) {
 NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
     Napi::ObjectWrap<NAVBuffer>(callback)
 {
-    AVBufferRef *handle;
-    
     if (callback[0].IsNumber()) {
         auto size = callback[0].As<Napi::Number>().Int64Value();
         auto zero = false;
@@ -56,16 +54,18 @@ NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
             return;
         }
 
+        handle = buf_ref;
+        LibAvAddon::Self(callback.Env())->RegisterResource(buf_ref->buffer, this);
+
         if (!ownedArrayBuffer.IsEmpty())
             ownedArrayBuffer.Unref();
         ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>::New(
             Napi::ArrayBuffer::New(callback.Env(), buf_ref->data, buf_ref->size),
             1
         );
-        this->handle = buf_ref;
     } else if (callback[0].IsExternal()) {
+        // This path should only ever be hit from NAVBuffer::FromHandle().
         handle = callback[0].As<Napi::External<AVBufferRef>>().Data();
-        this->handle = handle;
         
         if (!ownedArrayBuffer.IsEmpty())
             ownedArrayBuffer.Unref();
@@ -85,12 +85,31 @@ NAVBuffer::NAVBuffer(const Napi::CallbackInfo &callback):
 
         if (!ownedArrayBuffer.IsEmpty())
             ownedArrayBuffer.Unref();
-        this->ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>::New(buffer, 1);
-        this->handle = av_buffer_create((uint8_t*)buffer.Data(), buffer.ByteLength(), &NAVBuffer::Disown, this, 0);
+        ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>::New(buffer, 1);
+        handle = av_buffer_create((uint8_t*)buffer.Data(), buffer.ByteLength(), &NAVBuffer::Disown, this, 0);
+
+        LibAvAddon::Self(callback.Env())->RegisterResource(handle->buffer, this);
+
     } else {
         Napi::TypeError::New(callback.Env(), "Invalid invocation").ThrowAsJavaScriptException();
         return;
     }
+}
+
+Napi::Value NAVBuffer::FromHandle(const Napi::Env env, AVBufferRef *ref, bool refIsOwned) {
+    auto addon = LibAvAddon::Self(env);
+    auto buffer = addon->GetResource<NAVBuffer, AVBuffer>(ref->buffer);
+
+    if (buffer)
+        return buffer->Value();
+
+    if (!refIsOwned)
+        ref = av_buffer_ref(ref);
+    
+    buffer = NAVBuffer::Unwrap(addon->AVBuffer->New({ Napi::External<AVBufferRef>::New(env, ref) }));
+
+    addon->RegisterResource(ref->buffer, buffer);
+    return buffer->Value();
 }
 
 void NAVBuffer::Disown(void *opaque, uint8_t *data) {
@@ -199,6 +218,7 @@ Napi::Value NAVBuffer::Free(const Napi::CallbackInfo& info) {
 
 void NAVBuffer::Finalize(Napi::Env env) {
     if (this->handle) {
+        LibAvAddon::Self(env)->UnregisterResource<NAVBuffer, AVBuffer>(this->handle->buffer);
         av_buffer_unref(&this->handle);
     }
 }
@@ -252,9 +272,7 @@ Napi::Value NAVBufferPool::Get(const Napi::CallbackInfo& info) {
         return info.Env().Undefined();
     }
 
-    return LibAvAddon::Self(info.Env())->AVBuffer->New({ 
-        Napi::External<AVBufferRef>::New(info.Env(), buffer)
-    });
+    return NAVBuffer::FromHandle(info.Env(), buffer, true);
 }
 
 Napi::Value NAVBufferPool::IsFreed(const Napi::CallbackInfo& info) {

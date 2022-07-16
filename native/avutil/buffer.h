@@ -11,6 +11,8 @@ class NAVBuffer : public Napi::ObjectWrap<NAVBuffer> {
         NAVBuffer(const Napi::CallbackInfo& info);
         static void Init(Napi::Env env, Napi::Object exports);
         virtual void Finalize(Napi::Env env);
+
+        static Napi::Value FromHandle(const Napi::Env env, AVBufferRef *ref, bool refIsOwned);
     private:
         AVBufferRef *handle;
         Napi::Reference<Napi::ArrayBuffer> ownedArrayBuffer;
