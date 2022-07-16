@@ -218,30 +218,19 @@ Napi::Value NAVBuffer::Free(const Napi::CallbackInfo& info) {
         av_buffer_unref(&handle);
     
     SetHandle(handle);
-    
+
     if (!ownedArrayBuffer.IsEmpty())
         this->ownedArrayBuffer.Unref();
     this->ownedArrayBuffer = Napi::Reference<Napi::ArrayBuffer>();
     return info.Env().Undefined();
 }
 
-void NAVBufferPool::Init(Napi::Env env, Napi::Object exports) {
-    auto func = DefineClass(env, "AVBufferPool", {
-        InstanceAccessor("freed", &NAVBufferPool::IsFreed, nullptr),
-        InstanceMethod<&NAVBufferPool::Free>("free"),
-        InstanceMethod<&NAVBufferPool::Get>("get")
-    });
-
-    auto constructor = new Napi::FunctionReference();
-    *constructor = Napi::Persistent(func);
-    
-    LibAvAddon::Self(env)->AVBufferPool = constructor;
-    exports.Set("AVBufferPool", constructor->Value());
-}
-
 NAVBufferPool::NAVBufferPool(const Napi::CallbackInfo& info):
-    Napi::ObjectWrap<NAVBufferPool>(info)
+    NAVResource(info)
 {
+    if (ConstructFromHandle(info))
+        return;
+    
     auto size = info[0].As<Napi::Number>().Int64Value();
     
     if (size < 0) {
@@ -249,26 +238,30 @@ NAVBufferPool::NAVBufferPool(const Napi::CallbackInfo& info):
         return;
     }
 
-    this->handle = av_buffer_pool_init(size, nullptr);
+    SetHandle(av_buffer_pool_init(size, nullptr));
 }
 
-void NAVBufferPool::Finalize(Napi::Env env) {
-    if (this->handle)
-        av_buffer_pool_uninit(&this->handle);
+void NAVBufferPool::Free() {
+    auto handle = GetHandle();
+    av_buffer_pool_uninit(&handle);
+    SetHandle(handle);
 }
 
 Napi::Value NAVBufferPool::Free(const Napi::CallbackInfo& info) {
-    av_buffer_pool_uninit(&this->handle);
+    auto handle = GetHandle();
+    av_buffer_pool_uninit(&handle);
+    SetHandle(handle);
     return info.Env().Undefined();
 }
 
 Napi::Value NAVBufferPool::Get(const Napi::CallbackInfo& info) {
-    if (this->handle == nullptr) {
+    auto handle = GetHandle();
+    if (!handle) {
         Napi::TypeError::New(info.Env(), "Cannot retrieve a new buffer from a pool which has been marked as freed.").ThrowAsJavaScriptException();
         return info.Env().Undefined();
     }
 
-    auto buffer = av_buffer_pool_get(this->handle);
+    auto buffer = av_buffer_pool_get(handle);
     if (!buffer) {
         Napi::TypeError::New(info.Env(), "Failed to get buffer from buffer pool");
         return info.Env().Undefined();
@@ -278,5 +271,5 @@ Napi::Value NAVBufferPool::Get(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value NAVBufferPool::IsFreed(const Napi::CallbackInfo& info) {
-    return Napi::Boolean::New(info.Env(), handle == nullptr);
+    return Napi::Boolean::New(info.Env(), !GetHandle());
 }

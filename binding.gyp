@@ -7,7 +7,8 @@
       "native/avutil/dict.cpp",
       "native/avutil/frame.cpp",
       "native/avutil/index.cpp",
-      "native/libav.cpp"
+      "native/libav.cpp",
+      "native/resource.cpp"
     ],
     'cflags!': [ '-fno-exceptions' ],
     'cflags_cc!': [ '-fno-exceptions' ],

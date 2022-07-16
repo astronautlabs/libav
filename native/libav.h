@@ -15,10 +15,7 @@ public:
     static LibAvAddon *Self(const Napi::Env &env);
     static LibAvAddon *Self(const Napi::CallbackInfo &call);
 
-    Napi::FunctionReference *AVBuffer;
     Napi::FunctionReference *AVBufferPool;
-    Napi::FunctionReference *AVDictionary;
-    Napi::FunctionReference *AVDictionaryEntry;
     Napi::FunctionReference *AVFrame;
     Napi::FunctionReference *AVFrameSideData;
 

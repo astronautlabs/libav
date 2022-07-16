@@ -2,32 +2,17 @@
 #include "dict.h"
 
 NAVDictionary::NAVDictionary(const Napi::CallbackInfo& info):
-    Napi::ObjectWrap<NAVDictionary>(info)
+    NAVResource(info)
 {
-    handle = nullptr;
+    if (ConstructFromHandle(info))
+        return;
 }
 
-void NAVDictionary::Init(Napi::Env env, Napi::Object exports) {
-    auto func = DefineClass(env, "AVDictionary", {
-        InstanceAccessor("count", &NAVDictionary::Count, nullptr),
-        InstanceAccessor("keys", &NAVDictionary::GetKeys, nullptr),
-        InstanceMethod<&NAVDictionary::Get>("get"),
-        InstanceMethod<&NAVDictionary::Set>("set"),
-        InstanceMethod<&NAVDictionary::Copy>("copy"),
-        InstanceMethod<&NAVDictionary::Clear>("clear"),
-    });
-
-    auto constructor = new Napi::FunctionReference();
-    *constructor = Napi::Persistent(func);
-    
-    LibAvAddon::Self(env)->AVDictionary = constructor;
-    exports.Set("AVDictionary", constructor->Value());
-}
-
-void NAVDictionary::Finalize(Napi::Env env) {
+void NAVDictionary::Free() {
+    auto handle = GetHandle();
     av_dict_free(&handle);
+    SetHandle(handle);
 }
-
 
 Napi::Value NAVDictionary::Get(const Napi::CallbackInfo& info) {
     auto key = info[0].ToString().Utf8Value();
@@ -38,7 +23,7 @@ Napi::Value NAVDictionary::Get(const Napi::CallbackInfo& info) {
         if (!info[1].IsUndefined() && !info[1].IsNull()) {
             auto nPrev = NAVDictionaryEntry::Unwrap(info[1].As<Napi::Object>());
             if (nPrev)
-                prev = nPrev->handle;
+                prev = nPrev->GetHandle();
         }
 
         if (info.Length() > 2) {
@@ -46,17 +31,16 @@ Napi::Value NAVDictionary::Get(const Napi::CallbackInfo& info) {
         }
     }
 
+    auto handle = GetHandle();
     auto entry = av_dict_get(handle, key.c_str(), prev, flags);
     if (!entry)
         return info.Env().Undefined();
     
-    return LibAvAddon::Self(info.Env())->AVDictionaryEntry->New({
-        Napi::External<AVDictionaryEntry>::New(info.Env(), entry)
-    });
+    return NAVDictionaryEntry::FromHandleWrapped(info.Env(), entry, false);
 }
 
 Napi::Value NAVDictionary::Count(const Napi::CallbackInfo& info) {
-    return Napi::Number::New(info.Env(), av_dict_count(this->handle));
+    return Napi::Number::New(info.Env(), av_dict_count(GetHandle()));
 }
 
 Napi::Value NAVDictionary::Set(const Napi::CallbackInfo& info) {
@@ -71,13 +55,15 @@ Napi::Value NAVDictionary::Set(const Napi::CallbackInfo& info) {
     if (info.Length() > 2)
         flags = info[2].ToNumber().Uint32Value();
 
+    auto handle = GetHandle();
     auto status = av_dict_set(
-        &this->handle, key.c_str(), 
+        &handle, key.c_str(), 
         info[1].IsNull() || info[1].IsUndefined() 
             ? nullptr 
             : valueStr.c_str(), 
         flags
     );
+    SetHandle(handle);
 
     if (status < 0) {
         Napi::Error::New(info.Env(), "Failed to add dictionary key: " + status)
@@ -88,7 +74,7 @@ Napi::Value NAVDictionary::Set(const Napi::CallbackInfo& info) {
     return Napi::Boolean::New(info.Env(), true);
 }
 
-Napi::Value NAVDictionary::Copy(const Napi::CallbackInfo& info) {
+Napi::Value NAVDictionary::CopyTo(const Napi::CallbackInfo& info) {
     auto other = Unwrap(info[0].As<Napi::Object>());
     uint32_t flags = 0;
     if (info.Length() > 1)
@@ -100,7 +86,9 @@ Napi::Value NAVDictionary::Copy(const Napi::CallbackInfo& info) {
         return info.Env().Undefined();
     }
 
-    auto status = av_dict_copy(&other->handle, handle, flags);
+    auto handle = GetHandle();
+    auto otherHandle = other->GetHandle();
+    auto status = av_dict_copy(&otherHandle, handle, flags);
 
     if (status < 0) {
         Napi::Error::New(info.Env(), "Failed to copy dictionary: " + status)
@@ -108,18 +96,21 @@ Napi::Value NAVDictionary::Copy(const Napi::CallbackInfo& info) {
         return info.Env().Undefined();
     }
 
+    other->SetHandle(otherHandle);
     return Napi::Boolean::New(info.Env(), true);
 }
 
 Napi::Value NAVDictionary::Clear(const Napi::CallbackInfo& info) {
+    auto handle = GetHandle();
     av_dict_free(&handle);
+    SetHandle(handle);
     return info.Env().Undefined();
 }
 
 Napi::Value NAVDictionary::GetKeys(const Napi::CallbackInfo& info) {
     std::vector<std::string> keys;
     AVDictionaryEntry *entry = nullptr;
-
+    auto handle = GetHandle();
     while (entry = av_dict_get(handle, "", entry, AV_DICT_IGNORE_SUFFIX))
         keys.push_back(entry->key);
 
@@ -131,31 +122,26 @@ Napi::Value NAVDictionary::GetKeys(const Napi::CallbackInfo& info) {
 
 
 NAVDictionaryEntry::NAVDictionaryEntry(const Napi::CallbackInfo& info):
-    Napi::ObjectWrap<NAVDictionaryEntry>(info)
+    NAVResource(info)
 {
-    handle = info[0].As<Napi::External<AVDictionaryEntry>>().Data(); 
-    key = handle->key;
-    value = handle->value;
-}
-
-void NAVDictionaryEntry::Init(Napi::Env env, Napi::Object exports) {
-    auto func = DefineClass(env, "AVDictionaryEntry", {
-        InstanceAccessor("key", &NAVDictionaryEntry::GetKey, nullptr),
-        InstanceAccessor("value", &NAVDictionaryEntry::GetValue, nullptr),
-        InstanceMethod<&NAVDictionaryEntry::ToJSON>("toJSON"),
-        InstanceMethod<&NAVDictionaryEntry::ToString>("toString")
-    });
-
-    auto constructor = new Napi::FunctionReference();
-    *constructor = Napi::Persistent(func);
-    
-    LibAvAddon::Self(env)->AVDictionaryEntry = constructor;
-    exports.Set("AVDictionaryEntry", constructor->Value());
-
+    if (ConstructFromHandle(info)) {
+        auto handle = GetHandle();
+        key = handle->key;
+        value = handle->value;
+        return;
+    }
 }
 
 Napi::Value NAVDictionaryEntry::GetKey(const Napi::CallbackInfo& info) {
     return Napi::String::New(info.Env(), key);
+}
+
+void NAVDictionaryEntry::Free() {
+    // Do nothing, we do not own this.
+}
+
+bool NAVDictionaryEntry::IsResourceMappingEnabled() {
+    return false;
 }
 
 Napi::Value NAVDictionaryEntry::GetValue(const Napi::CallbackInfo& info) {

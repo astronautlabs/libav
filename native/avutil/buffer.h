@@ -46,13 +46,21 @@ class NAVBuffer : public NAVResource<NAVBuffer, AVBufferRef, GetRegisterableBuff
         static void Disown(void *opaque, uint8_t *data);
 };
 
-class NAVBufferPool : public Napi::ObjectWrap<NAVBufferPool> {
+class NAVBufferPool : public NAVResource<NAVBufferPool, AVBufferPool> {
     public:
         NAVBufferPool(const Napi::CallbackInfo& info);
-        static void Init(Napi::Env env, Napi::Object exports);
-        virtual void Finalize(Napi::Env env);
+        
+        inline static std::string ExportName() { return "AVBufferPool"; }
+        inline static Napi::Function ClassDefinition(const Napi::Env &env) {
+            return DefineClass(env, "AVBufferPool", {
+                InstanceAccessor("freed", &NAVBufferPool::IsFreed, nullptr),
+                InstanceMethod<&NAVBufferPool::Free>("free"),
+                InstanceMethod<&NAVBufferPool::Get>("get")
+            });
+        }
+        
+        virtual void Free();
     private:
-        AVBufferPool *handle;
         Napi::Value Free(const Napi::CallbackInfo& info);
         Napi::Value Get(const Napi::CallbackInfo& info);
         Napi::Value IsFreed(const Napi::CallbackInfo& info);

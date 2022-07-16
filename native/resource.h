@@ -87,6 +87,16 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         virtual void Free() = 0;
 
         /**
+         * Whether resource mapping is enabled (default true).
+         * When false is returned, the handles of the subclass are never entered into the 
+         * resource map. Allows the subclass to take advantage of the other capabilities 
+         * of inheriting from NAVResource without enabling this behavior. This is particularly 
+         * useful when the handles are never owned by the NAVResource subclass 
+         * (such as AVDictionaryEntry).
+         */
+        virtual bool IsResourceMappingEnabled() { return true; }
+
+        /**
          * Increase the reference count of the associated handle. By default this does nothing,
          * assuming that the underlying handle is not reference counted. 
          */
@@ -105,7 +115,7 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
          */
         static SelfT *FromHandle(const Napi::Env env, HandleT *handle, bool refIsOwned) {
             SelfT *instance = LibAvAddon::Self(env)->GetResource<SelfT>(
-                GetRegisterableBufferHandle(handle)
+                GetRegisterableHandle(handle)
             );
 
             if (instance)
@@ -152,7 +162,7 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
          * sole instance responsible for the given handle.
          */
         void RegisterResource(const Napi::Env &env) {
-            if (!handle)
+            if (!handle || !IsResourceMappingEnabled())
                 return;
             
             LibAvAddon::Self(env)->RegisterResource(
