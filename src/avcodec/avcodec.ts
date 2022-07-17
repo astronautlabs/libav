@@ -634,23 +634,35 @@ export const FF_SUB_TEXT_FMT_ASS =              0;
  * structure field names for historic reasons or brevity.
  * sizeof(AVCodecContext) must not be used outside libav*.
  */
-export interface AVCodecContext {
+export declare class AVCodecContext {
+    constructor(codec: AVCodec);
+
+    /**
+     * Callback called when a new frame arrives from the decoder.
+     */
+    onFrame: (frame: AVFrame) => void;
+
+    /**
+     * Callback called when a new packet arrives from the encoder.
+     */
+    onPacket: (frame: AVPacket) => void;
+
     /**
      * information on struct for av_log
      * - set by avcodec_alloc_context3
      */
-    av_class: AVClass;
-    log_level_offset: number;
+    class: AVClass;
 
     /** 
      * see AVMEDIA_TYPE_xxx 
      */
-    codec_type: AVMediaType;
+    codecType: AVMediaType;
     codec: AVCodec;
+
     /**
      * see AV_CODEC_ID_xxx 
      */
-    codec_id: AVCodecID;
+    codecID: AVCodecID;
 
     /**
      * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
@@ -665,24 +677,7 @@ export interface AVCodecContext {
      * - encoding: Set by user, if not then the default based on codec_id will be used.
      * - decoding: Set by user, will be converted to uppercase by libavcodec during init.
      */
-    codec_tag: number;
-
-    priv_data: OpaquePtr;
-
-    /**
-     * Private context used for internal data.
-     *
-     * Unlike priv_data, this is not codec-specific. It is used in general
-     * libavcodec functions.
-     */
-    internal: AVCodecInternal;
-
-    /**
-     * Private data of the user, can be used to carry app specific stuff.
-     * - encoding: Set by user.
-     * - decoding: Set by user.
-     */
-    opaque: OpaquePtr;
+    codecTag: number;
 
     /**
      * the average bitrate
@@ -690,7 +685,7 @@ export interface AVCodecContext {
      * - decoding: Set by user, may be overwritten by libavcodec
      *             if this info is available in the stream
      */
-    bit_rate: number;
+    bitRate: number;
 
     /**
      * number of bits the bitstream is allowed to diverge from the reference.
@@ -698,7 +693,7 @@ export interface AVCodecContext {
      * - encoding: Set by user; unused for constant quantizer encoding.
      * - decoding: unused
      */
-    bit_rate_tolerance: number;
+    bitRateTolerance: number;
 
     /**
      * Global quality for codecs which cannot change it per frame.
@@ -706,13 +701,13 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-    global_quality: number;
+    globalQuality: number;
 
     /**
      * - encoding: Set by user.
      * - decoding: unused
      */
-    compression_level: number;
+    compressionLevel: number;
 
     /**
      * AV_CODEC_FLAG_*.
@@ -727,21 +722,6 @@ export interface AVCodecContext {
      * - decoding: Set by user.
      */
     flags2: number;
-
-    /**
-     * some codecs need / can use extradata like Huffman tables.
-     * MJPEG: Huffman tables
-     * rv10: additional flags
-     * MPEG-4: global headers (they can be in the bitstream or here)
-     * The allocated memory should be AV_INPUT_BUFFER_PADDING_SIZE bytes larger
-     * than extradata_size to avoid problems if it is read with the bitstream reader.
-     * The bytewise contents of extradata must not depend on the architecture or CPU endianness.
-     * Must be allocated with the av_malloc() family of functions.
-     * - encoding: Set/allocated/freed by libavcodec.
-     * - decoding: Set/allocated/freed by user.
-     */
-    extradata: Buffer;
-    extradata_size: number;
 
     /**
      * This is the fundamental unit of time (in seconds) in terms
@@ -762,7 +742,7 @@ export interface AVCodecContext {
      * - decoding: the use of this field for decoding is deprecated.
      *             Use framerate instead.
      */
-    time_base: AVRational;
+    timeBase: AVRational;
 
     /**
      * For some codecs, the time base is closer to the field rate than the frame rate.
@@ -771,7 +751,7 @@ export interface AVCodecContext {
      *
      * Set to time_base ticks per frame. Default 1, e.g., H.264/MPEG-2 set it to 2.
      */
-    ticks_per_frame: number;
+    ticksPerFrame: number;
 
     /**
      * Codec delay.
@@ -828,15 +808,15 @@ export interface AVCodecContext {
      *             e.g. from the container. During decoding, the decoder may
      *             overwrite those values as required while parsing the data.
      */
-    coded_width: number;
-    coded_height: number;
+    codedWidth: number;
+    codedHeight: number;
 
     /**
      * the number of pictures in a group of pictures, or 0 for intra_only
      * - encoding: Set by user.
      * - decoding: unused
      */
-    gop_size: number;
+    gopSize: number;
 
     /**
      * Pixel format, see AV_PIX_FMT_xxx.
@@ -851,68 +831,7 @@ export interface AVCodecContext {
      * - decoding: Set by user if known, overridden by libavcodec while
      *             parsing the data.
      */
-    pix_fmt: AVPixelFormat;
-
-    /**
-     * If non NULL, 'draw_horiz_band' is called by the libavcodec
-     * decoder to draw a horizontal band. It improves cache usage. Not
-     * all codecs can do that. You must check the codec capabilities
-     * beforehand.
-     * When multithreading is used, it may be called from multiple threads
-     * at the same time; threads might draw different parts of the same AVFrame,
-     * or multiple AVFrames, and there is no guarantee that slices will be drawn
-     * in order.
-     * The function is also used by hardware acceleration APIs.
-     * It is called at least once during frame decoding to pass
-     * the data needed for hardware render.
-     * In that mode instead of pixel data, AVFrame points to
-     * a structure specific to the acceleration API. The application
-     * reads the structure and can change some fields to indicate progress
-     * or mark state.
-     * - encoding: unused
-     * - decoding: Set by user.
-     * @param height the height of the slice
-     * @param y the y position of the slice
-     * @param type 1->top field, 2->bottom field, 3->frame
-     * @param offset offset into the AVFrame.data from which the slice should be read
-     */
-    draw_horiz_band: (
-        s: AVCodecContext,
-        src: AVFrame,
-        /**
-         * Length should be AV_NUM_DATA_POINTERS
-         */
-        offset: number[],
-        y: number, type: number, 
-        height: number
-    ) => void;
-
-    /**
-     * Callback to negotiate the pixel format. Decoding only, may be set by the
-     * caller before avcodec_open2().
-     *
-     * Called by some decoders to select the pixel format that will be used for
-     * the output frames. This is mainly used to set up hardware acceleration,
-     * then the provided format list contains the corresponding hwaccel pixel
-     * formats alongside the "software" one. The software pixel format may also
-     * be retrieved from \ref sw_pix_fmt.
-     *
-     * This callback will be called when the coded frame properties (such as
-     * resolution, pixel format, etc.) change and more than one output format is
-     * supported for those new properties. If a hardware pixel format is chosen
-     * and initialization for it fails, the callback may be called again
-     * immediately.
-     *
-     * This callback may be called from different threads if the decoder is
-     * multi-threaded, but not from more than one thread simultaneously.
-     *
-     * @param fmt list of formats which may be used in the current
-     *            configuration, terminated by AV_PIX_FMT_NONE.
-     * @warning Behavior is undefined if the callback returns a value other
-     *          than one of the formats in fmt or AV_PIX_FMT_NONE.
-     * @return the chosen format or AV_PIX_FMT_NONE
-     */
-    get_format: (s: AVCodecContext, fmt: AVPixelFormat) => AVPixelFormat;
+    pixelFormat: AVPixelFormat;
 
     /**
      * maximum number of B-frames between non-B-frames
@@ -920,7 +839,7 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-    max_b_frames: number;
+    maxBFrames: number;
 
     /**
      * qscale factor between IP and B-frames
@@ -929,14 +848,14 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-    b_quant_factor: number;
+    bQuantizationFactor: number;
 
     /**
      * qscale offset between IP and B-frames
      * - encoding: Set by user.
      * - decoding: unused
      */
-    b_quant_offset: number;
+     bQuantizationOffset: number;
 
     /**
      * Size of the frame reordering buffer in the decoder.
@@ -944,7 +863,7 @@ export interface AVCodecContext {
      * - encoding: Set by libavcodec.
      * - decoding: Set by libavcodec.
      */
-    has_b_frames: number;
+    hasBFrames: number;
 
     /**
      * qscale factor between P- and I-frames
@@ -953,63 +872,56 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-    i_quant_factor: number;
+    iQuantizationFactor: number;
 
     /**
      * qscale offset between P and I-frames
      * - encoding: Set by user.
      * - decoding: unused
      */
-    i_quant_offset: number;
+     iQuantizationOffset: number;
 
     /**
      * luminance masking (0-> disabled)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    lumi_masking: number;
+    luminanceMasking: number;
 
     /**
      * temporary complexity masking (0-> disabled)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    temporal_cplx_masking: number;
+    temporalComplexityMasking: number;
 
     /**
      * spatial complexity masking (0-> disabled)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    spatial_cplx_masking: number;
+    spatialComplexityMasking: number;
 
     /**
      * p block masking (0-> disabled)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    p_masking: number;
+    pMasking: number;
 
     /**
      * darkness masking (0-> disabled)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    dark_masking: number;
+    darkMasking: number;
 
     /**
      * slice count
      * - encoding: Set by libavcodec.
      * - decoding: Set by user (or 0).
      */
-    slice_count: number;
-
-    /**
-     * slice offsets in the frame in bytes
-     * - encoding: Set/allocated by libavcodec.
-     * - decoding: Set/allocated by user (or NULL).
-     */
-    slice_offset: number[];
+    sliceCount: number;
 
     /**
      * sample aspect ratio (0 if unknown)
@@ -1018,70 +930,70 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    sample_aspect_ratio: AVRational;
+    sampleAspectRatio: AVRational;
 
     /**
      * motion estimation comparison function
      * - encoding: Set by user.
      * - decoding: unused
      */
-    me_cmp: number;
+    motionEstimationComparisonFunction: number;
 
     /**
      * subpixel motion estimation comparison function
      * - encoding: Set by user.
      * - decoding: unused
      */
-    me_sub_cmp: number;
+    subpixelMotionEstimationComparisonFunction: number;
 
     /**
      * macroblock comparison function (not supported yet)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    mb_cmp: number;
+    macroblockComparisonFunction: number;
 
     /**
      * interlaced DCT comparison function
      * - encoding: Set by user.
      * - decoding: unused
      */
-    ildct_cmp: number;
+    interlacedDCTComparisonFunction: number;
 
     /**
      * ME diamond size & shape
      * - encoding: Set by user.
      * - decoding: unused
      */
-    dia_size: number;
+    diamondSize: number;
 
     /**
      * amount of previous MV predictors (2a+1 x 2a+1 square)
      * - encoding: Set by user.
      * - decoding: unused
      */
-    last_predictor_count: number;
+    lastPredictorCount: number;
 
     /**
      * motion estimation prepass comparison function
      * - encoding: Set by user.
      * - decoding: unused
      */
-    me_pre_cmp: number;
+    motionEstimationPrepassComparisonFunction: number;
 
     /**
      * ME prepass diamond size & shape
      * - encoding: Set by user.
      * - decoding: unused
      */
-    pre_dia_size: number;
+    motionEstimationPrepassDiamondSize: number;
 
     /**
      * subpel ME quality
      * - encoding: Set by user.
      * - decoding: unused
      */
-    me_subpel_quality: number;
+    motionEstimationSubpelQuality: number;
 
     /**
      * maximum motion estimation search range in subpel units
@@ -1090,164 +1002,137 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-    me_range: number;
+    motionEstimationRange: number;
 
     /**
      * slice flags
      * - encoding: unused
      * - decoding: Set by user.
      */
-    slice_flags: number;
+    sliceFlags: number;
 
     /**
      * macroblock decision mode
      * - encoding: Set by user.
      * - decoding: unused
      */
-    mb_decision: number;
-
-    /**
-     * custom intra quantization matrix
-     * Must be allocated with the av_malloc() family of functions, and will be freed in
-     * avcodec_free_context().
-     * - encoding: Set/allocated by user, freed by libavcodec. Can be NULL.
-     * - decoding: Set/allocated/freed by libavcodec.
-     */
-    intra_matrix: number[];
-
-    /**
-     * custom inter quantization matrix
-     * Must be allocated with the av_malloc() family of functions, and will be freed in
-     * avcodec_free_context().
-     * - encoding: Set/allocated by user, freed by libavcodec. Can be NULL.
-     * - decoding: Set/allocated/freed by libavcodec.
-     */
-    inter_matrix: number[];
+     macroblockDecisionMode: number;
 
     /**
      * precision of the intra DC coefficient - 8
      * - encoding: Set by user.
      * - decoding: Set by libavcodec
      */
-    intra_dc_precision: number;
+    intraDCPrecision: number;
 
     /**
      * Number of macroblock rows at the top which are skipped.
      * - encoding: unused
      * - decoding: Set by user.
      */
-    skip_top: number;
+    skipTop: number;
 
     /**
      * Number of macroblock rows at the bottom which are skipped.
      * - encoding: unused
      * - decoding: Set by user.
      */
-    skip_bottom: number;
+    skipBottom: number;
 
     /**
      * minimum MB Lagrange multiplier
      * - encoding: Set by user.
      * - decoding: unused
      */
-    mb_lmin: number;
+    minMBLagrangeMultiplier: number;
 
     /**
      * maximum MB Lagrange multiplier
      * - encoding: Set by user.
      * - decoding: unused
      */
-    mb_lmax: number;
+    maxLBLagrangeMultiplier: number;
 
     /**
      * - encoding: Set by user.
      * - decoding: unused
      */
-    bidir_refine: number;
+    bidirectionalRefine: number;
 
     /**
      * minimum GOP size
      * - encoding: Set by user.
      * - decoding: unused
      */
-    keyint_min: number;
+    minGopSize: number;
 
     /**
      * number of reference frames
      * - encoding: Set by user.
      * - decoding: Set by lavc.
      */
-    refs: number;
+    referenceFrameCount: number;
 
     /**
      * Note: Value depends upon the compare function used for fullpel ME.
      * - encoding: Set by user.
      * - decoding: unused
      */
-    mv0_threshold: number;
+    mv0Threshold: number;
 
     /**
      * Chromaticity coordinates of the source primaries.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    color_primaries: AVColorPrimaries;
+    colorPrimaries: AVColorPrimaries;
 
     /**
      * Color Transfer Characteristic.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    color_trc: AVColorTransferCharacteristic;
+    colorTrc: AVColorTransferCharacteristic;
 
     /**
      * YUV colorspace type.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    colorspace: AVColorSpace;
+    colorSpace: AVColorSpace;
 
     /**
      * MPEG vs JPEG YUV range.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    color_range: AVColorRange;
+    colorRange: AVColorRange;
 
     /**
      * This defines the location of chroma samples.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    chroma_sample_location: AVChromaLocation;
-
-    /**
-     * Number of slices.
-     * Indicates number of picture subdivisions. Used for parallelized
-     * decoding.
-     * - encoding: Set by user
-     * - decoding: unused
-     */
-    slices: number;
+    chromeSampleLocation: AVChromaLocation;
 
     /** Field order
      * - encoding: set by libavcodec
      * - decoding: Set by user.
      */
-    field_order: AVFieldOrder;
+    fieldOrder: AVFieldOrder;
 
     /* audio only */
     /**
      * samples per second
      */
-    sample_rate: number;
+    sampleRate: number;
 
     /**
      * audio sample format
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    sample_fmt: AVSampleFormat;
+    sampleFormat: AVSampleFormat;
 
     /* The following data should not be initialized. */
     /**
@@ -1259,7 +1144,7 @@ export interface AVCodecContext {
      *   frame size is not restricted.
      * - decoding: may be set by some decoders to indicate constant frame size
      */
-    frame_size: number;
+    frameSize: number;
 
     /**
      * Frame counter, set by libavcodec.
@@ -1270,13 +1155,13 @@ export interface AVCodecContext {
      *   @note the counter is not incremented if encoding/decoding resulted in
      *   an error.
      */
-    frame_number: number;
+    frameNumber: number;
 
     /**
      * number of bytes per packet if constant and known or 0
      * Used by some WAV based audio codecs.
      */
-    block_align: number;
+    blockAlignment: number;
 
     /**
      * Audio cutoff bandwidth (0 means "automatic")
@@ -1290,7 +1175,7 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    audio_service_type: AVAudioServiceType;
+    audioServiceType: AVAudioServiceType;
 
     /**
      * desired sample format
@@ -1298,7 +1183,7 @@ export interface AVCodecContext {
      * - decoding: Set by user.
      * Decoder will decode to this format if it can.
      */
-    request_sample_fmt: AVSampleFormat;
+    requestSampleFormat: AVSampleFormat;
 
     /**
      * This callback is called at the beginning of each frame to get data
@@ -1385,81 +1270,80 @@ export interface AVCodecContext {
     /* - encoding parameters */
 
     /** < amount of qscale change between easy & hard scenes (0.0-1.0) */
-    qcompress: number;
+    quantizerCompression: number;
 
     /** < amount of qscale smoothing over time (0.0-1.0) */
-    qblur: number;
+    quantizerBlur: number;
 
     /**
      * minimum quantizer
      * - encoding: Set by user.
      * - decoding: unused
      */
-    qmin: number;
+    minQuantizer: number;
 
     /**
      * maximum quantizer
      * - encoding: Set by user.
      * - decoding: unused
      */
-    qmax: number;
+    maxQuantizer: number;
 
     /**
      * maximum quantizer difference between frames
      * - encoding: Set by user.
      * - decoding: unused
      */
-    max_qdiff: number;
+    maxQuantizerDifference: number;
 
     /**
      * decoder bitstream buffer size
      * - encoding: Set by user.
      * - decoding: unused
      */
-    rc_buffer_size: number;
+    rateControlBufferSize: number;
 
     /**
      * ratecontrol override, see RcOverride
      * - encoding: Allocated/set/freed by user.
      * - decoding: unused
      */
-    rc_override_count: number;
-    rc_override: RcOverride;
+    rateControlOverrideCount: number;
 
     /**
      * maximum bitrate
      * - encoding: Set by user.
      * - decoding: Set by user, may be overwritten by libavcodec.
      */
-    rc_max_rate: number;
+    rateControlMaxBitrate: number;
 
     /**
      * minimum bitrate
      * - encoding: Set by user.
      * - decoding: unused
      */
-    rc_min_rate: number;
+    rateControlMinBitrate: number;
 
     /**
      * Ratecontrol attempt to use, at maximum, <value> of what can be used without an underflow.
      * - encoding: Set by user.
      * - decoding: unused.
      */
-    rc_max_available_vbv_use: number;
+     rateControlMaxAvailableVbvSize: number;
 
     /**
      * Ratecontrol attempt to use, at least, <value> times the amount needed to prevent a vbv overflow.
      * - encoding: Set by user.
      * - decoding: unused.
      */
-    rc_min_vbv_overflow_use: number;
+    rateControlMinVbvOverflowUse: number;
 
     /**
      * Number of bits which should be loaded into the rc buffer before decoding starts.
      * - encoding: Set by user.
      * - decoding: unused
      */
-    rc_initial_buffer_occupancy: number;
+    rateControlInitialBufferOccupancy: number;
 
     /**
      * trellis RD quantization
@@ -1469,26 +1353,13 @@ export interface AVCodecContext {
     trellis: number;
 
     /**
-     * pass1 encoding statistics output buffer
-     * - encoding: Set by libavcodec.
-     * - decoding: unused
-     */
-    stats_out: string;
-
-    /**
-     * pass2 encoding statistics input buffer
-     * Concatenated stuff from stats_out of pass1 should be placed here.
-     * - encoding: Allocated/set/freed by user.
-     * - decoding: unused
-     */
-    stats_in: string;
-
-    /**
      * Work around bugs in encoders which sometimes cannot be detected automatically.
      * - encoding: Set by user
      * - decoding: Set by user
      */
-    workaround_bugs: number;
+    workaroundBugs: number;
+
+    // TODO BELOW
 
     /**
      * strictly follow the standard (MPEG-4, ...).
@@ -1523,7 +1394,7 @@ export interface AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
-    err_recognition: number;
+    errorRecognitionFlags: number;
 
     /**
      * opaque 64-bit number (generally a PTS) that will be reordered and
@@ -2337,42 +2208,6 @@ export interface AVSubtitle {
     ///< Same as packet pts, in AV_TIME_BASE
     pts: number;
 }
-
-/**
- * Return the LIBAVCODEC_VERSION_INT constant.
- */
-export function avcodec_version(): number { throw new NotImplemented(); }
-
-/**
- * Return the libavcodec build-time configuration.
- */
-export function avcodec_configuration(): string { throw new NotImplemented(); }
-
-/**
- * Return the libavcodec license.
- */
-export function avcodec_license(): string { throw new NotImplemented(); }
-
-/**
- * Allocate an AVCodecContext and set its fields to default values. The
- * resulting struct should be freed with avcodec_free_context().
- *
- * @param codec if non-NULL, allocate private data and initialize defaults
- *              for the given codec. It is illegal to then call avcodec_open2()
- *              with a different codec.
- *              If NULL, then the codec-specific defaults won't be initialized,
- *              which may result in suboptimal default settings (this is
- *              important mainly for encoders, e.g. libx264).
- *
- * @return An AVCodecContext filled with default values or NULL on failure.
- */
-export function avcodec_alloc_context3(codec: AVCodec): AVCodecContext { throw new NotImplemented(); }
-
-/**
- * Free the codec context and everything associated with it and write NULL to
- * the provided pointer.
- */
-export function avcodec_free_context(avctx: Ref<AVCodecContext>): void { throw new NotImplemented(); }
 
 /**
  * Get the AVClass for AVCodecContext. It can be used in combination with

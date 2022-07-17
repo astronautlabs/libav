@@ -15,6 +15,19 @@ void NAVCodec::Free() {
     // Do nothing. We never own codecs.
 }
 
+Napi::Value NAVCodec::GetVersion(const Napi::CallbackInfo& info) {
+    return Napi::Number::New(info.Env(), avcodec_version());
+}
+
+Napi::Value NAVCodec::GetConfiguration(const Napi::CallbackInfo& info) {
+    return Napi::String::New(info.Env(), avcodec_configuration());
+}
+
+Napi::Value NAVCodec::GetLicense(const Napi::CallbackInfo& info) {
+    return Napi::String::New(info.Env(), avcodec_license());
+}
+
+
 Napi::Value NAVCodec::All(const Napi::CallbackInfo& info) {
     void *iter = nullptr;
     std::vector<Napi::Value> vec;

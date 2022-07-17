@@ -1,6 +1,7 @@
 #include "../libav.h"
 #include "frame.h"
 #include "buffer.h"
+#include <assert.h>
 
 NAVFrame::NAVFrame(const Napi::CallbackInfo& info):
     NAVResource(info)
@@ -15,6 +16,13 @@ void NAVFrame::Free() {
     auto handle = GetHandle();
     av_frame_free(&handle);
     SetHandle(handle);
+}
+
+void NAVFrame::RefHandle() {
+    auto newFrame = av_frame_alloc();
+    assert(0 == av_frame_ref(newFrame, GetHandle()));
+    SetHandle(newFrame);
+    Owned = false;
 }
 
 Napi::Value NAVFrame::ReferTo(const Napi::CallbackInfo& info) {

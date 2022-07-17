@@ -57,7 +57,14 @@ public:
         const Napi::Env &env, 
         std::initializer_list<napi_value> &args
     ) {
-        return Construct(env, ResourceT::template ExportName(), args);
+        return Construct<ResourceT>(env, ResourceT::template ExportName(), args);
+    }
+
+    template<class ResourceT>
+    static ResourceT* Construct(
+        const Napi::Env &env
+    ) {
+        return Construct<ResourceT>(env, std::initializer_list<napi_value>());
     }
 
     template<class ResourceT>

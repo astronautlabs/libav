@@ -14,6 +14,10 @@ class NAVCodec : public NAVResource<NAVCodec, AVCodec> {
         inline static std::string ExportName() { return "AVCodec"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVCodec", {
+                StaticAccessor("version", &NAVCodec::GetVersion, nullptr),
+                StaticAccessor("configuration", &NAVCodec::GetConfiguration, nullptr),
+                StaticAccessor("license", &NAVCodec::GetLicense, nullptr),
+                
                 StaticMethod("all", &NAVCodec::All),
                 StaticMethod("findEncoder", &NAVCodec::FindDecoder),
                 StaticMethod("findDecoder", &NAVCodec::FindEncoder),
@@ -39,6 +43,10 @@ class NAVCodec : public NAVResource<NAVCodec, AVCodec> {
 
         virtual void Free();
     private:
+        static Napi::Value GetVersion(const Napi::CallbackInfo& info);
+        static Napi::Value GetConfiguration(const Napi::CallbackInfo& info);
+        static Napi::Value GetLicense(const Napi::CallbackInfo& info);
+
         static Napi::Value All(const Napi::CallbackInfo& info);
         static Napi::Value FindDecoder(const Napi::CallbackInfo& info);
         static Napi::Value FindEncoder(const Napi::CallbackInfo& info);

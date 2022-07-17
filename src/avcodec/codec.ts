@@ -187,6 +187,10 @@ export declare class AVProfile {
  * AVCodec.
  */
 export declare class AVCodec {
+    static readonly version: number;
+    static readonly configuration: string;
+    static readonly license: string;
+
     static all(): AVCodec[];
     static findDecoder(name: string): AVCodec;
     static findDecoder(id: AVCodecID): AVCodec;
@@ -307,16 +311,3 @@ export interface AVCodecHWConfig {
      */
     device_type: AVHWDeviceType;
 }
-
-/**
- * Retrieve supported hardware configurations for a codec.
- *
- * Values of index from zero to some maximum return the indexed configuration
- * descriptor; all other values return NULL.  If the codec does not support
- * any hardware configurations then it will always return NULL.
- */
-export function avcodec_get_hw_config(codec: AVCodec, index: number): AVCodecHWConfig { throw new NotImplemented(); }
-
-/**
- * @}
- */

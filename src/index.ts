@@ -2,3 +2,4 @@
 
 export * from '../binding';
 export * from './avutil';
+export * from './avcodec';

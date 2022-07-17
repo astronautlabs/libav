@@ -62,8 +62,11 @@ class NAVFrame : public NAVResource<NAVFrame, AVFrame> {
         }
 
         virtual void Free();
+        virtual void RefHandle();
 
     private:
+        bool Owned = true;
+
         Napi::Value ReferTo(const Napi::CallbackInfo& info);
         Napi::Value Unrefer(const Napi::CallbackInfo& info);
         Napi::Value Clone(const Napi::CallbackInfo& info);
