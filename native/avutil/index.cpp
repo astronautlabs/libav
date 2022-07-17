@@ -3,6 +3,7 @@
 #include "buffer.h"
 #include "dict.h"
 #include "frame.h"
+#include "class.h"
 
 void nlavu_init(Napi::Env env, Napi::Object exports) {
 
@@ -26,5 +27,6 @@ void nlavu_init(Napi::Env env, Napi::Object exports) {
     NAVDictionary::Register(env, exports);
     NAVDictionaryEntry::Register(env, exports);
     NAVFrame::Register(env, exports);
+    NAVClass::Register(env, exports);
     //NAVFrameSideData::Init(env, exports);
 }

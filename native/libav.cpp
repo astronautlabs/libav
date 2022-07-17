@@ -1,5 +1,6 @@
 #include "libav.h"
 #include "avutil/index.h"
+#include "avcodec/index.h"
 
 LibAvAddon::LibAvAddon(Napi::Env env, Napi::Object exports) {
 
@@ -7,6 +8,7 @@ LibAvAddon::LibAvAddon(Napi::Env env, Napi::Object exports) {
     env.SetInstanceData<LibAvAddon>(this);
 
     nlavu_init(env, exports);
+    nlavc_init(env, exports);
 
     // In the constructor we declare the functions the add-on makes available
     // to JavaScript.

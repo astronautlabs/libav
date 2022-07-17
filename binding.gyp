@@ -2,8 +2,16 @@
   "targets": [{
     "target_name" : "libav",
     'sources' : [ 
+      "native/avcodec/codec-context.cpp",
+      "native/avcodec/codec.cpp",
+      "native/avcodec/index.cpp",
+      "native/avcodec/packet.cpp",
+      "native/avcodec/profile.cpp",
+
       "native/avutil/avutil.cpp",
       "native/avutil/buffer.cpp",
+      "native/avutil/channel-layout.cpp",
+      "native/avutil/class.cpp",
       "native/avutil/dict.cpp",
       "native/avutil/frame.cpp",
       "native/avutil/index.cpp",
@@ -59,7 +67,9 @@
             "-lD:/dev/ffmpeg/ffmpeg/libavformat/avformat",
             "-lD:/dev/ffmpeg/ffmpeg/libavcodec/avcodec",
             "-lD:/dev/ffmpeg/ffmpeg/libavdevice/avdevice",
-            "-lD:/dev/ffmpeg/ffmpeg/libavfilter/avfilter"
+            "-lD:/dev/ffmpeg/ffmpeg/libavfilter/avfilter",
+            "-lD:/dev/ffmpeg/ffmpeg/libswresample/swresample",
+            "-lD:/dev/ffmpeg/ffmpeg/libswscale/swscale"
         ],
         "copies": [
             {
@@ -69,7 +79,9 @@
                 "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
                 "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
                 "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll"
+                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll",
+                "D:/dev/ffmpeg/ffmpeg/libswresample/swresample-4.dll",
+                "D:/dev/ffmpeg/ffmpeg/libswscale/swscale-6.dll"
               ]
             },
             {
@@ -79,7 +91,9 @@
                 "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
                 "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
                 "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll"
+                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll",
+                "D:/dev/ffmpeg/ffmpeg/libswresample/swresample-4.dll",
+                "D:/dev/ffmpeg/ffmpeg/libswscale/swscale-6.dll"
               ]
             }
           ]

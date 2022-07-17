@@ -178,42 +178,49 @@ export const AV_CODEC_CAP_ENCODER_FLUSH =   (1 << 21);
 /**
  * AVProfile.
  */
-export interface AVProfile {
-    profile: number;
-    name: string; ///< short name for the profile
+export declare class AVProfile {
+    readonly profile: number;
+    readonly name: string; ///< short name for the profile
 }
 
 /**
  * AVCodec.
  */
-export interface AVCodec {
+export declare class AVCodec {
+    static all(): AVCodec[];
+    static findDecoder(name: string): AVCodec;
+    static findDecoder(id: AVCodecID): AVCodec;
+    static findEncoder(name: string): AVCodec;
+    static findEncoder(id: AVCodecID): AVCodec;
+
     /**
      * Name of the codec implementation.
      * The name is globally unique among encoders and among decoders (but an
      * encoder and a decoder can share the same name).
      * This is the primary way to find a codec from the user perspective.
      */
-    name: string;
+    readonly name: string;
+
     /**
      * Descriptive name for the codec, meant to be more human readable than name.
      * You should use the NULL_IF_CONFIG_SMALL() macro to define it.
      */
-    long_name: string;
-    type: AVMediaType;
-    id: AVCodecID;
+    readonly longName: string;
+    readonly type: AVMediaType;
+    readonly id: AVCodecID;
+
     /**
      * Codec capabilities.
      * see AV_CODEC_CAP_*
      */
-    capabilities: number;
-    max_lowres: number;                     ///< maximum value for lowres supported by the decoder
-    supported_framerates: AVRational[]; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
-    pix_fmts: AVPixelFormat[];     ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
-    supported_samplerates: number[];       ///< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
-    sample_fmts: AVSampleFormat[]; ///< array of supported sample formats, or NULL if unknown, array is terminated by -1
-
-    priv_class: AVClass;              ///< AVClass for the private context
-    profiles: AVProfile[];              ///< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
+    readonly capabilities: number;
+    readonly decoderMaxLowResolution: number;                     ///< maximum value for lowres supported by the decoder
+    readonly supportedFrameRates: AVRational[]; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
+    readonly pixelFormats: AVPixelFormat[];     ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
+    readonly supportedSampleRates: number[];       ///< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
+    readonly sampleFormats: AVSampleFormat[]; ///< array of supported sample formats, or NULL if unknown, array is terminated by -1
+    readonly privateClass: AVClass;              ///< AVClass for the private context
+    readonly profiles: AVProfile[];              ///< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
 
     /**
      * Group name of the codec implementation.
@@ -225,74 +232,18 @@ export interface AVCodec {
      * If non-NULL, this will be the suffix in AVCodec.name in most cases
      * (usually AVCodec.name will be of the form "<codec_name>_<wrapper_name>").
      */
-    wrapper_name: string;
+    readonly wrapperName: string;
 
     /**
      * Array of supported channel layouts, terminated with a zeroed layout.
      */
-    ch_layouts: AVChannelLayout[];
+    readonly channelLayouts: AVChannelLayout[];
+
+    readonly isEncoder: boolean;
+    readonly isDecoder: boolean;
+
+    getProfile(profile: number): AVProfile;
 }
-
-/**
- * Iterate over all registered codecs.
- *
- * @param opaque a pointer where libavcodec will store the iteration state. Must
- *               point to NULL to start the iteration.
- *
- * @return the next registered codec or NULL when the iteration is
- *         finished
- */
-export function av_codec_iterate(opaque: Ref<OpaquePtr>): AVCodec { throw new NotImplemented(); }
-
-/**
- * Find a registered decoder with a matching codec ID.
- *
- * @param id AVCodecID of the requested decoder
- * @return A decoder if one was found, NULL otherwise.
- */
-export function avcodec_find_decoder(id: AVCodecID): AVCodec { throw new NotImplemented(); }
-
-/**
- * Find a registered decoder with the specified name.
- *
- * @param name name of the requested decoder
- * @return A decoder if one was found, NULL otherwise.
- */
-export function avcodec_find_decoder_by_name(name: string): AVCodec { throw new NotImplemented(); }
-
-/**
- * Find a registered encoder with a matching codec ID.
- *
- * @param id AVCodecID of the requested encoder
- * @return An encoder if one was found, NULL otherwise.
- */
-export function avcodec_find_encoder(id: AVCodecID): AVCodec { throw new NotImplemented(); }
-
-/**
- * Find a registered encoder with the specified name.
- *
- * @param name name of the requested encoder
- * @return An encoder if one was found, NULL otherwise.
- */
-export function avcodec_find_encoder_by_name(name: string): AVCodec { throw new NotImplemented(); }
-/**
- * @return a non-zero number if codec is an encoder, zero otherwise
- */
-export function av_codec_is_encoder(codec: AVCodec): number { throw new NotImplemented(); }
-
-/**
- * @return a non-zero number if codec is a decoder, zero otherwise
- */
-export function av_codec_is_decoder(codec: AVCodec): number { throw new NotImplemented(); }
-
-/**
- * Return a name for the specified profile, if available.
- *
- * @param codec the codec that is searched for the given profile
- * @param profile the profile value for which a name is requested
- * @return A name for the profile if found, NULL otherwise.
- */
-export function av_get_profile_name(codec: AVCodec, profile: number): string { throw new NotImplemented(); }
 
 /**
  * The codec supports this format via the hw_device_ctx interface.

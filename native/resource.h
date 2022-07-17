@@ -118,20 +118,21 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
          *                   If it was not, then Ref() will be called to increase the reference count 
          *                   of the underlying handle (if that is supported by the subclass)
          */
-        static SelfT *FromHandle(const Napi::Env env, HandleT *handle, bool refIsOwned) {
+        static SelfT *FromHandle(const Napi::Env &env, HandleT *handle, bool refIsOwned) {
             SelfT *instance = LibAvAddon::Self(env)->GetResource<SelfT>(
-                GetRegisterableHandle(handle)
+                GetRegisterableHandle((void*)handle)
             );
 
             if (instance)
                 return instance;
 
             instance = LibAvAddon::Self(env)->Construct<SelfT>(env, SelfT::template ExportName(), { 
-                Napi::External<HandleT>::New(env, handle)
+                Napi::External<HandleT>::New(env, (HandleT*)handle)
             });
 
-            if (!refIsOwned)
+            if (!refIsOwned) {
                 instance->RefHandle();
+            }
 
             return instance;
         }
@@ -139,6 +140,24 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         static Napi::Value FromHandleWrapped(const Napi::Env env, HandleT *ref, bool refIsOwned) {
             return FromHandle(env, ref, refIsOwned)->Value();
         }
+        
+        static std::vector<SelfT *> FromHandles(const Napi::Env &env, HandleT *items, int count, bool refsAreOwned) {
+            std::vector<SelfT*> vec;
+            for (int i = 0, max = count; i < max; ++i)
+                vec.push_back(FromHandle(env, items + i, refsAreOwned));
+            return vec;
+        }
+        
+        static Napi::Array FromHandlesWrapped(const Napi::Env &env, HandleT *items, int count, bool refsAreOwned) {
+            auto array = Napi::Array::New(env, count);
+            std::vector<SelfT*> vec = FromHandles(env, items, count, refsAreOwned);
+
+            for (int i = 0, max = count; i < max; ++i)
+                array.Set(i, vec[i]->Value());
+            
+            return array;
+        }
+
 
         HandleT *GetHandle() {
             return handle;

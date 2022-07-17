@@ -304,10 +304,10 @@ export enum AVPacketSideDataType {
     AV_PKT_DATA_NB
 };
 
-export interface AVPacketSideData {
-    data: Buffer;
-    size: number;
-    type: AVPacketSideDataType;
+export declare class AVPacketSideData {
+    readonly data: Buffer;
+    readonly size: number;
+    readonly type: AVPacketSideDataType;
 }
 
 /**
@@ -340,13 +340,14 @@ export interface AVPacketSideData {
  * @see av_packet_ref
  * @see av_packet_unref
  */
-export interface AVPacket {
+export declare class AVPacket {
     /**
      * A reference to the reference-counted buffer where the packet data is
      * stored.
      * May be NULL, then the packet data is not reference-counted.
      */
-    buf: AVBuffer;
+    readonly buffer: AVBuffer;
+
     /**
      * Presentation timestamp in AVStream->time_base units; the time at which
      * the decompressed packet will be presented to the user.
@@ -356,40 +357,37 @@ export interface AVPacket {
      * the terms dts and pts/cts to mean something different. Such timestamps
      * must be converted to true pts/dts before they are stored in AVPacket.
      */
-    pts: number;
+    readonly pts: number;
+
     /**
      * Decompression timestamp in AVStream->time_base units; the time at which
      * the packet is decompressed.
      * Can be AV_NOPTS_VALUE if it is not stored in the file.
      */
-    dts: number;
-    data: Buffer;
-    size: number;
-    stream_index: number;
+    readonly dts: number;
+    
+    readonly size: number;
+    readonly streamIndex: number;
     /**
      * A combination of AV_PKT_FLAG values
      */
-    flags: number;
+    readonly flags: number;
+
     /**
      * Additional packet data that can be provided by the container.
      * Packet can contain several types of side information.
      */
-    side_data: AVPacketSideData[];
-    side_data_elems: number;
+    readonly sideData: AVPacketSideData[];
+    readonly sideDataCount: number;
 
     /**
      * Duration of this packet in AVStream->time_base units, 0 if unknown.
      * Equals next_pts - this_pts in presentation order.
      */
-    duration: number;
+    readonly duration: number;
 
     ///< byte position in stream, -1 if unknown
-    pos: number;
-
-    /**
-     * for some private data of the user
-     */
-    opaque: OpaquePtr;
+    readonly position: number;
 
     /**
      * AVBufferRef for free use by the API user. FFmpeg will never check the
@@ -400,7 +398,7 @@ export interface AVPacket {
      * This is unrelated to the opaque field, although it serves a similar
      * purpose.
      */
-    opaque_ref: AVBuffer;
+    readonly opaqueBuffer: AVBuffer;
 
     /**
      * Time base of the packet's timestamps.
@@ -408,7 +406,7 @@ export interface AVPacket {
      * demuxers, but its value will be by default ignored on input to decoders
      * or muxers.
      */
-    time_base: AVRational;
+    readonly timeBase: AVRational;
 }
 
 /**
