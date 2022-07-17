@@ -25,6 +25,6 @@ void nlavu_init(Napi::Env env, Napi::Object exports) {
     NAVBufferPool::Register(env, exports);
     NAVDictionary::Register(env, exports);
     NAVDictionaryEntry::Register(env, exports);
-    NAVFrame::Init(env, exports);
+    NAVFrame::Register(env, exports);
     //NAVFrameSideData::Init(env, exports);
 }

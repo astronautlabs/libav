@@ -1,17 +1,67 @@
-#include "../common.h"
-
 #include <napi.h>
+
+#include "../common.h"
+#include "../resource.h"
 
 extern "C" {
     #include <libavutil/frame.h>
 }
 
-class NAVFrame : public Napi::ObjectWrap<NAVFrame> {
+class NAVFrame : public NAVResource<NAVFrame, AVFrame> {
     public:
         NAVFrame(const Napi::CallbackInfo& info);
-        static void Init(Napi::Env env, Napi::Object exports);
-        virtual void Finalize(Napi::Env env);
-        AVFrame *handle;
+        
+        inline static std::string ExportName() { return "AVFrame"; }
+        inline static Napi::Function ClassDefinition(const Napi::Env &env) {
+            return DefineClass(env, "AVFrame", {
+                R_GETTER("data", &NAVFrame::GetData),
+                R_GETTER("lineSize", &NAVFrame::GetLineSize),
+                R_GETTER("extendedData", &NAVFrame::GetExtendedData),
+                R_GETTER("width", &NAVFrame::GetWidth),
+                R_GETTER("height", &NAVFrame::GetHeight),
+                R_GETTER("numberOfSamples", &NAVFrame::GetNumberOfSamples),
+                R_GETTER("format", &NAVFrame::GetFormat),
+                R_GETTER("keyFrame", &NAVFrame::IsKeyFrame),
+                R_GETTER("pictureType", &NAVFrame::GetPictType),
+                R_GETTER("sampleAspectRatio", &NAVFrame::GetSampleAspectRatio),
+                R_GETTER("pts", &NAVFrame::GetPts),
+                R_GETTER("packetPts", &NAVFrame::GetPacketPts),
+                R_GETTER("timeBase", &NAVFrame::GetTimeBase),
+                R_GETTER("codedPictureNumber", &NAVFrame::GetCodedPictureNumber),
+                R_GETTER("displayPictureNumber", &NAVFrame::GetDisplayPictureNumber),
+                R_GETTER("quality", &NAVFrame::GetQuality),
+                R_GETTER("repeatPict", &NAVFrame::GetRepeatPict),
+                R_GETTER("interlaced", &NAVFrame::GetInterlacedFrame),
+                R_GETTER("topFieldFirst", &NAVFrame::GetTopFieldFirst),
+                R_GETTER("paletteHasChanged", &NAVFrame::HasPaletteChanged),
+                R_GETTER("reorderedOpaque", &NAVFrame::GetReorderedOpaque),
+                R_GETTER("sampleRate", &NAVFrame::GetSampleRate),
+                R_GETTER("buffers", &NAVFrame::GetBuffers),
+                R_GETTER("extendedBuffers", &NAVFrame::GetExtendedBuffers),
+                R_GETTER("sideData", &NAVFrame::GetSideData),
+                R_GETTER("flags", &NAVFrame::GetFlags),
+                R_GETTER("colorRange", &NAVFrame::GetColorRange),
+                R_GETTER("colorPrimaries", &NAVFrame::GetColorPrimaries),
+                R_GETTER("colorTransferCharacteristics", &NAVFrame::GetColorTrc),
+                R_GETTER("colorSpace", &NAVFrame::GetColorSpace),
+                R_GETTER("chromaLocation", &NAVFrame::GetChromaLocation),
+                R_GETTER("bestEffortTimestamp", &NAVFrame::GetBestEffortTimestamp),
+                R_GETTER("packetPosition", &NAVFrame::GetPacketPos),
+                R_GETTER("packetDuration", &NAVFrame::GetPacketDuration),
+                R_GETTER("metadata", &NAVFrame::GetMetadata),
+                R_GETTER("decodeErrorFlags", &NAVFrame::GetDecodeErrorFlags),
+                R_GETTER("packetSize", &NAVFrame::GetPacketSize),
+                R_GETTER("hwFramesContext", &NAVFrame::GetHwFramesContext),
+                R_GETTER("opaqueRef", &NAVFrame::GetOpaqueRef),
+                R_GETTER("cropTop", &NAVFrame::GetCropTop),
+                R_GETTER("cropBottom", &NAVFrame::GetCropBottom),
+                R_GETTER("cropLeft", &NAVFrame::GetCropLeft),
+                R_GETTER("cropRight", &NAVFrame::GetCropRight),
+                R_GETTER("channelLayout", &NAVFrame::GetChannelLayout),
+            });
+        }
+
+        virtual void Free();
 
     private:
         Napi::Value ReferTo(const Napi::CallbackInfo& info);

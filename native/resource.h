@@ -4,6 +4,11 @@
 #include <napi.h>
 #include "libav.h"
 
+#define R_GETTER(name, getter) InstanceAccessor((name), (getter), nullptr)
+#define R_SETTER(name, setter) InstanceAccessor((name), nullptr, (setter))
+#define R_ACCESSOR(name, getter, setter) InstanceAccessor((name), (getter), (setter))
+#define R_METHOD(name, impl) InstanceMethod<impl>((name))
+
 /**
  * The default implementation of GetRegisterableHandle when a more specific one is not provided.
  * This implementation simply returns the given handle.

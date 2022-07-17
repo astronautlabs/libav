@@ -16,13 +16,13 @@ class NAVBuffer : public NAVResource<NAVBuffer, AVBufferRef, GetRegisterableBuff
         inline static std::string ExportName() { return "AVBuffer"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVBuffer", {
-                InstanceAccessor("size", &NAVBuffer::GetSize, nullptr),
-                InstanceAccessor("data", &NAVBuffer::GetData, nullptr),
-                InstanceAccessor("refCount", &NAVBuffer::GetRefCount, nullptr),
-                InstanceAccessor("writable", &NAVBuffer::GetIsWritable, nullptr),
-                InstanceMethod<&NAVBuffer::Free>("free"),
-                InstanceMethod<&NAVBuffer::MakeWritable>("makeWritable"),
-                InstanceMethod<&NAVBuffer::Realloc>("realloc")
+                R_GETTER("size", &NAVBuffer::GetSize),
+                R_GETTER("data", &NAVBuffer::GetData),
+                R_GETTER("refCount", &NAVBuffer::GetRefCount),
+                R_GETTER("writable", &NAVBuffer::GetIsWritable),
+                R_METHOD("free", &NAVBuffer::Free),
+                R_METHOD("makeWritable", &NAVBuffer::MakeWritable),
+                R_METHOD("realloc", &NAVBuffer::Realloc)
             });
         }
 
@@ -53,9 +53,9 @@ class NAVBufferPool : public NAVResource<NAVBufferPool, AVBufferPool> {
         inline static std::string ExportName() { return "AVBufferPool"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVBufferPool", {
-                InstanceAccessor("freed", &NAVBufferPool::IsFreed, nullptr),
-                InstanceMethod<&NAVBufferPool::Free>("free"),
-                InstanceMethod<&NAVBufferPool::Get>("get")
+                R_GETTER("freed", &NAVBufferPool::IsFreed),
+                R_METHOD("free", &NAVBufferPool::Free),
+                R_METHOD("get", &NAVBufferPool::Get)
             });
         }
         

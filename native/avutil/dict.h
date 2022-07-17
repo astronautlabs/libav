@@ -14,12 +14,12 @@ class NAVDictionary : public NAVResource<NAVDictionary, AVDictionary> {
         inline static std::string ExportName() { return "AVDictionary"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVDictionary", {
-                InstanceAccessor("count", &NAVDictionary::Count, nullptr),
-                InstanceAccessor("keys", &NAVDictionary::GetKeys, nullptr),
-                InstanceMethod<&NAVDictionary::Get>("get"),
-                InstanceMethod<&NAVDictionary::Set>("set"),
-                InstanceMethod<&NAVDictionary::CopyTo>("copyTo"),
-                InstanceMethod<&NAVDictionary::Clear>("clear"),
+                R_GETTER("count", &NAVDictionary::Count),
+                R_GETTER("keys", &NAVDictionary::GetKeys),
+                R_METHOD("get", &NAVDictionary::Get),
+                R_METHOD("set", &NAVDictionary::Set),
+                R_METHOD("copyTo", &NAVDictionary::CopyTo),
+                R_METHOD("clear", &NAVDictionary::Clear),
             });
         }
 
@@ -40,10 +40,10 @@ class NAVDictionaryEntry : public NAVResource<NAVDictionaryEntry, AVDictionaryEn
         inline static std::string ExportName() { return "AVDictionaryEntry"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVDictionaryEntry", {
-                InstanceAccessor("key", &NAVDictionaryEntry::GetKey, nullptr),
-                InstanceAccessor("value", &NAVDictionaryEntry::GetValue, nullptr),
-                InstanceMethod<&NAVDictionaryEntry::ToJSON>("toJSON"),
-                InstanceMethod<&NAVDictionaryEntry::ToString>("toString")
+                R_GETTER("key", &NAVDictionaryEntry::GetKey),
+                R_GETTER("value", &NAVDictionaryEntry::GetValue),
+                R_METHOD("toJSON", &NAVDictionaryEntry::ToJSON),
+                R_METHOD("toString", &NAVDictionaryEntry::ToString)
             });
         }
 
