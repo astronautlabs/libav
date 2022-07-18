@@ -119,6 +119,9 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
          *                   of the underlying handle (if that is supported by the subclass)
          */
         static SelfT *FromHandle(const Napi::Env &env, HandleT *handle, bool refIsOwned) {
+            if (!handle)
+                return nullptr;
+            
             SelfT *instance = LibAvAddon::Self(env)->GetResource<SelfT>(
                 GetRegisterableHandle((void*)handle)
             );
@@ -138,6 +141,9 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         }
 
         static Napi::Value FromHandleWrapped(const Napi::Env env, HandleT *ref, bool refIsOwned) {
+            if (!ref)
+                return env.Null();
+            
             return FromHandle(env, ref, refIsOwned)->Value();
         }
         
@@ -153,11 +159,10 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
             std::vector<SelfT*> vec = FromHandles(env, items, count, refsAreOwned);
 
             for (int i = 0, max = count; i < max; ++i)
-                array.Set(i, vec[i]->Value());
+                array.Set(i, vec[i] ? vec[i]->Value() : env.Null());
             
             return array;
         }
-
 
         HandleT *GetHandle() {
             return handle;

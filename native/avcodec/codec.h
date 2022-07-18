@@ -19,8 +19,8 @@ class NAVCodec : public NAVResource<NAVCodec, AVCodec> {
                 StaticAccessor("license", &NAVCodec::GetLicense, nullptr),
                 
                 StaticMethod("all", &NAVCodec::All),
-                StaticMethod("findEncoder", &NAVCodec::FindDecoder),
-                StaticMethod("findDecoder", &NAVCodec::FindEncoder),
+                StaticMethod("findEncoder", &NAVCodec::FindEncoder),
+                StaticMethod("findDecoder", &NAVCodec::FindDecoder),
 
                 R_GETTER("name", &NAVCodec::GetName),
                 R_GETTER("longName", &NAVCodec::GetLongName),

@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { NotImplemented, OpaquePtr, Ref } from "../helpers";
 import { AVPictureType } from "./avutil";
 import { AVBuffer } from "./buffer";
 import { AVChannelLayout } from "./channel-layout";
@@ -222,7 +221,6 @@ export enum AVActiveFormatDescription {
  */
 export declare class AVFrameSideData {
     readonly type: AVFrameSideDataType;
-    readonly data: Buffer;
     readonly size: number;
     readonly metadata: AVDictionary;
     readonly buf: AVBuffer;
@@ -342,32 +340,149 @@ export const FF_DECODE_ERROR_DECODE_SLICES =       8;
  * for AVFrame can be obtained from avcodec_get_frame_class()
  */
 export declare class AVFrame {
+    static getSideDataName(type: AVFrameSideDataType): string;
+
     constructor();
-
     /**
-     * pointer to the picture/channel planes.
-     * This might be different from the first allocated byte. For video,
-     * it could even point to the end of the image data.
+     * Set up a new reference to the data described by the source frame.
      *
-     * All pointers in data and extended_data must point into one of the
-     * AVBufferRef in buf or extended_buf.
+     * Copy frame properties from src to dst and create a new reference for each
+     * AVBufferRef from src.
      *
-     * Some decoders access areas outside 0,0 - width,height, please
-     * see avcodec_align_dimensions2(). Some filters and swscale can read
-     * up to 16 bytes beyond the planes, if these filters are to be used,
-     * then 16 extra bytes must be allocated.
+     * If src is not reference counted, new buffers are allocated and the data is
+     * copied.
      *
-     * NOTE: Pointers not needed by the format MUST be set to NULL.
-     *
-     * @attention In case of video, the data[] pointers can point to the
-     * end of image data in order to reverse line order, when used in
-     * combination with negative values in the linesize[] array.
-     * 
-     * @note Length is AV_NUM_DATA_POINTERS
+     * @warning: This frame MUST have been either unreferenced or newly constructed
+     *          before calling this function, or undefined behavior will occur.
      */
-    data: Buffer[];
+    referTo(sourceFrame: AVFrame);
 
     /**
+     * Unreference all the buffers referenced by frame and reset the frame fields.
+     */
+    unrefer();
+
+    /**
+     * Create a new frame that references the same data as this one.
+     * This is a shortcut for new AVFrame().referTo(this)
+     */
+    clone(): AVFrame;
+
+    /**
+     * Copy the frame data from this frame to another frame.
+     *
+     * This function does not allocate anything, the other frame must be already 
+     * initialized and allocated with the same parameters as this one.
+     *
+     * This function only copies the frame data (i.e. the contents of the data /
+     * extended data arrays), not any other properties.
+     */
+    copyTo(other: AVFrame);
+
+    /**
+     * Copy only "metadata" fields from this frame to another.
+     *
+     * Metadata for the purpose of this function are those fields that do not affect
+     * the data layout in the buffers.  E.g. pts, sample rate (for audio) or sample
+     * aspect ratio (for video), but not width/height or channel layout.
+     * Side data is also copied.
+     */
+    copyPropertiesTo(other: AVFrame);
+
+    /**
+     * Get the buffer reference a given data plane is stored in.
+     *
+     * @param plane index of the data plane of interest in frame->extendedBuffers.
+     * @return the buffer reference that contains the plane.
+     */
+    getPlaneBuffer(plane: number): AVBuffer;
+
+    /**
+     * Add a new side data to the frame.
+     *
+     * @param type type of the added side data
+     * @param size size of the side data
+     *
+     * @return newly added side data object
+     */
+    addSideData(type: AVFrameSideDataType, size: number): AVFrameSideData;
+
+    /**
+     * Retrieve the side data object with the given type, if it exists.
+     * Otherwise null is returned.
+     */
+    getSideData(type: AVFrameSideDataType): AVFrameSideData;
+
+    /**
+     * Remove the side data object with the given type, if it exists.
+     */
+    removeSideData(type: AVFrameSideDataType);
+
+    /**
+     * Crop this video frame according to its cropLeft/cropTop/cropRight/
+     * cropBottom fields. If cropping is successful, the function will adjust the
+     * data pointers and the width/height fields, and set the crop fields to 0.
+     *
+     * In all cases, the cropping boundaries will be rounded to the inherent
+     * alignment of the pixel format. In some cases, such as for opaque hwaccel
+     * formats, the left/top cropping is ignored. The crop fields are set to 0 even
+     * if the cropping was rounded or ignored.
+     * 
+     * If the cropping fields were invalid, ERANGE is thrown and nothing is changed.
+     *
+     * @param flags Some combination of AV_FRAME_CROP_* flags, or 0 (default).
+     */
+    applyCropping(flags?: number);
+
+    /**
+     * Move everything contained in the other frame into this one and 
+     * reset the other frame.
+     *
+     * @warning: The other frame is not unreferenced, but directly overwritten 
+     *           without reading or deallocating its contents. Call 
+     *           unrefer() manually before calling this function to ensure 
+     *           that no memory is leaked.
+     */
+    moveReferenceFrom(other: AVFrame);
+
+    /**
+     * Allocate new buffer(s) for audio or video data.
+     *
+     * The following fields must be set on frame before calling this function:
+     * - format (pixel format for video, sample format for audio)
+     * - width and height for video
+     * - numberOfSamples and channelLayout for audio
+     *
+     * This function will fill `buffers` and, if necessary, `extendedBuffers`.
+     * For planar formats, one buffer will be allocated for each plane.
+     *
+     * @warning: if frame's buffers have already been allocated, calling this function will
+     *           leak memory. In addition, undefined behavior can occur in certain
+     *           cases.
+     *
+     * @param align Required buffer size alignment. If equal to 0, alignment will be
+     *              chosen automatically for the current CPU. It is highly
+     *              recommended to pass 0 (default) here unless you know what you are doing.
+     */
+    allocateBuffer(alignment?: number);
+
+    /**
+     * Check if the frame data is writable.
+     *
+     * @return True if the frame data is writable (which is the case if and
+     * only if each of the underlying buffers has only one reference, namely the one
+     * stored in this frame). Return 0 otherwise.
+     *
+     * If `true` is returned the answer is valid until av_buffer_ref() is called on any
+     * of the underlying AVBufferRefs (e.g. through av_frame_ref() or directly).
+     */
+    readonly writable: boolean;
+
+    /**
+     * NOTE: Arrays returned by this property are a copy of the values in the AVFrame. 
+     * You must set this field entirely to change it. If you pass an array with less than 
+     * AV_NUM_DATA_POINTERS elements, the remaining ones will be set to zero.
+     * 
      * For video, a positive or negative value, which is typically indicating
      * the size in bytes of each picture line, but it can also be:
      * - the negative byte size of lines for vertical flipping
@@ -391,23 +506,7 @@ export declare class AVFrame {
      * 
      * @note Length is AV_NUM_DATA_POINTERS
      */
-    linesize: number[];
-
-    /**
-     * pointers to the data planes/channels.
-     *
-     * For video, this should simply point to data[].
-     *
-     * For planar audio, each channel has a separate data pointer, and
-     * linesize[0] contains the size of each channel buffer.
-     * For packed audio, there is just one data pointer, and linesize[0]
-     * contains the total size of the buffer for all channels.
-     *
-     * Note: Both data and extended_data should always be set in a valid frame,
-     * but for planar audio with more channels that can fit in data,
-     * extended_data must be used in order to access all channels.
-     */
-    extended_data: Buffer[];
+    lineSizes: number[];
 
     /**
      * @name Video dimensions
@@ -428,7 +527,7 @@ export declare class AVFrame {
     /**
      * number of audio samples (per channel) described by this frame
      */
-    nb_samples: number;
+    numberOfSamples: number;
 
     /**
      * format of the frame, -1 if unknown or unset
@@ -438,19 +537,19 @@ export declare class AVFrame {
     format: number;
 
     /**
-     * 1 -> keyframe, 0-> not
+     * Whether this is a key frame or not
      */
-    key_frame: number;
+    keyFrame: boolean;
 
     /**
      * Picture type of the frame.
      */
-    pict_type: AVPictureType;
+    pictureType: AVPictureType;
 
     /**
      * Sample aspect ratio for the video frame, 0/1 if unknown/unspecified.
      */
-    sample_aspect_ratio: AVRational;
+    sampleAspectRatio: AVRational;
 
     /**
      * Presentation timestamp in time_base units (time when frame should be shown to user).
@@ -462,7 +561,7 @@ export declare class AVFrame {
      * This is also the Presentation time of this AVFrame calculated from
      * only AVPacket.dts values without pts values.
      */
-    pkt_dts: number;
+    packetDts: number;
 
     /**
      * Time base for the timestamps in this frame.
@@ -470,16 +569,16 @@ export declare class AVFrame {
      * filters, but its value will be by default ignored on input to encoders
      * or filters.
      */
-    time_base: AVRational;
+    timeBase: AVRational;
 
     /**
      * picture number in bitstream order
      */
-    coded_picture_number: number;
+    codedPictureNumber: number;
     /**
      * picture number in display order
      */
-    display_picture_number: number;
+    displayPictureNumber: number;
 
     /**
      * quality (between 1 (good) and FF_LAMBDA_MAX (bad))
@@ -487,30 +586,25 @@ export declare class AVFrame {
     quality: number;
 
     /**
-     * for some private data of the user
-     */
-    opaque: OpaquePtr;
-
-    /**
      * When decoding, this signals how much the picture must be delayed.
      * extra_delay = repeat_pict / (2*fps)
      */
-    repeat_pict: number;
+    repeatPicture: number;
 
     /**
      * The content of the picture is interlaced.
      */
-    interlaced_frame: number;
+    interlaced: boolean;
 
     /**
      * If the content is interlaced, is top field displayed first.
      */
-    top_field_first: number;
+    topFieldFirst: boolean;
 
     /**
      * Tell user application that palette has changed from previous frame.
      */
-    palette_has_changed: number;
+    paletteHasChanged: number;
 
     /**
      * reordered opaque 64 bits (generally an integer or a double precision float
@@ -520,12 +614,12 @@ export declare class AVFrame {
      * the decoder reorders values as needed and sets AVFrame.reordered_opaque
      * to exactly one of the values provided by the user through AVCodecContext.reordered_opaque
      */
-    reordered_opaque: number;
+    reorderedOpaque: number;
 
     /**
      * Sample rate of the audio data.
      */
-    sample_rate: number;
+    sampleRate: number;
 
     /**
      * AVBuffer references backing the data for this frame. All the pointers in
@@ -541,7 +635,7 @@ export declare class AVFrame {
      * 
      * @note Length is AV_NUM_DATA_POINTERS
      */
-    buf: AVBuffer[];
+    buffers: AVBuffer[];
 
     /**
      * For planar audio which requires more than AV_NUM_DATA_POINTERS
@@ -555,15 +649,12 @@ export declare class AVFrame {
      * This array is always allocated using av_malloc() by whoever constructs
      * the frame. It is freed in av_frame_unref().
      */
-    extended_buf: AVBuffer[];
+    extendedBuffers: AVBuffer[];
 
     /**
-     * Number of elements in extended_buf.
+     * Retrieve the full set of side data objects.
      */
-    nb_extended_buf: number;
-
-    side_data: AVFrameSideData[];
-    nb_side_data: number;
+    readonly sideData: AVFrameSideData[];
 
     /**
      * Frame flags, a combination of @ref lavu_frame_flags
@@ -575,34 +666,34 @@ export declare class AVFrame {
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    color_range: AVColorRange;
+    colorRange: AVColorRange;
 
-    color_primaries: AVColorPrimaries;
+    colorPrimaries: AVColorPrimaries;
 
-    color_trc: AVColorTransferCharacteristic;
+    colorTrc: AVColorTransferCharacteristic;
 
     /**
      * YUV colorspace type.
      * - encoding: Set by user
      * - decoding: Set by libavcodec
      */
-    colorspace: AVColorSpace;
+    colorSpace: AVColorSpace;
 
-    chroma_location: AVChromaLocation;
+    chromaLocation: AVChromaLocation;
 
     /**
      * frame timestamp estimated using various heuristics, in stream time base
      * - encoding: unused
      * - decoding: set by libavcodec, read by user.
      */
-    best_effort_timestamp: number;
+    bestEffortTimestamp: number;
 
     /**
      * reordered pos from the last AVPacket that has been input into the decoder
      * - encoding: unused
      * - decoding: Read by user.
      */
-    pkt_pos: number;
+    packetPosition: number;
 
     /**
      * duration of the corresponding packet, expressed in
@@ -610,7 +701,7 @@ export declare class AVFrame {
      * - encoding: unused
      * - decoding: Read by user.
      */
-    pkt_duration: number;
+    packetDuration: number;
 
     /**
      * metadata.
@@ -626,7 +717,7 @@ export declare class AVFrame {
      * - encoding: unused
      * - decoding: set by libavcodec, read by user.
      */
-    decode_error_flags: number;
+    decodeErrorFlags: number;
 
     /**
      * size of the corresponding packet containing the compressed
@@ -635,13 +726,13 @@ export declare class AVFrame {
      * - encoding: unused
      * - decoding: set by libavcodec, read by user.
      */
-    pkt_size: number;
+    packetSize: number;
 
     /**
      * For hwaccel-format frames, this should be a reference to the
      * AVHWFramesContext describing the frame.
      */
-    hw_frames_ctx: AVBuffer;
+    hwFramesContext: AVBuffer;
 
     /**
      * AVBufferRef for free use by the API user. FFmpeg will never check the
@@ -652,7 +743,7 @@ export declare class AVFrame {
      * This is unrelated to the opaque field, although it serves a similar
      * purpose.
      */
-    opaque_ref: AVBuffer;
+    opaqueRef: AVBuffer;
 
     /**
      * @anchor cropping
@@ -662,219 +753,16 @@ export declare class AVFrame {
      * the frame intended for presentation.
      * @{
      */
-    crop_top: number;
-    crop_bottom: number;
-    crop_left: number;
-    crop_right: number;
-    /**
-     * @}
-     */
-
-    /**
-     * AVBufferRef for internal use by a single libav* library.
-     * Must not be used to transfer data between libraries.
-     * Has to be NULL when ownership of the frame leaves the respective library.
-     *
-     * Code outside the FFmpeg libs should never check or change the contents of the buffer ref.
-     *
-     * FFmpeg calls av_buffer_unref() on it when the frame is unreferenced.
-     * av_frame_copy_props() calls create a new reference with av_buffer_ref()
-     * for the target frame's private_ref field.
-     */
-    private_ref: AVBuffer;
+    cropTop: number;
+    cropBottom: number;
+    cropLeft: number;
+    cropRight: number;
 
     /**
      * Channel layout of the audio data.
      */
-    ch_layout: AVChannelLayout;
+    channelLayout: AVChannelLayout;
 }
-
-/**
- * Allocate an AVFrame and set its fields to default values.  The resulting
- * struct must be freed using av_frame_free().
- *
- * @return An AVFrame filled with default values or NULL on failure.
- *
- * @note this only allocates the AVFrame itself, not the data buffers. Those
- * must be allocated through other means, e.g. with av_frame_get_buffer() or
- * manually.
- */
-export function av_frame_alloc(): AVFrame { throw new NotImplemented(); }
-
-/**
- * Free the frame and any dynamically allocated objects in it,
- * e.g. extended_data. If the frame is reference counted, it will be
- * unreferenced first.
- *
- * @param frame frame to be freed. The pointer will be set to NULL.
- */
-export function av_frame_free(frame: Ref<AVFrame>): void { throw new NotImplemented(); }
-
-/**
- * Set up a new reference to the data described by the source frame.
- *
- * Copy frame properties from src to dst and create a new reference for each
- * AVBufferRef from src.
- *
- * If src is not reference counted, new buffers are allocated and the data is
- * copied.
- *
- * @warning: dst MUST have been either unreferenced with av_frame_unref(dst),
- *           or newly allocated with av_frame_alloc() before calling this
- *           function, or undefined behavior will occur.
- *
- * @return 0 on success, a negative AVERROR on error
- */
-export function av_frame_ref(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
-
-/**
- * Create a new frame that references the same data as src.
- *
- * This is a shortcut for av_frame_alloc()+av_frame_ref().
- *
- * @return newly created AVFrame on success, NULL on error.
- */
-export function av_frame_clone(src: AVFrame): AVFrame { throw new NotImplemented(); }
-
-/**
- * Unreference all the buffers referenced by frame and reset the frame fields.
- */
-export function av_frame_unref(frame: AVFrame): void { throw new NotImplemented(); }
-
-/**
- * Move everything contained in src to dst and reset src.
- *
- * @warning: dst is not unreferenced, but directly overwritten without reading
- *           or deallocating its contents. Call av_frame_unref(dst) manually
- *           before calling this function to ensure that no memory is leaked.
- */
-export function av_frame_move_ref(dst: AVFrame, src: AVFrame): void { throw new NotImplemented(); }
-
-/**
- * Allocate new buffer(s) for audio or video data.
- *
- * The following fields must be set on frame before calling this function:
- * - format (pixel format for video, sample format for audio)
- * - width and height for video
- * - nb_samples and ch_layout for audio
- *
- * This function will fill AVFrame.data and AVFrame.buf arrays and, if
- * necessary, allocate and fill AVFrame.extended_data and AVFrame.extended_buf.
- * For planar formats, one buffer will be allocated for each plane.
- *
- * @warning: if frame already has been allocated, calling this function will
- *           leak memory. In addition, undefined behavior can occur in certain
- *           cases.
- *
- * @param frame frame in which to store the new buffers.
- * @param align Required buffer size alignment. If equal to 0, alignment will be
- *              chosen automatically for the current CPU. It is highly
- *              recommended to pass 0 here unless you know what you are doing.
- *
- * @return 0 on success, a negative AVERROR on error.
- */
-export function av_frame_get_buffer(frame: AVFrame, align: number): number { throw new NotImplemented(); }
-
-/**
- * Check if the frame data is writable.
- *
- * @return A positive value if the frame data is writable (which is true if and
- * only if each of the underlying buffers has only one reference, namely the one
- * stored in this frame). Return 0 otherwise.
- *
- * If 1 is returned the answer is valid until av_buffer_ref() is called on any
- * of the underlying AVBufferRefs (e.g. through av_frame_ref() or directly).
- *
- * @see av_frame_make_writable(), av_buffer_is_writable()
- */
-export function av_frame_is_writable(frame: AVFrame): number { throw new NotImplemented(); }
-
-/**
- * Ensure that the frame data is writable, avoiding data copy if possible.
- *
- * Do nothing if the frame is writable, allocate new buffers and copy the data
- * if it is not.
- *
- * @return 0 on success, a negative AVERROR on error.
- *
- * @see av_frame_is_writable(), av_buffer_is_writable(),
- * av_buffer_make_writable()
- */
-export function av_frame_make_writable(frame: AVFrame): number { throw new NotImplemented(); }
-
-/**
- * Copy the frame data from src to dst.
- *
- * This function does not allocate anything, dst must be already initialized and
- * allocated with the same parameters as src.
- *
- * This function only copies the frame data (i.e. the contents of the data /
- * extended data arrays), not any other properties.
- *
- * @return >= 0 on success, a negative AVERROR on error.
- */
-export function av_frame_copy(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
-
-/**
- * Copy only "metadata" fields from src to dst.
- *
- * Metadata for the purpose of this function are those fields that do not affect
- * the data layout in the buffers.  E.g. pts, sample rate (for audio) or sample
- * aspect ratio (for video), but not width/height or channel layout.
- * Side data is also copied.
- */
-export function av_frame_copy_props(dst: AVFrame, src: AVFrame): number { throw new NotImplemented(); }
-
-/**
- * Get the buffer reference a given data plane is stored in.
- *
- * @param plane index of the data plane of interest in frame->extended_data.
- *
- * @return the buffer reference that contains the plane or NULL if the input
- * frame is not valid.
- */
-export function av_frame_get_plane_buffer(frame: AVFrame, plane: number): AVBuffer { throw new NotImplemented(); }
-
-/**
- * Add a new side data to a frame.
- *
- * @param frame a frame to which the side data should be added
- * @param type type of the added side data
- * @param size size of the side data
- *
- * @return newly added side data on success, NULL on error
- */
-export function av_frame_new_side_data(frame: AVFrame,
-                                        type: AVFrameSideDataType,
-                                        size: number): AVFrameSideData { throw new NotImplemented(); }
-
-/**
- * Add a new side data to a frame from an existing AVBufferRef
- *
- * @param frame a frame to which the side data should be added
- * @param type  the type of the added side data
- * @param buf   an AVBufferRef to add as side data. The ownership of
- *              the reference is transferred to the frame.
- *
- * @return newly added side data on success, NULL on error. On failure
- *         the frame is unchanged and the AVBufferRef remains owned by
- *         the caller.
- */
-export function av_frame_new_side_data_from_buf(frame: AVFrame,
-                                                type: AVFrameSideDataType,
-                                                buf: AVBuffer): AVFrameSideData { throw new NotImplemented(); }
-
-/**
- * @return a pointer to the side data of a given type on success, NULL if there
- * is no side data with such type in this frame.
- */
-export function av_frame_get_side_data(frame: AVFrame,
-                                        type: AVFrameSideDataType): AVFrameSideData { throw new NotImplemented(); }
-
-/**
- * Remove and free all side data instances of the given type.
- */
-export function av_frame_remove_side_data(frame: AVFrame, type: AVFrameSideDataType): void { throw new NotImplemented(); }
 
 /**
  * Flags for frame cropping.
@@ -889,26 +777,3 @@ export function av_frame_remove_side_data(frame: AVFrame, type: AVFrameSideDataT
  * absolutely know what you are doing.
  */
 export const AV_FRAME_CROP_UNALIGNED     = 1 << 0;
-
-/**
- * Crop the given video AVFrame according to its crop_left/crop_top/crop_right/
- * crop_bottom fields. If cropping is successful, the function will adjust the
- * data pointers and the width/height fields, and set the crop fields to 0.
- *
- * In all cases, the cropping boundaries will be rounded to the inherent
- * alignment of the pixel format. In some cases, such as for opaque hwaccel
- * formats, the left/top cropping is ignored. The crop fields are set to 0 even
- * if the cropping was rounded or ignored.
- *
- * @param frame the frame which should be cropped
- * @param flags Some combination of AV_FRAME_CROP_* flags, or 0.
- *
- * @return >= 0 on success, a negative AVERROR on error. If the cropping fields
- * were invalid, AVERROR(ERANGE) is returned, and nothing is changed.
- */
-export function av_frame_apply_cropping(frame: AVFrame, flags: number): number { throw new NotImplemented(); }
-
-/**
- * @return a string identifying the side data type
- */
-export function av_frame_side_data_name(type: AVFrameSideDataType): string { throw new NotImplemented(); }

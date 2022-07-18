@@ -621,6 +621,11 @@ export const FF_CODEC_PROPERTY_CLOSED_CAPTIONS =  0x00000002;
 export const FF_CODEC_PROPERTY_FILM_GRAIN =       0x00000004;
 export const FF_SUB_TEXT_FMT_ASS =              0;
 
+export interface AVCodecContextError {
+    code: string;
+    message: string;
+}
+
 /**
  * main external API structure.
  * New fields can be added to the end with minor version bumps.
@@ -648,21 +653,31 @@ export declare class AVCodecContext {
     onPacket: (frame: AVPacket) => void;
 
     /**
+     * Callback called when an error occurs within the encoder/decoder
+     * thread.
+     */
+    onError: (err: AVCodecContextError) => void;
+
+    open(options?: AVDictionary);
+    sendFrame(frame: AVFrame);
+    sendPacket(frame: AVPacket);
+    
+    /**
      * information on struct for av_log
      * - set by avcodec_alloc_context3
      */
-    class: AVClass;
+    readonly class: AVClass;
 
     /** 
      * see AVMEDIA_TYPE_xxx 
      */
-    codecType: AVMediaType;
-    codec: AVCodec;
+    readonly codecType: AVMediaType;
+    readonly codec: AVCodec;
 
     /**
      * see AV_CODEC_ID_xxx 
      */
-    codecID: AVCodecID;
+    readonly codecID: AVCodecID;
 
     /**
      * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
@@ -677,7 +692,7 @@ export declare class AVCodecContext {
      * - encoding: Set by user, if not then the default based on codec_id will be used.
      * - decoding: Set by user, will be converted to uppercase by libavcodec during init.
      */
-    codecTag: number;
+    readonly codecTag: number;
 
     /**
      * the average bitrate
@@ -879,7 +894,7 @@ export declare class AVCodecContext {
      * - encoding: Set by user.
      * - decoding: unused
      */
-     iQuantizationOffset: number;
+    iQuantizationOffset: number;
 
     /**
      * luminance masking (0-> disabled)
@@ -1486,14 +1501,14 @@ export declare class AVCodecContext {
      * - encoding: Set by user, otherwise the default is used.
      * - decoding: Set by user, otherwise the default is used.
      */
-    thread_type: number;
+    threadType: number;
 
     /**
      * Which multithreading methods are in use by the codec.
      * - encoding: Set by libavcodec.
      * - decoding: Set by libavcodec.
      */
-    active_thread_type: number;
+    activeThreadType: number;
 
 
     /**
@@ -1514,7 +1529,7 @@ export declare class AVCodecContext {
      * @if FF_API_THREAD_SAFE_CALLBACKS
      * @attribute_deprecated
      */
-    thread_safe_callbacks: number;
+    threadSafeCallbacks: number;
 
     /**
      * The codec may call this to execute several independent things.
@@ -1627,7 +1642,7 @@ export declare class AVCodecContext {
      * - encoding: May be used to signal the framerate of CFR content to an
      *             encoder.
      */
-    framerate: AVRational;
+    frameRate: AVRational;
 
     /**
      * Nominal unaccelerated pixel format, see AV_PIX_FMT_xxx.

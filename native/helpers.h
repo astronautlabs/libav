@@ -16,6 +16,15 @@ static inline Napi::Value NRational(napi_env env, AVRational rational) {
 
     return obj;
 }
+static inline AVRational FromNRational(napi_env env, Napi::Value value) {
+    auto obj = value.As<Napi::Object>();
+    AVRational rational;
+
+    rational.num = obj.Get("num").As<Napi::Number>().Int32Value();
+    rational.den = obj.Get("den").As<Napi::Number>().Int32Value();
+
+    return rational;
+}
 
 static inline Napi::Array NRationalArray(napi_env env, const AVRational *rational, int count) {
     Napi::Array array = Napi::Array::New(env, count);
