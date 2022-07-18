@@ -21,16 +21,6 @@
 
 import { NotImplemented, OpaquePtr, Ref } from "../helpers"
 
-/**
- * @file
- * audio channel layout utility functions
- */
-
-/**
- * @addtogroup lavu_audio
- * @{
- */
-
 export enum AVChannel {
     ///< Invalid channel index
     AV_CHAN_NONE = -1,
@@ -137,16 +127,12 @@ export enum AVChannelOrder {
 
 
 /**
- * @defgroup channel_masks Audio channel masks
- *
  * A channel layout is a 64-bits integer with a bit set for every channel.
  * The number of bits set must be equal to the number of channels.
  * The value 0 means that the channel layout is not known.
  * @note this data structure is not powerful enough to handle channels
  * combinations that have the same channel multiple times, such as
  * dual-mono.
- *
- * @{
  */
 export const AV_CH_FRONT_LEFT =             (1 << AVChannel.AV_CHAN_FRONT_LEFT           )
 export const AV_CH_FRONT_RIGHT =            (1 << AVChannel.AV_CHAN_FRONT_RIGHT          )
@@ -179,11 +165,6 @@ export const AV_CH_BOTTOM_FRONT_CENTER =    (1 << AVChannel.AV_CHAN_BOTTOM_FRONT
 export const AV_CH_BOTTOM_FRONT_LEFT =      (1 << AVChannel.AV_CHAN_BOTTOM_FRONT_LEFT    )
 export const AV_CH_BOTTOM_FRONT_RIGHT =     (1 << AVChannel.AV_CHAN_BOTTOM_FRONT_RIGHT   )
 
-/**
- * @}
- * @defgroup channel_mask_c Audio channel layouts
- * @{
- * */
 export const AV_CH_LAYOUT_MONO =              (AV_CH_FRONT_CENTER)
 export const AV_CH_LAYOUT_STEREO =            (AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT)
 export const AV_CH_LAYOUT_2POINT1 =           (AV_CH_LAYOUT_STEREO|AV_CH_LOW_FREQUENCY)
@@ -214,7 +195,7 @@ export const AV_CH_LAYOUT_HEXADECAGONAL =     (AV_CH_LAYOUT_OCTAGONAL|AV_CH_WIDE
 export const AV_CH_LAYOUT_STEREO_DOWNMIX =    (AV_CH_STEREO_LEFT|AV_CH_STEREO_RIGHT)
 export const AV_CH_LAYOUT_22POINT2 =          (AV_CH_LAYOUT_5POINT1_BACK|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER|AV_CH_BACK_CENTER|AV_CH_LOW_FREQUENCY_2|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT|AV_CH_TOP_FRONT_LEFT|AV_CH_TOP_FRONT_RIGHT|AV_CH_TOP_FRONT_CENTER|AV_CH_TOP_CENTER|AV_CH_TOP_BACK_LEFT|AV_CH_TOP_BACK_RIGHT|AV_CH_TOP_SIDE_LEFT|AV_CH_TOP_SIDE_RIGHT|AV_CH_TOP_BACK_CENTER|AV_CH_BOTTOM_FRONT_CENTER|AV_CH_BOTTOM_FRONT_LEFT|AV_CH_BOTTOM_FRONT_RIGHT)
 
-enum AVMatrixEncoding {
+export enum AVMatrixEncoding {
     AV_MATRIX_ENCODING_NONE,
     AV_MATRIX_ENCODING_DOLBY,
     AV_MATRIX_ENCODING_DPLII,
@@ -224,10 +205,6 @@ enum AVMatrixEncoding {
     AV_MATRIX_ENCODING_DOLBYHEADPHONE,
     AV_MATRIX_ENCODING_NB
 };
-
-/**
- * @}
- */
 
 /**
  * An AVChannelCustom defines a single channel within a custom order layout
@@ -243,7 +220,6 @@ export interface AVChannelCustom {
      * @note Length is 16
      */
     name: string;
-    opaque: OpaquePtr;
 }
 
 /**
@@ -273,68 +249,22 @@ export interface AVChannelCustom {
  * No new fields may be added to it without a major version bump, except for
  * new elements of the union fitting in sizeof(uint64_t).
  */
-export interface AVChannelLayout {
+export declare class AVChannelLayout {
     /**
      * Channel order used in this layout.
      * This is a mandatory field.
      */
-    order: AVChannelOrder;
+    readonly order: AVChannelOrder;
 
     /**
      * Number of channels in this layout. Mandatory field.
      */
-    nb_channels: number;
-
-    /**
-     * Details about which channels are present in this layout.
-     * For AV_CHANNEL_ORDER_UNSPEC, this field is undefined and must not be
-     * used.
-     */
-
-    /**
-     * This member must be used for AV_CHANNEL_ORDER_NATIVE, and may be used
-     * for AV_CHANNEL_ORDER_AMBISONIC to signal non-diegetic channels.
-     * It is a bitmask, where the position of each set bit means that the
-     * AVChannel with the corresponding value is present.
-     *
-     * I.e. when (mask & (1 << AV_CHAN_FOO)) is non-zero, then AV_CHAN_FOO
-     * is present in the layout. Otherwise it is not present.
-     *
-     * @note when a channel layout using a bitmask is constructed or
-     * modified manually (i.e.  not using any of the av_channel_layout_*
-     * functions), the code doing it must ensure that the number of set bits
-     * is equal to nb_channels.
-     */
-    mask: number;
-    /**
-     * This member must be used when the channel order is
-     * AV_CHANNEL_ORDER_CUSTOM. It is a nb_channels-sized array, with each
-     * element signalling the presence of the AVChannel with the
-     * corresponding value in map[i].id.
-     *
-     * I.e. when map[i].id is equal to AV_CHAN_FOO, then AV_CH_FOO is the
-     * i-th channel in the audio data.
-     *
-     * When map[i].id is in the range between AV_CHAN_AMBISONIC_BASE and
-     * AV_CHAN_AMBISONIC_END (inclusive), the channel contains an ambisonic
-     * component with ACN index (as defined above)
-     * n = map[i].id - AV_CHAN_AMBISONIC_BASE.
-     *
-     * map[i].name may be filled with a 0-terminated string, in which case
-     * it will be used for the purpose of identifying the channel with the
-     * convenience functions below. Otherise it must be zeroed.
-     */
-    map: AVChannelCustom[];
-
-    /**
-     * For some private data of the user.
-     */
-    opaque?: OpaquePtr;
+     readonly count: number;
 }
 
-export const AV_CHANNEL_LAYOUT_MASK = (nb_channels: number, m: number) => (<AVChannelLayout>{ 
+export const AV_CHANNEL_LAYOUT_MASK = (count: number, m: number) => (<AVChannelLayout>{ 
     order: AVChannelOrder.AV_CHANNEL_ORDER_NATIVE, 
-    nb_channels,
+    count,
     mask: m, 
     map: null 
 });
@@ -371,7 +301,7 @@ export const AV_CHANNEL_LAYOUT_22POINT2 =          AV_CHANNEL_LAYOUT_MASK(24, AV
 
 export const AV_CHANNEL_LAYOUT_AMBISONIC_FIRST_ORDER = <AVChannelLayout>{ 
     order: AVChannelOrder.AV_CHANNEL_ORDER_AMBISONIC, 
-    nb_channels: 4, 
+    count: 4, 
     mask: 0
 };
 
