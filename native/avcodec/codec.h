@@ -22,6 +22,12 @@ class NAVCodec : public NAVResource<NAVCodec, AVCodec> {
                 StaticMethod("findEncoder", &NAVCodec::FindEncoder),
                 StaticMethod("findDecoder", &NAVCodec::FindDecoder),
 
+                // Methods
+
+                R_METHOD("newContext", &NAVCodec::NewContext),
+
+                // Properties
+
                 R_GETTER("name", &NAVCodec::GetName),
                 R_GETTER("longName", &NAVCodec::GetLongName),
                 R_GETTER("type", &NAVCodec::GetType),
@@ -43,14 +49,24 @@ class NAVCodec : public NAVResource<NAVCodec, AVCodec> {
 
         virtual void Free();
     private:
+        // libavcodec core
+
         static Napi::Value GetVersion(const Napi::CallbackInfo& info);
         static Napi::Value GetConfiguration(const Napi::CallbackInfo& info);
         static Napi::Value GetLicense(const Napi::CallbackInfo& info);
+
+        // Static methods
 
         static Napi::Value All(const Napi::CallbackInfo& info);
         static Napi::Value FindDecoder(const Napi::CallbackInfo& info);
         static Napi::Value FindEncoder(const Napi::CallbackInfo& info);
         
+        // Methods
+
+        Napi::Value NewContext(const Napi::CallbackInfo& info);
+
+        // Properties
+
         Napi::Value GetName(const Napi::CallbackInfo& info);
         Napi::Value GetLongName(const Napi::CallbackInfo& info);
         Napi::Value GetType(const Napi::CallbackInfo& info);

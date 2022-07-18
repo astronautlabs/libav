@@ -74,9 +74,16 @@ public:
         const std::initializer_list<napi_value> &args
     ) {
         return ResourceT::template Unwrap(
-            assert_valid(Self(env)->GetConstructor(ctorName))
-                ->New(args)
+            ConstructWrapped(env, ctorName, args)
         );
+    }
+
+    inline static Napi::Object ConstructWrapped(
+        const Napi::Env &env, 
+        const std::string ctorName, 
+        const std::initializer_list<napi_value> &args
+    ) {
+        return assert_valid(Self(env)->GetConstructor(ctorName))->New(args);
     }
     
 private: 

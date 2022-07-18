@@ -20,6 +20,7 @@
 
 import { AVChannelLayout, AVClass, AVHWDeviceType, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
 import { NotImplemented, OpaquePtr, Ref } from "../helpers";
+import { AVCodecContext } from "./avcodec";
 import { AVCodecID } from "./codec_id";
 
 /**
@@ -196,6 +197,8 @@ export declare class AVCodec {
     static findDecoder(id: AVCodecID): AVCodec;
     static findEncoder(name: string): AVCodec;
     static findEncoder(id: AVCodecID): AVCodec;
+
+    newContext(): AVCodecContext;
 
     /**
      * Name of the codec implementation.

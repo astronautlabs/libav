@@ -17,7 +17,7 @@ const AVPacket = <typeof AVPacketType>AVPacketImpl;
 describe("AVCodecContext", it => {
     function createEncoderContext(encoder: string) {
         let codec = AVCodec.findEncoder('rawvideo');
-        let context = new AVCodecContext(codec);
+        let context = codec.newContext();
         context.bitRate = 400000;
         context.width = 352;
         context.height = 288;

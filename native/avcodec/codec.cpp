@@ -1,3 +1,4 @@
+#include "../libav.h"
 #include "codec.h"
 #include "../helpers.h"
 #include "../avutil/class.h"
@@ -73,6 +74,10 @@ Napi::Value NAVCodec::FindEncoder(const Napi::CallbackInfo& info) {
     }
 
     return info.Env().Undefined();
+}
+
+Napi::Value NAVCodec::NewContext(const Napi::CallbackInfo& info) {
+    return LibAvAddon::Self(info.Env())->ConstructWrapped(info.Env(), "AVCodecContext", { Value() });
 }
 
 Napi::Value NAVCodec::GetName(const Napi::CallbackInfo& info) {
