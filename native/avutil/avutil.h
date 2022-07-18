@@ -1,13 +1,39 @@
 #include "../common.h"
 #include <napi.h>
+#include "../resource.h"
 
-Napi::Value nlavu_avutil_version(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_version_info(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_avutil_configuration(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_avutil_license(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_get_media_type_string(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_get_picture_type_char(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_int_list_length_for_size(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_fopen_utf8(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_get_time_base_q(const Napi::CallbackInfo& callback);
-Napi::Value nlavu_av_fourcc_make_string(const Napi::CallbackInfo& callback);
+class NAVUtil : public NAVResource<NAVUtil, void> {
+    public:
+        NAVUtil(const Napi::CallbackInfo& info);
+        
+        inline static std::string ExportName() { return "AVUtil"; }
+        inline static Napi::Function ClassDefinition(const Napi::Env &env) {
+            return DefineClass(env, "AVUtil", {
+                StaticAccessor("version", &NAVUtil::GetVersion, nullptr),
+                StaticAccessor("versionInfo", &NAVUtil::GetVersionInfo, nullptr),
+                StaticAccessor("configuration", &NAVUtil::GetConfiguration, nullptr),
+                StaticAccessor("license", &NAVUtil::GetLicense, nullptr),
+                StaticAccessor("timebase", &NAVUtil::GetTimeBase, nullptr),
+
+                StaticMethod("getMediaTypeString", &NAVUtil::GetMediaTypeString),
+                StaticMethod("getPictureTypeString", &NAVUtil::GetPictureTypeString),
+                StaticMethod("getFourCCString", &NAVUtil::GetFourCCString)
+            });
+        }
+
+        virtual void Free();
+    private:
+        // Static Properties
+
+        static Napi::Value GetVersion(const Napi::CallbackInfo& callback);
+        static Napi::Value GetVersionInfo(const Napi::CallbackInfo& callback);
+        static Napi::Value GetConfiguration(const Napi::CallbackInfo& callback);
+        static Napi::Value GetLicense(const Napi::CallbackInfo& callback);
+        static Napi::Value GetTimeBase(const Napi::CallbackInfo& callback);
+
+        // Static Methods
+
+        static Napi::Value GetMediaTypeString(const Napi::CallbackInfo& callback);
+        static Napi::Value GetPictureTypeString(const Napi::CallbackInfo& callback);
+        static Napi::Value GetFourCCString(const Napi::CallbackInfo& callback);
+};

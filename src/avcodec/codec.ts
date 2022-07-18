@@ -19,7 +19,6 @@
  */
 
 import { AVChannelLayout, AVClass, AVHWDeviceType, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
-import { NotImplemented, OpaquePtr, Ref } from "../helpers";
 import { AVCodecContext } from "./avcodec";
 import { AVCodecID } from "./codec_id";
 

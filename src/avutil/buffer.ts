@@ -16,19 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { OpaquePtr } from "../helpers";
+import { AVBuffer as AVBufferImpl } from "../../binding";
 
 /**
- * @file
- * @ingroup lavu_buffer
- * refcounted data buffer API
- */
-
-/**
- * @defgroup lavu_buffer AVBuffer
- * @ingroup lavu_data
- *
- * @{
  * AVBuffer is an API for reference-counted data buffers.
  *
  * There are two core objects in this API -- AVBuffer and AVBufferRef. AVBuffer
@@ -62,10 +52,6 @@ import { OpaquePtr } from "../helpers";
  * @note Two different references to the same buffer can point to different
  * parts of the buffer (i.e. their AVBufferRef.data will not be equal).
  */
-
- /**
-  * A reference counted buffer type.
- */
 export declare class AVBuffer {
 
     /**
@@ -74,14 +60,12 @@ export declare class AVBuffer {
      */
     constructor(buffer: Uint8Array | Uint16Array | Uint32Array | BigUint64Array | ArrayBuffer | Buffer);
 
-    constructor(size: number, zero?: boolean);
-
     /**
-     * Construct a new AVBuffer from the given underlying AVBufferRef reference.
-     * @param handle The AVBufferRef
-     * @internal
+     * Construct a new AVBuffer with the given size.
+     * @param size The size of the new buffer
+     * @param zero If true, the memory will be zeroed
      */
-    constructor(handle: OpaquePtr);
+    constructor(size: number, zero?: boolean);
 
     /**
      * The data buffer. It is considered writable if and only if
@@ -159,10 +143,6 @@ export declare class AVBuffer {
 export const AV_BUFFER_FLAG_READONLY = (1 << 0);
 
 /**
- * @defgroup lavu_bufferpool AVBufferPool
- * @ingroup lavu_data
- *
- * @{
  * AVBufferPool is an API for a lock-free thread-safe pool of AVBuffers.
  *
  * Frequently allocating and freeing large buffers may be slow. AVBufferPool is

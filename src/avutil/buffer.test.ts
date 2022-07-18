@@ -1,10 +1,6 @@
 import { describe } from "razmin";
-import { AVBuffer as AVBufferImpl, AVBufferPool as AVBufferPoolImpl } from "../../binding";
-import type { AVBuffer as AVBufferType, AVBufferPool as AVBufferPoolType } from "./buffer";
 import { expect } from 'chai';
-
-const AVBuffer = <typeof AVBufferType>AVBufferImpl;
-const AVBufferPool = <typeof AVBufferPoolType>AVBufferPoolImpl;
+import { AVBuffer, AVBufferPool } from "..";
 
 describe("AVBuffer", it => {
     it('can be constructed with a size', () => {

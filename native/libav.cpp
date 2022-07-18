@@ -7,14 +7,11 @@ LibAvAddon::LibAvAddon(Napi::Env env, Napi::Object exports) {
     // This will be done later for us, but we want to access it during initialization phase.
     env.SetInstanceData<LibAvAddon>(this);
 
+    // Modules
     nlavu_init(env, exports);
     nlavc_init(env, exports);
 
-    // In the constructor we declare the functions the add-on makes available
-    // to JavaScript.
-    DefineAddon(exports, {
-        // Global instance methods / properties / etc can go here
-    });
+    DefineAddon(exports, {});
 }
 
 LibAvAddon *LibAvAddon::Self(const Napi::Env &env) {

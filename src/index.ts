@@ -1,5 +1,6 @@
 //require('segfault-handler').registerHandler('crash.log');
 
-export * from '../binding';
+export * from '../binding'; 
+
 export * from './avutil';
 export * from './avcodec';

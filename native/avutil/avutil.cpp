@@ -7,28 +7,38 @@ extern "C" {
 #include "avutil.h"
 #include "../helpers.h"
 
-Napi::Value nlavu_avutil_version(const Napi::CallbackInfo& callback) {
+NAVUtil::NAVUtil(const Napi::CallbackInfo& info):
+    NAVResource(info)
+{
+    Napi::TypeError::New(info.Env(), "This class cannot be constructed.").ThrowAsJavaScriptException();
+}
+
+void NAVUtil::Free() {
+    // Do nothing. NAVUtil does not have a handle.
+}
+
+Napi::Value NAVUtil::GetVersion(const Napi::CallbackInfo& callback) {
     return Napi::Number::New(callback.Env(), avutil_version());
 }
 
-Napi::Value nlavu_av_version_info(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetVersionInfo(const Napi::CallbackInfo& callback) {
     return Napi::String::New(callback.Env(), av_version_info());
 }
 
-Napi::Value nlavu_avutil_configuration(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetConfiguration(const Napi::CallbackInfo& callback) {
     return Napi::String::New(callback.Env(), avutil_configuration());
 }
 
-Napi::Value nlavu_avutil_license(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetLicense(const Napi::CallbackInfo& callback) {
     return Napi::String::New(callback.Env(), avutil_license());
 }
 
-Napi::Value nlavu_av_get_media_type_string(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetMediaTypeString(const Napi::CallbackInfo& callback) {
     auto media_type = callback[0].As<Napi::Number>().Int32Value();
     return Napi::String::New(callback.Env(), av_get_media_type_string((AVMediaType)media_type));
 }
 
-Napi::Value nlavu_av_get_picture_type_char(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetPictureTypeString(const Napi::CallbackInfo& callback) {
     auto pict_type = callback[0].As<Napi::Number>().Int32Value();
     char buf[2];
 
@@ -37,26 +47,12 @@ Napi::Value nlavu_av_get_picture_type_char(const Napi::CallbackInfo& callback) {
     return Napi::String::New(callback.Env(), (const char *)&buf);
 }
 
-Napi::Value nlavu_av_int_list_length_for_size(const Napi::CallbackInfo& callback) {
-    auto elsize = callback[0].As<Napi::Number>().Int32Value();
-    auto list = callback[1].As<Napi::External<void>>().Data();
-    auto term = callback[0].As<Napi::Number>().Int64Value();
-
-    return Napi::Number::New(callback.Env(), av_int_list_length_for_size(elsize, list, term));
-}
-
-Napi::Value nlavu_av_fopen_utf8(const Napi::CallbackInfo& callback) {
-    auto path = callback[0].As<Napi::String>().Utf8Value();
-    auto mode = callback[1].As<Napi::String>().Utf8Value();
-    return Napi::External<FILE>::New(callback.Env(), av_fopen_utf8(path.c_str(), mode.c_str()));
-}
-
-Napi::Value nlavu_av_get_time_base_q(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetTimeBase(const Napi::CallbackInfo& callback) {
     return NRational(callback.Env(), av_get_time_base_q());
 
 }
 
-Napi::Value nlavu_av_fourcc_make_string(const Napi::CallbackInfo& callback) {
+Napi::Value NAVUtil::GetFourCCString(const Napi::CallbackInfo& callback) {
     auto fourcc = callback[0].As<Napi::Number>().Uint32Value();
     char buf[AV_FOURCC_MAX_STRING_SIZE];
 
