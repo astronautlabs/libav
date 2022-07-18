@@ -1,6 +1,30 @@
 # @/libav
 
-Implements native libav* bindings for Node.js.
+> 📝 **Pre-Alpha Quality**  
+> This library is incomplete, broken, and in heavy development.
+
+> 📺 Part of the [**Astronaut Labs Broadcast Suite**](https://github.com/astronautlabs/broadcast)
+
+---
+
+Node.js bindings for ffmpeg's `libav*` libraries. The original C APIs are highly adapted for comfortable and efficient use in Typescript and other Javascript flavors.
+
+# Progress
+
+Release Status:
+- Pre-alpha quality: Nothing is expected to work, and you shouldn't use this (yet)
+- No packages released yet.
+- No handling of ffmpeg build yet during install, and the paths are hardcoded.
+- Seriously you shouldn't use this yet. 
+
+Libraries:
+- `libavutil` -- The common data structures needed to interface with the rest of the library (AVBuffer, AVFrame, AVDictionary, AVRational, etc) are mostly complete.
+- `libavcodec` -- The core API and DX is complete.
+- `libavformat` -- Only declarations are present, barely supported at all yet.
+- `avdevice` -- Not started.
+- `avfilter` -- Not started.
+- `swresample` -- Not started.
+- `swscale` -- Not started.
 
 # Examples
 
@@ -46,7 +70,7 @@ Implements native libav* bindings for Node.js.
 
     // Send the frame to the encoder
     // The resulting packets will arrive via onPacket
-    
+
     context.sendFrame(frame);
 ```
 
