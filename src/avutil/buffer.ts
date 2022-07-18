@@ -16,8 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVBuffer as AVBufferImpl } from "../../binding";
-
 /**
  * AVBuffer is an API for reference-counted data buffers.
  *
