@@ -15,7 +15,7 @@ LibAvAddon::LibAvAddon(Napi::Env env, Napi::Object exports) {
 }
 
 LibAvAddon *LibAvAddon::Self(const Napi::Env &env) {
-    return env.GetInstanceData<LibAvAddon>();
+    return ((Napi::Env &)env).GetInstanceData<LibAvAddon>();
 }
 
 LibAvAddon *LibAvAddon::Self(const Napi::CallbackInfo &call) {
