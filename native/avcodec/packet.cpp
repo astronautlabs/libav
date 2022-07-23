@@ -9,6 +9,15 @@ NAVPacket::NAVPacket(const Napi::CallbackInfo& info):
     }
     
     SetHandle(av_packet_alloc());
+
+    if (info.Length() > 0) {
+        auto externalBuffer = info[0].As<Napi::Uint8Array>();
+        auto length = externalBuffer.ByteLength();
+
+        uint8_t *buffer = (uint8_t*)av_malloc(length);
+        memcpy(buffer, externalBuffer.Data(), length);
+        av_packet_from_data(GetHandle(), buffer, length);
+    }
 }
 
 void NAVPacket::Free() {

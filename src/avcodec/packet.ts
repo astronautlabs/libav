@@ -342,6 +342,12 @@ export declare class AVPacketSideData {
  */
 export declare class AVPacket {
     /**
+     * Create a new AVPacket, optionally initializing it with the given data.
+     * @param initialData 
+     */
+    constructor(initialData?: Uint8Array);
+
+    /**
      * A reference to the reference-counted buffer where the packet data is
      * stored.
      * May be NULL, then the packet data is not reference-counted.
