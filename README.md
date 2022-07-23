@@ -9,6 +9,15 @@
 
 Node.js bindings for ffmpeg's `libav*` libraries. The original C APIs are highly adapted for comfortable and efficient use in Typescript and other Javascript flavors.
 
+# Installation
+
+On Linux and macOS you will need to install FFmpeg 5.0 or 5.1 (including its shared libraries). On Windows a build 
+will be downloaded and used as part of the package installation.
+
+```
+npm install libav
+```
+
 # Progress
 
 Release Status:
