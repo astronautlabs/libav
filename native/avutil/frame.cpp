@@ -1,4 +1,4 @@
-#include "../libav.h"
+#include "../libavaddon.h"
 #include "frame.h"
 #include "buffer.h"
 #include "../avutil/dict.h"
@@ -55,7 +55,7 @@ Napi::Value NAVFrame::Clone(const Napi::CallbackInfo& info) {
 Napi::Value NAVFrame::CopyTo(const Napi::CallbackInfo& info) {
     auto other = NAVFrame::Unwrap(info[0].As<Napi::Object>());
     auto otherHandle = other->GetHandle();
-    uint32_t result = av_frame_copy(otherHandle, GetHandle());
+    int result = av_frame_copy(otherHandle, GetHandle());
 
     if (result < 0)
         nlav_throw(info.Env(), result, "av_frame_copy");
@@ -65,7 +65,7 @@ Napi::Value NAVFrame::CopyTo(const Napi::CallbackInfo& info) {
 
 Napi::Value NAVFrame::CopyPropertiesTo(const Napi::CallbackInfo& info) {
     auto other = NAVFrame::Unwrap(info[0].As<Napi::Object>());
-    uint32_t result = av_frame_copy_props(other->GetHandle(), GetHandle());
+    int result = av_frame_copy_props(other->GetHandle(), GetHandle());
 
     if (result < 0)
         return nlav_throw(info.Env(), result, "av_frame_copy_props");

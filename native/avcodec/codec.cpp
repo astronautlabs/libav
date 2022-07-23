@@ -1,4 +1,4 @@
-#include "../libav.h"
+#include "../libavaddon.h"
 #include "codec.h"
 #include "../helpers.h"
 #include "../avutil/class.h"

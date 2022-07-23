@@ -1,4 +1,4 @@
-#include "../libav.h"
+#include "../libavaddon.h"
 #include "dict.h"
 
 NAVDictionary::NAVDictionary(const Napi::CallbackInfo& info):
@@ -111,7 +111,7 @@ Napi::Value NAVDictionary::GetKeys(const Napi::CallbackInfo& info) {
     std::vector<std::string> keys;
     AVDictionaryEntry *entry = nullptr;
     auto handle = GetHandle();
-    while (entry = av_dict_get(handle, "", entry, AV_DICT_IGNORE_SUFFIX))
+    while ((entry = av_dict_get(handle, "", entry, AV_DICT_IGNORE_SUFFIX)))
         keys.push_back(entry->key);
 
     auto array = Napi::Array::New(info.Env(), keys.size());

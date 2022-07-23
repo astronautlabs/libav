@@ -1,6 +1,6 @@
 {
   "targets": [{
-    "target_name" : "libav",
+    "target_name" : "nlav",
     'sources' : [ 
       "native/avcodec/codec-context.cpp",
       "native/avcodec/codec.cpp",
@@ -15,7 +15,7 @@
       "native/avutil/dict.cpp",
       "native/avutil/frame.cpp",
       "native/avutil/index.cpp",
-      "native/libav.cpp",
+      "native/libavaddon.cpp",
       "native/resource.cpp"
     ],
     'cflags!': [ '-fno-exceptions' ],
@@ -33,8 +33,7 @@
       ]
     },
     "include_dirs" : [
-      "<!(node -p \"require('node-addon-api').include_dir\")",
-      "D:/dev/ffmpeg/ffmpeg"
+      "<!(node -p \"require('node-addon-api').include_dir\")"
     ],
     'dependencies': [
         '<!(node -p \"require(\'node-addon-api\').gyp\")'
@@ -43,6 +42,27 @@
       '__STDC_CONSTANT_MACROS'
     ],
     "conditions": [
+      ['OS=="linux"', {
+        'cflags': [ 
+          '-std=c++11',
+          '<!(pkg-config libavutil --cflags)',
+          '<!(pkg-config libavformat --cflags)',
+          '<!(pkg-config libavcodec --cflags)',
+          '<!(pkg-config libavdevice --cflags)',
+          '<!(pkg-config libavfilter --cflags)',
+          '<!(pkg-config libswresample --cflags)',
+          '<!(pkg-config libswscale --cflags)',
+        ],
+        "libraries": [
+            "-lavutil",
+            "-lavformat",
+            "-lavcodec",
+            "-lavdevice",
+            "-lavfilter",
+            "-lswresample",
+            "-lswscale"
+        ],
+      }],
       ['OS=="win"', {
         "configurations": {
           "Release": {
@@ -62,6 +82,9 @@
             }
           }
         },
+        "include_dirs": [
+          "dist/ffmpeg/include"
+        ],
         "libraries": [
             "-l../dist/ffmpeg/lib/avutil",
             "-l../dist/ffmpeg/lib/avformat",

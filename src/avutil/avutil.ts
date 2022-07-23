@@ -18,7 +18,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-import { AVChannel } from "./channel-layout";
 import { AVRational } from "./rational";
 
 export declare class AVUtil {
@@ -78,12 +77,12 @@ export declare class AVUtil {
      * Get a human readable string in an abbreviated form describing a given channel.
      * This is the inverse function of channelFromName().
      */
-    getChannelName(channel: AVChannel): string;
+    getChannelName(channel: number): string;
 
     /**
      * Get a human readable string describing a given channel.
      */
-    getChannelDescription(channel: AVChannel): string;
+    getChannelDescription(channel: number): string;
 
     /**
      * This is the inverse function of @ref av_channel_name().
@@ -91,7 +90,67 @@ export declare class AVUtil {
      * @return the channel with the given name
      *         AV_CHAN_NONE when name does not identify a known channel
      */
-    getChannelFromName(name: string): AVChannel;
+    getChannelFromName(name: string): number;
+
+    /**
+     * Return a channel layout id that matches name, or 0 if no match is found.
+     *
+     * name can be one or several of the following notations,
+     * separated by '+' or '|':
+     * - the name of an usual channel layout (mono, stereo, 4.0, quad, 5.0,
+     *   5.0(side), 5.1, 5.1(side), 7.1, 7.1(wide), downmix);
+     * - the name of a single channel (FL, FR, FC, LFE, BL, BR, FLC, FRC, BC,
+     *   SL, SR, TC, TFL, TFC, TFR, TBL, TBC, TBR, DL, DR);
+     * - a number of channels, in decimal, followed by 'c', yielding
+     *   the default channel layout for that number of channels (@see
+     *   av_get_default_channel_layout);
+     * - a channel layout mask, in hexadecimal starting with "0x" (see the
+     *   AV_CH_* macros).
+     *
+     * Example: "stereo+FC" = "2c+FC" = "2c+1c" = "0x7"
+     */
+    getChannelLayoutFromName(name: string): number;
+    
+    /**
+     * Return a channel layout and the number of channels based on the specified name.
+     *
+     * This function is similar to (@see getChannelLayoutFromName), but can also parse
+     * unknown channel layout specifications.
+     *
+     * @param name             channel layout specification string
+     */
+    getExtendedChannelLayout(name: string): { layout: number, numberOfChannels: number };
+
+    /**
+     * Return a description of a channel layout.
+     * If numberOfChannels is not present or <= 0, it is guessed from the channel_layout.
+     */
+    getChannelLayoutName(layout: number, numberOfChannels?: number): string;
+    
+    /**
+     * Return the number of channels in the channel layout.
+     */
+    getNumberOfChannelsInLayout(layout: number): number;
+    
+    /**
+     * Return default channel layout for a given number of channels.
+     */
+    getDefaultChannelLayout(numberOfChannels: number): number;
+
+    /**
+     * Get the index of a channel in a channel layout.
+     *
+     * @param channel a channel layout describing exactly one channel which must be
+     *                present in channel_layout.
+     *
+     * @return index of channel in channel_layout on success
+     */
+    getIndexOfChannelInLayout(layout: number, channel: number): number;
+    
+    /**
+     * Get the channel with the given index in channel_layout.
+     */
+    getChannelInLayoutByIndex(layout: number, index: number): number;
 }
 
 /**

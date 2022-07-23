@@ -21,6 +21,14 @@ class NAVUtil : public NAVResource<NAVUtil, void> {
                 StaticMethod("getChannelName", &NAVUtil::GetChannelName),
                 StaticMethod("getChannelDescription", &NAVUtil::GetChannelDescription),
                 StaticMethod("getChannelFromName", &NAVUtil::GetChannelFromName),
+                
+                StaticMethod("getChannelLayoutFromName", &NAVUtil::GetChannelLayout),
+                StaticMethod("getExtendedChannelLayout", &NAVUtil::GetExtendedChannelLayout),
+                StaticMethod("getChannelLayoutName", &NAVUtil::GetChannelLayoutName),
+                StaticMethod("getNumberOfChannelsInLayout", &NAVUtil::GetNumberOfChannelsInLayout),
+                StaticMethod("getDefaultChannelLayout", &NAVUtil::GetDefaultChannelLayout),
+                StaticMethod("getIndexOfChannelInLayout", &NAVUtil::GetIndexOfChannelInLayout),
+                StaticMethod("getChannelInLayoutByIndex", &NAVUtil::GetChannelInLayoutByIndex)
             });
         }
 
@@ -42,4 +50,13 @@ class NAVUtil : public NAVResource<NAVUtil, void> {
         static Napi::Value GetChannelName(const Napi::CallbackInfo& callback);
         static Napi::Value GetChannelDescription(const Napi::CallbackInfo& callback);
         static Napi::Value GetChannelFromName(const Napi::CallbackInfo& callback);
+
+        // Channel layout stuff (pre 5.1)
+        static Napi::Value GetChannelLayout(const Napi::CallbackInfo& callback);
+        static Napi::Value GetExtendedChannelLayout(const Napi::CallbackInfo& callback);
+        static Napi::Value GetChannelLayoutName(const Napi::CallbackInfo& callback);
+        static Napi::Value GetNumberOfChannelsInLayout(const Napi::CallbackInfo& callback);
+        static Napi::Value GetDefaultChannelLayout(const Napi::CallbackInfo& callback);
+        static Napi::Value GetIndexOfChannelInLayout(const Napi::CallbackInfo& callback);
+        static Napi::Value GetChannelInLayoutByIndex(const Napi::CallbackInfo& callback);
 };

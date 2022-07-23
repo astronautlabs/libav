@@ -1,11 +1,10 @@
-#ifndef __LIBAV_H
-#define __LIBAV_H
+#ifndef __NLAV_LIBAV_H
+#define __NLAV_LIBAV_H
 
 #include "common.h"
 #include "helpers.h"
 #include <napi.h>
 #include <map>
-#include "resource.h"
 #include <assert.h>
 
 class LibAvAddon : public Napi::Addon<LibAvAddon>
@@ -55,9 +54,9 @@ public:
     template<class ResourceT>
     static ResourceT* Construct(
         const Napi::Env &env, 
-        std::initializer_list<napi_value> &args
+        const std::initializer_list<napi_value> &args
     ) {
-        return Construct<ResourceT>(env, ResourceT::template ExportName(), args);
+        return Construct<ResourceT>(env, ResourceT::ExportName(), args);
     }
 
     template<class ResourceT>
@@ -73,7 +72,7 @@ public:
         const std::string ctorName, 
         const std::initializer_list<napi_value> &args
     ) {
-        return ResourceT::template Unwrap(
+        return ResourceT::Unwrap(
             ConstructWrapped(env, ctorName, args)
         );
     }
@@ -91,4 +90,4 @@ private:
     std::map<std::string, Napi::FunctionReference*> constructorMap;
 };
 
-#endif // __LIBAV_H
+#endif // __NLAV_LIBAV_H

@@ -18,7 +18,6 @@
 
 import { AVPictureType } from "./avutil";
 import { AVBuffer } from "./buffer";
-import { AVChannelLayout } from "./channel-layout";
 import { AVDictionary } from "./dict";
 import { AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic } from "./pixfmt";
 import { AVRational } from "./rational";
@@ -761,7 +760,7 @@ export declare class AVFrame {
     /**
      * Channel layout of the audio data.
      */
-    channelLayout: AVChannelLayout;
+    channelLayout: number;
 }
 
 /**

@@ -2,7 +2,7 @@
 #   define __RESOURCE_H__
 
 #include <napi.h>
-#include "libav.h"
+#include "libavaddon.h"
 
 #define R_GETTER(name, getter) InstanceAccessor((name), (getter), nullptr)
 #define R_SETTER(name, setter) InstanceAccessor((name), nullptr, (setter))
@@ -64,8 +64,8 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         }
 
         static void Register(Napi::Env env, Napi::Object exports) {
-            Napi::Function ctor = SelfT::template ClassDefinition(env);
-            std::string exportName = SelfT::template ExportName();
+            Napi::Function ctor = SelfT::ClassDefinition(env);
+            std::string exportName = SelfT::ExportName();
 
             LibAvAddon::Self(env)->RegisterConstructor(exportName, ctor);
             exports.Set(exportName, ctor);
@@ -129,7 +129,7 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
             if (instance)
                 return instance;
 
-            instance = LibAvAddon::Self(env)->Construct<SelfT>(env, SelfT::template ExportName(), { 
+            instance = LibAvAddon::Self(env)->Construct<SelfT>(env, SelfT::ExportName(), { 
                 Napi::External<HandleT>::New(env, (HandleT*)handle)
             });
 
@@ -178,9 +178,9 @@ class NAVResource : public Napi::ObjectWrap<SelfT> {
         void SetHandle(HandleT *handle) {
             if (this->handle == handle)
                 return;
-            UnregisterResource(Env());
+            UnregisterResource(this->Env());
             this->handle = handle;
-            RegisterResource(Env());
+            RegisterResource(this->Env());
         }
 
     private:

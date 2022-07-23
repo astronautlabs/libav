@@ -11,12 +11,30 @@ Node.js bindings for ffmpeg's `libav*` libraries. The original C APIs are highly
 
 # Installation
 
-On Linux and macOS you will need to install FFmpeg 5.0 or 5.1 (including its shared libraries). On Windows a build 
-will be downloaded and used as part of the package installation.
+On Linux and macOS you need to install FFmpeg 5.0 or 5.1 (including its shared libraries) yourself. You will also 
+need the headers (-dev packages) for the libav* libraries. Most distributions are shipping FFmpeg 4.x, that version is 
+not supported by this binding. On Windows a build will be downloaded and used as part of the package installation.
 
 ```
 npm install libav
 ```
+
+## Ubuntu
+
+```
+sudo apt install ffmpeg libavutil-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev
+```
+> NOTE: Make sure you have ffmpeg 5.0 or 5.1. The 4.x versions are not supported.
+
+## Enabling GPL features
+
+On Windows by default, the package installer will install an LGPL-compatible version of FFmpeg. If your application's 
+license is GPL-compatible, you can enable GPL features on that build by setting the environment variable FFMPEG_ENABLE_GPL=1
+before installing the package. 
+
+On other platforms (Linux, macOS), the ffmpeg installation is handled externally, and it is up to you to ensure that you 
+properly adhere to the terms of the LGPL or GPL as appropriate. For more information about the important issues 
+regarding ffmpeg licensing, please visit https://ffmpeg.org/legal.html.
 
 # Progress
 

@@ -5,7 +5,7 @@ extern "C" {
 }
 
 #include "buffer.h"
-#include "../libav.h"
+#include "../libavaddon.h"
 #include "../helpers.h"
 
 void *GetRegisterableBufferHandle(void *bufferRef) {
@@ -174,7 +174,7 @@ Napi::Value NAVBuffer::Replace(const Napi::CallbackInfo& info) {
     if (this == other || handle->buffer == otherHandle->buffer)
         return info.Env().Undefined();
     
-    uint32_t result = av_buffer_replace(&handle, otherHandle);
+    int result = av_buffer_replace(&handle, otherHandle);
     if (result < 0) {
         Napi::TypeError::New(info.Env(), "Error while replacing: " + result).ThrowAsJavaScriptException();
         return info.Env().Undefined();

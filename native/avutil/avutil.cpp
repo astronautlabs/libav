@@ -105,3 +105,80 @@ Napi::Value NAVUtil::GetChannelFromName(const Napi::CallbackInfo& callback) {
     return callback.Env().Undefined();
 #endif
 }
+
+Napi::Value NAVUtil::GetChannelLayout(const Napi::CallbackInfo& callback) {
+    return Napi::Number::New(callback.Env(), av_get_channel_layout(callback[0].As<Napi::String>().Utf8Value().c_str()));
+}
+
+Napi::Value NAVUtil::GetExtendedChannelLayout(const Napi::CallbackInfo& callback) {
+    uint64_t channelLayout;
+    int numberOfChannels;
+
+    int result = Napi::Number::New(
+        callback.Env(), 
+        av_get_extended_channel_layout(
+            callback[0].As<Napi::String>().Utf8Value().c_str(),
+            &channelLayout,
+            &numberOfChannels
+        )
+    );
+
+    if (result < 0)
+        return nlav_throw(callback.Env(), result, "av_get_extended_channel_layout");
+    
+    auto obj = Napi::Object::New(callback.Env());
+
+    obj.Set("layout", Napi::Number::New(callback.Env(), channelLayout));
+    obj.Set("numberOfChannels", Napi::Number::New(callback.Env(), numberOfChannels));
+
+    return obj;
+}
+
+Napi::Value NAVUtil::GetChannelLayoutName(const Napi::CallbackInfo& callback) {
+    auto layout = callback[0].As<Napi::Number>().Int32Value();
+    auto channelCount = 0;
+    
+    if (callback.Length() > 1)
+        channelCount = callback[1].As<Napi::Number>().Int32Value();
+    
+    char name[128];
+    av_get_channel_layout_string(name, sizeof(name), channelCount, layout);
+
+    return Napi::String::New(callback.Env(), name);
+}
+
+Napi::Value NAVUtil::GetNumberOfChannelsInLayout(const Napi::CallbackInfo& callback) {
+    return Napi::Number::New(
+        callback.Env(), 
+        av_get_channel_layout_nb_channels(callback[0].As<Napi::Number>().Int32Value())
+    );
+}
+
+Napi::Value NAVUtil::GetDefaultChannelLayout(const Napi::CallbackInfo& callback) {
+    return Napi::Number::New(
+        callback.Env(), 
+        av_get_default_channel_layout(callback[0].As<Napi::Number>().Int32Value())
+    );
+}
+
+Napi::Value NAVUtil::GetIndexOfChannelInLayout(const Napi::CallbackInfo& callback) {
+    auto result = av_get_channel_layout_channel_index(
+        (uint64_t)callback[0].As<Napi::Number>().Int64Value(),
+        (uint64_t)callback[1].As<Napi::Number>().Int64Value()
+    );
+
+    if (result < 0)
+        return nlav_throw(callback.Env(), result, "av_get_channel_layout_channel_index");
+
+    return Napi::Number::New(callback.Env(), result);
+}
+
+Napi::Value NAVUtil::GetChannelInLayoutByIndex(const Napi::CallbackInfo& callback) {
+    return Napi::Number::New(
+        callback.Env(),
+        av_channel_layout_extract_channel(
+            (uint64_t)callback[0].As<Napi::Number>().Int64Value(),
+            (uint64_t)callback[1].As<Napi::Number>().Int64Value()
+        )
+    );
+}

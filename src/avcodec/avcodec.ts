@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVBuffer, AVChannelLayout, AVChromaLocation, AVClass, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVDictionary, AVFrame, AVMediaType, AVRational, AVSampleFormat } from "../avutil";
+import { AVBuffer, AVChromaLocation, AVClass, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVDictionary, AVFrame, AVMediaType, AVRational, AVSampleFormat } from "../avutil";
 import { AVPixelFormat } from "../avutil";
 import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
 import { AVCodec } from "./codec";
@@ -1953,7 +1953,7 @@ export declare class AVCodecContext {
      * - decoding: may be set by the caller if known e.g. from the container.
      *             The decoder can then override during decoding as needed.
      */
-    ch_layout: AVChannelLayout;
+    ch_layout: number;
 }
 
 /**

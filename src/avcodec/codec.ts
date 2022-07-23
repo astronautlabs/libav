@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVChannelLayout, AVClass, AVHWDeviceType, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
+import { AVClass, AVHWDeviceType, AVMediaType, AVPixelFormat, AVRational, AVSampleFormat } from "../avutil";
 import { AVCodecContext } from "./avcodec";
 import { AVCodecID } from "./codec_id";
 
@@ -243,7 +243,7 @@ export declare class AVCodec {
     /**
      * Array of supported channel layouts, terminated with a zeroed layout.
      */
-    readonly channelLayouts: AVChannelLayout[];
+    readonly channelLayouts: number[];
 
     readonly isEncoder: boolean;
     readonly isDecoder: boolean;

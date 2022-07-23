@@ -4,6 +4,8 @@
 #include "../resource.h"
 #include <thread>
 #include <queue>
+#include <condition_variable>
+#include <mutex>
 
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -138,8 +140,8 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         std::queue<AVFrame*> framePool;
         std::queue<AVPacket*> packetPool;
 
-        int framePoolHeight = 0;
-        int packetPoolHeight = 0;
+        uint32_t framePoolHeight = 0;
+        uint32_t packetPoolHeight = 0;
         
         std::thread *thread = nullptr;
         std::mutex mutex;

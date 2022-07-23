@@ -20,7 +20,6 @@
  */
 
 import { NotImplemented, OpaquePtr, Out, Ref } from "../helpers";
-import { AVChannelLayout } from "./channel-layout";
 import { AVDictionary } from "./dict";
 import { AVClass } from "./log";
 import { AVPixelFormat } from "./pixfmt";
@@ -701,7 +700,7 @@ export function av_opt_set_image_size(obj: OpaquePtr, name: string, w: number, h
 export function av_opt_set_pixel_fmt (obj: OpaquePtr, name: string, fmt: AVPixelFormat, search_flags: number): number { throw new Error("NotImplemented"); }
 export function av_opt_set_sample_fmt(obj: OpaquePtr, name: string, fmt: AVSampleFormat, search_flags: number): number { throw new Error("NotImplemented"); }
 export function av_opt_set_video_rate(obj: OpaquePtr, name: string, val: AVRational, search_flags: number): number { throw new Error("NotImplemented"); }
-export function av_opt_set_chlayout(obj: OpaquePtr, name: string, layout: AVChannelLayout, search_flags: number): number { throw new Error("NotImplemented"); }
+export function av_opt_set_chlayout(obj: OpaquePtr, name: string, layout: number, search_flags: number): number { throw new Error("NotImplemented"); }
 /**
  * @note Any old dictionary present is discarded and replaced with a copy of the new one. The
  * caller still owns val is and responsible for freeing it.
@@ -740,7 +739,7 @@ export function av_opt_get_image_size(obj: OpaquePtr, name: string, search_flags
 export function av_opt_get_pixel_fmt (obj: OpaquePtr, name: string, search_flags: number, out_fmt: Out<AVPixelFormat>): number { throw new Error("NotImplemented"); }
 export function av_opt_get_sample_fmt(obj: OpaquePtr, name: string, search_flags: number, out_fmt: Out<AVSampleFormat>): number { throw new Error("NotImplemented"); }
 export function av_opt_get_video_rate(obj: OpaquePtr, name: string, search_flags: number, out_val: Out<AVRational>): number { throw new Error("NotImplemented"); }
-export function av_opt_get_chlayout(obj: OpaquePtr, name: string, search_flags: number, layout: Out<AVChannelLayout>): number { throw new Error("NotImplemented"); }
+export function av_opt_get_chlayout(obj: OpaquePtr, name: string, search_flags: number, layout: Out<number>): number { throw new Error("NotImplemented"); }
 /**
  * @param[out] out_val The returned dictionary is a copy of the actual value and must
  * be freed with av_dict_free() by the caller

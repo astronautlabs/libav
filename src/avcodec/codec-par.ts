@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import { AVChannelLayout, AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVMediaType, AVRational } from "../avutil";
+import { AVChromaLocation, AVColorPrimaries, AVColorRange, AVColorSpace, AVColorTransferCharacteristic, AVMediaType, AVRational } from "../avutil";
 import { NotImplemented, Ref } from "../helpers";
 import { AVCodecID } from "./codec_id";
 
@@ -185,7 +185,7 @@ export interface AVCodecParameters {
     /**
      * Audio only. The channel layout and number of channels.
      */
-    ch_layout: AVChannelLayout;
+    ch_layout: number;
 }
  
 /**
