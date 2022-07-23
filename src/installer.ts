@@ -37,7 +37,8 @@ function getBuildName() {
 async function main() {
     let buildName = getBuildName();
     let catalog = await getCatalog();
-    let gpl = false;
+    let gpl = process.env['FFMPEG_ENABLE_GPL'] === '1';
+
     let buildFile = catalog[`${buildName}-${gpl ? 'gpl' : 'lgpl'}-shared-5.0`];
     if (!buildName && os.platform() === 'win32')
         throw new Error(`No build available for platform=${os.platform()}, arch=${os.arch()}`);
