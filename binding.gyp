@@ -63,25 +63,25 @@
           }
         },
         "libraries": [
-            "-lD:/dev/ffmpeg/ffmpeg/libavutil/avutil",
-            "-lD:/dev/ffmpeg/ffmpeg/libavformat/avformat",
-            "-lD:/dev/ffmpeg/ffmpeg/libavcodec/avcodec",
-            "-lD:/dev/ffmpeg/ffmpeg/libavdevice/avdevice",
-            "-lD:/dev/ffmpeg/ffmpeg/libavfilter/avfilter",
-            "-lD:/dev/ffmpeg/ffmpeg/libswresample/swresample",
-            "-lD:/dev/ffmpeg/ffmpeg/libswscale/swscale"
+            "-l../dist/ffmpeg/lib/avutil",
+            "-l../dist/ffmpeg/lib/avformat",
+            "-l../dist/ffmpeg/lib/avcodec",
+            "-l../dist/ffmpeg/lib/avdevice",
+            "-l../dist/ffmpeg/lib/avfilter",
+            "-l../dist/ffmpeg/lib/swresample",
+            "-l../dist/ffmpeg/lib/swscale"
         ],
         "copies": [
             {
               "destination": "build/Release/",
               "files": [
-                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll",
-                "D:/dev/ffmpeg/ffmpeg/libswresample/swresample-4.dll",
-                "D:/dev/ffmpeg/ffmpeg/libswscale/swscale-6.dll"
+                "./dist/ffmpeg/lib/avutil-57.dll",
+                "./dist/ffmpeg/lib/avformat-59.dll",
+                "./dist/ffmpeg/lib/avcodec-59.dll",
+                "./dist/ffmpeg/lib/avdevice-59.dll",
+                "./dist/ffmpeg/lib/avfilter-8.dll",
+                "./dist/ffmpeg/lib/swresample-4.dll",
+                "./dist/ffmpeg/lib/swscale-6.dll"
               ]
             },
             {

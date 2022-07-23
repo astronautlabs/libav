@@ -188,7 +188,7 @@ void NAVFrame::SetLineSize(const Napi::CallbackInfo& info, const Napi::Value& va
     }
 
     auto handle = GetHandle();
-    for (int i = 0, max = AV_NUM_DATA_POINTERS; i < max; ++i) {
+    for (uint32_t i = 0, max = AV_NUM_DATA_POINTERS; i < max; ++i) {
         if (array.Length() <= i) {
             handle->linesize[i] = 0;
         } else {
@@ -545,12 +545,21 @@ void NAVFrame::SetCropRight(const Napi::CallbackInfo& info, const Napi::Value& v
 }
 
 Napi::Value NAVFrame::GetChannelLayout(const Napi::CallbackInfo& info) {
+#ifdef FFMPEG_5_1
     return NAVChannelLayout::FromHandleWrapped(info.Env(), &GetHandle()->ch_layout, false);
+#else
+    return Napi::Number::New(info.Env(), GetHandle()->channel_layout);
+#endif
 }
 
 void NAVFrame::SetChannelLayout(const Napi::CallbackInfo& info, const Napi::Value& value) {
+#ifdef FFMPEG_5_1
     auto layout = NAVChannelLayout::Unwrap(value.As<Napi::Object>());
     GetHandle()->ch_layout = *layout->GetHandle();
+#else
+    auto layout = info[0].As<Napi::Number>().Int64Value();
+    GetHandle()->channel_layout = (uint64_t)layout;
+#endif
 }
 
 NAVFrameSideData::NAVFrameSideData(const Napi::CallbackInfo &info):

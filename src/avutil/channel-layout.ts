@@ -20,6 +20,7 @@
 */
 
 import { NotImplemented, OpaquePtr, Ref } from "../helpers"
+import { AVChannelLayout as AVChannelLayoutImpl } from "../../binding";
 
 export enum AVChannel {
     ///< Invalid channel index
@@ -251,22 +252,80 @@ export interface AVChannelCustom {
  */
 export declare class AVChannelLayout {
     /**
+     * Initialize a native channel layout from a bitmask indicating which channels
+     * are present.
+     *
+     * @param mask bitmask describing the channel layout
+     */
+    static fromMask(mask: BigInt): AVChannelLayout;
+    
+    /**
+     * Initialize a channel layout from a given string description.
+     * The input string can be represented by:
+     *  - the formal channel layout name (returned by av_channel_layout_describe())
+     *  - single or multiple channel names (returned by av_channel_name(), eg. "FL",
+     *    or concatenated with "+", each optionally containing a custom name after
+     *    a "@", eg. "FL@Left+FR@Right+LFE")
+     *  - a decimal or hexadecimal value of a native channel layout (eg. "4" or "0x4")
+     *  - the number of channels with default layout (eg. "4c")
+     *  - the number of unordered channels (eg. "4C" or "4 channels")
+     *  - the ambisonic order followed by optional non-diegetic channels (eg.
+     *    "ambisonic 2+stereo")
+     *
+     * @param str string describing the channel layout
+     */
+    static fromString(str: string): AVChannelLayout;
+
+    /**
+     * Get the default channel layout for a given number of channels.
+     *
+     * @param nb_channels number of channels
+     */
+    static fromDefault(count: number): AVChannelLayout;
+
+    /**
+     * Free any allocated data in the channel layout and reset the channel
+     * count to 0.
+     */
+    uninit();
+    
+    /**
      * Channel order used in this layout.
      * This is a mandatory field.
      */
-    readonly order: AVChannelOrder;
+    order: AVChannelOrder;
 
     /**
      * Number of channels in this layout. Mandatory field.
      */
-     readonly count: number;
+    count: number;
+
+    /**
+     * Mask for this layout. Only valid if `order` is AV_CHANNEL_ORDER_NATIVE or
+     * AV_CHANNEL_ORDER_AMBISONIC. Otherwise getting or setting this value will throw 
+     * an exception.
+     */
+    mask: BigInt;
+
+    /**
+     * Custom channel ordering. Only valid if `order` is AV_CHANNEL_ORDER_CUSTOM.
+     * Otherwise getting or setting this value will throw an exception. 
+     * 
+     * The objects returned when getting this field are copies, modifying them will have 
+     * no effect. You should set the entire field if you wish to modify the values in the 
+     * layout itself.
+     * 
+     * When setting this field, the length of the array should be the same as `count`. 
+     * If it is not, then `count` will be changed to match.
+     */
+    customOrder?: AVChannelCustom[];
 }
 
-export const AV_CHANNEL_LAYOUT_MASK = (count: number, m: number) => (<AVChannelLayout>{ 
+export const AV_CHANNEL_LAYOUT_MASK = (count: number, m: number | bigint) => Object.assign(new AVChannelLayoutImpl(), <Partial<AVChannelLayout>>{ 
     order: AVChannelOrder.AV_CHANNEL_ORDER_NATIVE, 
     count,
-    mask: m, 
-    map: null 
+    mask: BigInt(m), 
+    customOrder: null 
 });
 
 export const AV_CHANNEL_LAYOUT_MONO =              AV_CHANNEL_LAYOUT_MASK(1,  AV_CH_LAYOUT_MONO)
@@ -299,108 +358,11 @@ export const AV_CHANNEL_LAYOUT_HEXADECAGONAL =     AV_CHANNEL_LAYOUT_MASK(16, AV
 export const AV_CHANNEL_LAYOUT_STEREO_DOWNMIX =    AV_CHANNEL_LAYOUT_MASK(2,  AV_CH_LAYOUT_STEREO_DOWNMIX)
 export const AV_CHANNEL_LAYOUT_22POINT2 =          AV_CHANNEL_LAYOUT_MASK(24, AV_CH_LAYOUT_22POINT2)
 
-export const AV_CHANNEL_LAYOUT_AMBISONIC_FIRST_ORDER = <AVChannelLayout>{ 
+export const AV_CHANNEL_LAYOUT_AMBISONIC_FIRST_ORDER = Object.assign(new AVChannelLayoutImpl(), <Partial<AVChannelLayout>>{ 
     order: AVChannelOrder.AV_CHANNEL_ORDER_AMBISONIC, 
     count: 4, 
-    mask: 0
-};
-
-export type AVBPrint = OpaquePtr;
-
-/**
- * Get a human readable string in an abbreviated form describing a given channel.
- * This is the inverse function of @ref av_channel_from_string().
- *
- * @param buf pre-allocated buffer where to put the generated string
- * @param buf_size size in bytes of the buffer.
- * @return amount of bytes needed to hold the output string, or a negative AVERROR
- *         on failure. If the returned value is bigger than buf_size, then the
- *         string was truncated.
- */
-export function av_channel_name(buf: Ref<string>, buf_size: number, channel: AVChannel): number { throw new NotImplemented(); }
-
-/**
- * bprint variant of av_channel_name().
- *
- * @note the string will be appended to the bprint buffer.
- */
-export function av_channel_name_bprint(bp: AVBPrint, channel_id: AVChannel): void { throw new NotImplemented(); }
-
-/**
- * Get a human readable string describing a given channel.
- *
- * @param buf pre-allocated buffer where to put the generated string
- * @param buf_size size in bytes of the buffer.
- * @return amount of bytes needed to hold the output string, or a negative AVERROR
- *         on failure. If the returned value is bigger than buf_size, then the
- *         string was truncated.
- */
-export function av_channel_description(buf: Ref<string>, buf_size: number,channel: AVChannel): number { throw new NotImplemented(); }
-
-/**
- * bprint variant of av_channel_description().
- *
- * @note the string will be appended to the bprint buffer.
- */
-export function av_channel_description_bprint(bp: AVBPrint,channel_id: AVChannel): void { throw new NotImplemented(); }
-
-/**
- * This is the inverse function of @ref av_channel_name().
- *
- * @return the channel with the given name
- *         AV_CHAN_NONE when name does not identify a known channel
- */
-export function av_channel_from_string(name: string): AVChannel { throw new NotImplemented(); };
-
-/**
- * Initialize a native channel layout from a bitmask indicating which channels
- * are present.
- *
- * @param channel_layout the layout structure to be initialized
- * @param mask bitmask describing the channel layout
- *
- * @return 0 on success
- *         AVERROR(EINVAL) for invalid mask values
- */
-export function av_channel_layout_from_mask(channel_layout: AVChannelLayout, mask: number): number { throw new NotImplemented(); }
-
-/**
- * Initialize a channel layout from a given string description.
- * The input string can be represented by:
- *  - the formal channel layout name (returned by av_channel_layout_describe())
- *  - single or multiple channel names (returned by av_channel_name(), eg. "FL",
- *    or concatenated with "+", each optionally containing a custom name after
- *    a "@", eg. "FL@Left+FR@Right+LFE")
- *  - a decimal or hexadecimal value of a native channel layout (eg. "4" or "0x4")
- *  - the number of channels with default layout (eg. "4c")
- *  - the number of unordered channels (eg. "4C" or "4 channels")
- *  - the ambisonic order followed by optional non-diegetic channels (eg.
- *    "ambisonic 2+stereo")
- *
- * @param channel_layout input channel layout
- * @param str string describing the channel layout
- * @return 0 channel layout was detected, AVERROR_INVALIDATATA otherwise
- */
-export function av_channel_layout_from_string(channel_layout: AVChannelLayout, str: string): number { throw new NotImplemented(); }
-
-/**
- * Get the default channel layout for a given number of channels.
- *
- * @param channel_layout the layout structure to be initialized
- * @param nb_channels number of channels
- */
-export function av_channel_layout_default(ch_layout: AVChannelLayout, nb_channels: number): void { throw new NotImplemented(); }
-
-/**
- * Iterate over all standard channel layouts.
- *
- * @param opaque a pointer where libavutil will store the iteration state. Must
- *               point to NULL to start the iteration.
- *
- * @return the standard channel layout or NULL when the iteration is
- *         finished
- */
-export function av_channel_layout_standard(opaque: Ref<OpaquePtr>): AVChannelLayout { throw new NotImplemented(); };
+    mask: BigInt(0)
+});
 
 /**
  * Free any allocated data in the channel layout and reset the channel
@@ -436,14 +398,6 @@ export function av_channel_layout_copy(dst: AVChannelLayout, src: AVChannelLayou
  *         string was truncated.
  */
 export function av_channel_layout_describe(channel_layout: AVChannelLayout, buf: Ref<string>, buf_size: number): number { throw new NotImplemented(); }
-
-/**
- * bprint variant of av_channel_layout_describe().
- *
- * @note the string will be appended to the bprint buffer.
- * @return 0 on success, or a negative AVERROR value on failure.
- */
-export function av_channel_layout_describe_bprint(channel_layout: AVChannelLayout, bp: AVBPrint): number { throw new NotImplemented(); }
 
 /**
  * Get the channel with the given index in a channel layout.

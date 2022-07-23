@@ -12,6 +12,7 @@
     "rebuild:native": "node-gyp -j 8 rebuild --release",
     "rebuild:native:debug": "node-gyp -j 8 rebuild --debug",
     "gyp:configure": "node-gyp configure",
+    "preinstall": "node dist/installer",
     "install": "node-gyp rebuild"
   },
   "author": "Astronaut Labs, LLC",
@@ -19,12 +20,18 @@
   "gypfile": true,
   "devDependencies": {
     "@types/chai": "^4.3.1",
+    "@types/rimraf": "^3.0.2",
+    "@types/tar": "^6.1.1",
+    "@types/unzip": "^0.1.1",
+    "@types/unzipper": "^0.10.5",
     "chai": "^4.3.6",
     "node-addon-api": "^5.0.0",
     "razmin": "^1.2.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "segfault-handler": "^1.3.0"
+    "node-fetch": "^2.6.7",
+    "rimraf": "^3.0.2",
+    "unzipper": "^0.10.11"
   }
 }

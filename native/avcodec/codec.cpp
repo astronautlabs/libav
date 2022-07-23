@@ -164,6 +164,7 @@ Napi::Value NAVCodec::GetWrapperName(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value NAVCodec::GetChannelLayouts(const Napi::CallbackInfo& info) {
+#ifdef FFMPEG_5_1
     std::vector <Napi::Value> vec;
     auto layouts = GetHandle()->ch_layouts;
 
@@ -172,6 +173,17 @@ Napi::Value NAVCodec::GetChannelLayouts(const Napi::CallbackInfo& info) {
     }
 
     return VectorToArray(info.Env(), vec);
+#else
+    return VectorToArray(
+        info.Env(),
+        Transform<uint64_t, Napi::Value>(
+            TerminatedArray<uint64_t>(GetHandle()->channel_layouts, 0),
+            [&](uint64_t value) {
+                return Napi::Number::New(info.Env(), value);
+            }
+        )
+    );
+#endif
 }
 
 Napi::Value NAVCodec::GetIsEncoder(const Napi::CallbackInfo& info) {

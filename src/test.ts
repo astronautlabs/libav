@@ -1,3 +1,4 @@
+import "zone.js";
 import { suite } from "razmin";
 
 console.log(`##### PID ${process.pid} #####`);

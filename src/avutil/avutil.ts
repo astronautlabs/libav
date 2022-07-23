@@ -18,6 +18,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+import { AVChannel } from "./channel-layout";
 import { AVRational } from "./rational";
 
 export declare class AVUtil {
@@ -72,6 +73,25 @@ export declare class AVUtil {
      * @return the buffer in input
      */
     static getFourCCString(fourcc: number): string;
+    
+    /**
+     * Get a human readable string in an abbreviated form describing a given channel.
+     * This is the inverse function of channelFromName().
+     */
+    getChannelName(channel: AVChannel): string;
+
+    /**
+     * Get a human readable string describing a given channel.
+     */
+    getChannelDescription(channel: AVChannel): string;
+
+    /**
+     * This is the inverse function of @ref av_channel_name().
+     *
+     * @return the channel with the given name
+     *         AV_CHAN_NONE when name does not identify a known channel
+     */
+    getChannelFromName(name: string): AVChannel;
 }
 
 /**

@@ -17,7 +17,10 @@ class NAVUtil : public NAVResource<NAVUtil, void> {
 
                 StaticMethod("getMediaTypeString", &NAVUtil::GetMediaTypeString),
                 StaticMethod("getPictureTypeString", &NAVUtil::GetPictureTypeString),
-                StaticMethod("getFourCCString", &NAVUtil::GetFourCCString)
+                StaticMethod("getFourCCString", &NAVUtil::GetFourCCString),
+                StaticMethod("getChannelName", &NAVUtil::GetChannelName),
+                StaticMethod("getChannelDescription", &NAVUtil::GetChannelDescription),
+                StaticMethod("getChannelFromName", &NAVUtil::GetChannelFromName),
             });
         }
 
@@ -36,4 +39,7 @@ class NAVUtil : public NAVResource<NAVUtil, void> {
         static Napi::Value GetMediaTypeString(const Napi::CallbackInfo& callback);
         static Napi::Value GetPictureTypeString(const Napi::CallbackInfo& callback);
         static Napi::Value GetFourCCString(const Napi::CallbackInfo& callback);
+        static Napi::Value GetChannelName(const Napi::CallbackInfo& callback);
+        static Napi::Value GetChannelDescription(const Napi::CallbackInfo& callback);
+        static Napi::Value GetChannelFromName(const Napi::CallbackInfo& callback);
 };
