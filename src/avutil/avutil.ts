@@ -77,12 +77,12 @@ export declare class AVUtil {
      * Get a human readable string in an abbreviated form describing a given channel.
      * This is the inverse function of channelFromName().
      */
-    getChannelName(channel: number): string;
+    static getChannelName(channel: number): string;
 
     /**
      * Get a human readable string describing a given channel.
      */
-    getChannelDescription(channel: number): string;
+    static getChannelDescription(channel: number): string;
 
     /**
      * This is the inverse function of @ref av_channel_name().
@@ -90,7 +90,7 @@ export declare class AVUtil {
      * @return the channel with the given name
      *         AV_CHAN_NONE when name does not identify a known channel
      */
-    getChannelFromName(name: string): number;
+    static getChannelFromName(name: string): number;
 
     /**
      * Return a channel layout id that matches name, or 0 if no match is found.
@@ -109,7 +109,7 @@ export declare class AVUtil {
      *
      * Example: "stereo+FC" = "2c+FC" = "2c+1c" = "0x7"
      */
-    getChannelLayoutFromName(name: string): number;
+    static getChannelLayoutFromName(name: string): number;
     
     /**
      * Return a channel layout and the number of channels based on the specified name.
@@ -119,23 +119,23 @@ export declare class AVUtil {
      *
      * @param name             channel layout specification string
      */
-    getExtendedChannelLayout(name: string): { layout: number, numberOfChannels: number };
+    static getExtendedChannelLayout(name: string): { layout: number, numberOfChannels: number };
 
     /**
      * Return a description of a channel layout.
      * If numberOfChannels is not present or <= 0, it is guessed from the channel_layout.
      */
-    getChannelLayoutName(layout: number, numberOfChannels?: number): string;
+    static getChannelLayoutName(layout: number, numberOfChannels?: number): string;
     
     /**
      * Return the number of channels in the channel layout.
      */
-    getNumberOfChannelsInLayout(layout: number): number;
+    static getNumberOfChannelsInLayout(layout: number): number;
     
     /**
      * Return default channel layout for a given number of channels.
      */
-    getDefaultChannelLayout(numberOfChannels: number): number;
+    static getDefaultChannelLayout(numberOfChannels: number): number;
 
     /**
      * Get the index of a channel in a channel layout.
@@ -145,12 +145,12 @@ export declare class AVUtil {
      *
      * @return index of channel in channel_layout on success
      */
-    getIndexOfChannelInLayout(layout: number, channel: number): number;
+    static getIndexOfChannelInLayout(layout: number, channel: number): number;
     
     /**
      * Get the channel with the given index in channel_layout.
      */
-    getChannelInLayoutByIndex(layout: number, index: number): number;
+    static getChannelInLayoutByIndex(layout: number, index: number): number;
 }
 
 /**
