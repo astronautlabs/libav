@@ -98,25 +98,25 @@
             {
               "destination": "build/Release/",
               "files": [
-                "./dist/ffmpeg/lib/avutil-57.dll",
-                "./dist/ffmpeg/lib/avformat-59.dll",
-                "./dist/ffmpeg/lib/avcodec-59.dll",
-                "./dist/ffmpeg/lib/avdevice-59.dll",
-                "./dist/ffmpeg/lib/avfilter-8.dll",
-                "./dist/ffmpeg/lib/swresample-4.dll",
-                "./dist/ffmpeg/lib/swscale-6.dll"
+                "./dist/ffmpeg/bin/avutil-57.dll",
+                "./dist/ffmpeg/bin/avformat-59.dll",
+                "./dist/ffmpeg/bin/avcodec-59.dll",
+                "./dist/ffmpeg/bin/avdevice-59.dll",
+                "./dist/ffmpeg/bin/avfilter-8.dll",
+                "./dist/ffmpeg/bin/swresample-4.dll",
+                "./dist/ffmpeg/bin/swscale-6.dll"
               ]
             },
             {
               "destination": "build/Debug/",
               "files": [
-                "D:/dev/ffmpeg/ffmpeg/libavutil/avutil-57.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavformat/avformat-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavcodec/avcodec-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavdevice/avdevice-59.dll",
-                "D:/dev/ffmpeg/ffmpeg/libavfilter/avfilter-8.dll",
-                "D:/dev/ffmpeg/ffmpeg/libswresample/swresample-4.dll",
-                "D:/dev/ffmpeg/ffmpeg/libswscale/swscale-6.dll"
+                "./dist/ffmpeg/bin/avutil-57.dll",
+                "./dist/ffmpeg/bin/avformat-59.dll",
+                "./dist/ffmpeg/bin/avcodec-59.dll",
+                "./dist/ffmpeg/bin/avdevice-59.dll",
+                "./dist/ffmpeg/bin/avfilter-8.dll",
+                "./dist/ffmpeg/bin/swresample-4.dll",
+                "./dist/ffmpeg/bin/swscale-6.dll"
               ]
             }
           ]
