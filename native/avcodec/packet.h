@@ -15,17 +15,17 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVPacket", {
                 R_GETTER("buffer", &NAVPacket::GetBuffer),
-                R_GETTER("pts", &NAVPacket::GetPts),
-                R_GETTER("dts", &NAVPacket::GetDts),
+                R_ACCESSOR("pts", &NAVPacket::GetPts, &NAVPacket::SetPts),
+                R_ACCESSOR("dts", &NAVPacket::GetDts, &NAVPacket::SetDts),
                 R_GETTER("size", &NAVPacket::GetSize),
-                R_GETTER("streamIndex", &NAVPacket::GetStreamIndex),
-                R_GETTER("flags", &NAVPacket::GetFlags),
+                R_ACCESSOR("streamIndex", &NAVPacket::GetStreamIndex, &NAVPacket::SetStreamIndex),
+                R_ACCESSOR("flags", &NAVPacket::GetFlags, &NAVPacket::SetFlags),
                 R_GETTER("sideData", &NAVPacket::GetSideData),
                 R_GETTER("sideDataCount", &NAVPacket::GetSideDataCount),
-                R_GETTER("duration", &NAVPacket::Duration),
-                R_GETTER("position", &NAVPacket::GetPosition),
+                R_ACCESSOR("duration", &NAVPacket::GetDuration, &NAVPacket::SetDuration),
+                R_ACCESSOR("position", &NAVPacket::GetPosition, &NAVPacket::SetPosition),
                 R_ACCESSOR("opaqueBuffer", &NAVPacket::GetOpaqueBuffer, &NAVPacket::SetOpaqueBuffer),
-                R_GETTER("timeBase", &NAVPacket::GetTimeBase),
+                R_ACCESSOR("timeBase", &NAVPacket::GetTimeBase, &NAVPacket::SetTimeBase)
             });
         }
 
@@ -34,17 +34,24 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
     private:
         Napi::Value GetBuffer(const Napi::CallbackInfo& info);
         Napi::Value GetPts(const Napi::CallbackInfo& info);
+        void SetPts(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetDts(const Napi::CallbackInfo& info);
+        void SetDts(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetSize(const Napi::CallbackInfo& info);
         Napi::Value GetStreamIndex(const Napi::CallbackInfo& info);
+        void SetStreamIndex(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetFlags(const Napi::CallbackInfo& info);
+        void SetFlags(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetSideData(const Napi::CallbackInfo& info);
         Napi::Value GetSideDataCount(const Napi::CallbackInfo& info);
-        Napi::Value Duration(const Napi::CallbackInfo& info);
+        Napi::Value GetDuration(const Napi::CallbackInfo& info);
+        void SetDuration(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetPosition(const Napi::CallbackInfo& info);
+        void SetPosition(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetOpaqueBuffer(const Napi::CallbackInfo& info);
         void SetOpaqueBuffer(const Napi::CallbackInfo& info, const Napi::Value &value);
         Napi::Value GetTimeBase(const Napi::CallbackInfo& info);
+        void SetTimeBase(const Napi::CallbackInfo& info, const Napi::Value& value);
 
 
 };

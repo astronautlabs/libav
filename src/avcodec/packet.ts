@@ -363,21 +363,21 @@ export declare class AVPacket {
      * the terms dts and pts/cts to mean something different. Such timestamps
      * must be converted to true pts/dts before they are stored in AVPacket.
      */
-    readonly pts: number;
+    pts: number;
 
     /**
      * Decompression timestamp in AVStream->time_base units; the time at which
      * the packet is decompressed.
      * Can be AV_NOPTS_VALUE if it is not stored in the file.
      */
-    readonly dts: number;
+    dts: number;
     
     readonly size: number;
-    readonly streamIndex: number;
+    streamIndex: number;
     /**
      * A combination of AV_PKT_FLAG values
      */
-    readonly flags: number;
+    flags: number;
 
     /**
      * Additional packet data that can be provided by the container.
@@ -390,10 +390,10 @@ export declare class AVPacket {
      * Duration of this packet in AVStream->time_base units, 0 if unknown.
      * Equals next_pts - this_pts in presentation order.
      */
-    readonly duration: number;
+    duration: number;
 
     ///< byte position in stream, -1 if unknown
-    readonly position: number;
+    position: number;
 
     /**
      * AVBufferRef for free use by the API user. FFmpeg will never check the
@@ -412,7 +412,7 @@ export declare class AVPacket {
      * demuxers, but its value will be by default ignored on input to decoders
      * or muxers.
      */
-    readonly timeBase: AVRational;
+    timeBase: AVRational;
 }
 
 /**

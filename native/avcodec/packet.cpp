@@ -44,8 +44,16 @@ Napi::Value NAVPacket::GetPts(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->pts);
 }
 
+void NAVPacket::SetPts(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->pts = info[0].As<Napi::Number>().Int64Value();
+}
+
 Napi::Value NAVPacket::GetDts(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->dts);
+}
+
+void NAVPacket::SetDts(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->dts = info[0].As<Napi::Number>().Int64Value();
 }
 
 Napi::Value NAVPacket::GetSize(const Napi::CallbackInfo& info) {
@@ -56,8 +64,16 @@ Napi::Value NAVPacket::GetStreamIndex(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->stream_index);
 }
 
+void NAVPacket::SetStreamIndex(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->stream_index = info[0].As<Napi::Number>().Int32Value();
+}
+
 Napi::Value NAVPacket::GetFlags(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->flags);
+}
+
+void NAVPacket::SetFlags(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->flags = info[0].As<Napi::Number>().Int32Value();
 }
 
 Napi::Value NAVPacket::GetSideData(const Napi::CallbackInfo& info) {
@@ -68,12 +84,20 @@ Napi::Value NAVPacket::GetSideDataCount(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->side_data_elems);
 }
 
-Napi::Value NAVPacket::Duration(const Napi::CallbackInfo& info) {
+Napi::Value NAVPacket::GetDuration(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->duration);
+}
+
+void NAVPacket::SetDuration(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->duration = info[0].As<Napi::Number>().Int64Value();
 }
 
 Napi::Value NAVPacket::GetPosition(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->pos);
+}
+
+void NAVPacket::SetPosition(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->pos = info[0].As<Napi::Number>().Int64Value();
 }
 
 Napi::Value NAVPacket::GetOpaqueBuffer(const Napi::CallbackInfo& info) {
@@ -86,6 +110,10 @@ void NAVPacket::SetOpaqueBuffer(const Napi::CallbackInfo& info, const Napi::Valu
 
 Napi::Value NAVPacket::GetTimeBase(const Napi::CallbackInfo& info) {
     return NRational(info.Env(), GetHandle()->time_base);
+}
+
+void NAVPacket::SetTimeBase(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->time_base = FromNRational(info.Env(), info[0]);
 }
 
 NAVPacketSideData::NAVPacketSideData(const Napi::CallbackInfo& info):
