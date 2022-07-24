@@ -340,6 +340,9 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         void SetWorkaroundBugs(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetErrorRecognitionFlags(const Napi::CallbackInfo& info);
         void SetErrorRecognitionFlags(const Napi::CallbackInfo& info, const Napi::Value& value);
+
+        Napi::Value GetChannelLayout(const Napi::CallbackInfo& info);
+        void SetChannelLayout(const Napi::CallbackInfo& info, const Napi::Value& value);
 };
 
 void nlavc_thread(NAVCodecContext *context);

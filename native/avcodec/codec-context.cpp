@@ -1025,3 +1025,13 @@ void NAVCodecContext::SetErrorRecognitionFlags(const Napi::CallbackInfo& info, c
 Napi::Value NAVCodecContext::GetErrorRecognitionFlags(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->err_recognition);
 }
+
+
+Napi::Value NAVCodecContext::GetChannelLayout(const Napi::CallbackInfo& info) {
+    return Napi::Number::New(info.Env(), GetHandle()->channel_layout);
+}
+
+void NAVCodecContext::SetChannelLayout(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    auto layout = info[0].As<Napi::Number>().Int32Value();
+    GetHandle()->channel_layout = layout;
+}

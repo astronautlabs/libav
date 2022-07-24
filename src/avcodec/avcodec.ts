@@ -1953,7 +1953,7 @@ export declare class AVCodecContext {
      * - decoding: may be set by the caller if known e.g. from the container.
      *             The decoder can then override during decoding as needed.
      */
-    ch_layout: number;
+    channelLayout: number;
 }
 
 /**
