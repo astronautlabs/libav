@@ -380,11 +380,23 @@ export declare class AVPacket {
     flags: number;
 
     /**
+     * Get a side data buffer with the given type.
+     * @param type 
+     */
+    getSideData(type: number): AVPacketSideData;
+
+    /**
+     * Add a new side data buffer with the given type.
+     * @param type 
+     * @param buffer 
+     */
+    addSideData(type: number, buffer: ArrayBuffer): AVPacketSideData;
+
+    /**
      * Additional packet data that can be provided by the container.
      * Packet can contain several types of side information.
      */
     readonly sideData: AVPacketSideData[];
-    readonly sideDataCount: number;
 
     /**
      * Duration of this packet in AVStream->time_base units, 0 if unknown.

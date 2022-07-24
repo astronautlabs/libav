@@ -36,6 +36,53 @@ void NAVPacket::RefHandle() {
     SetHandle(av_packet_clone(GetHandle()));
 }
 
+// Methods
+
+Napi::Value NAVPacket::AddSideData(const Napi::CallbackInfo& info) {
+    auto type = (AVPacketSideDataType)info[0].As<Napi::Number>().Int32Value();
+    auto buffer = info[1].As<Napi::ArrayBuffer>();
+    auto size = buffer.ByteLength();
+    auto data = (uint8_t*)av_malloc(size);
+    memcpy(data, buffer.Data(), size);
+
+    av_packet_add_side_data(GetHandle(), type, data, size);
+    
+    AVPacketSideData *sideData;
+
+    // NOTE: Find the _last_ matching side data to ensure we return what was just pushed in.
+    
+    for (int i = 0; i < GetHandle()->side_data_elems; i++) {
+        if (GetHandle()->side_data[i].type != type)
+            continue;
+        
+        sideData = GetHandle()->side_data + i;
+    }
+
+    if (!sideData)
+        return info.Env().Null();
+
+    return NAVPacketSideData::FromHandleWrapped(info.Env(), sideData, false);
+}
+
+Napi::Value NAVPacket::GetSideData(const Napi::CallbackInfo& info) {
+    auto type = (AVPacketSideDataType)info[0].As<Napi::Number>().Int32Value();
+    AVPacketSideData* sideData = nullptr;
+
+    for (int i = 0; i < GetHandle()->side_data_elems; i++) {
+        if (GetHandle()->side_data[i].type == type) {
+            sideData = GetHandle()->side_data + i;
+            break;
+        }
+    }
+
+    if (!sideData)
+        return info.Env().Null();
+
+    return NAVPacketSideData::FromHandleWrapped(info.Env(), sideData, false);
+}
+
+// Properties
+
 Napi::Value NAVPacket::GetBuffer(const Napi::CallbackInfo& info) {
     return NAVBuffer::FromHandleWrapped(info.Env(), GetHandle()->buf, false);
 }
@@ -76,12 +123,8 @@ void NAVPacket::SetFlags(const Napi::CallbackInfo& info, const Napi::Value& valu
     GetHandle()->flags = info[0].As<Napi::Number>().Int32Value();
 }
 
-Napi::Value NAVPacket::GetSideData(const Napi::CallbackInfo& info) {
+Napi::Value NAVPacket::GetSideDatas(const Napi::CallbackInfo& info) {
     return NAVPacketSideData::FromHandlesWrapped(info.Env(), GetHandle()->side_data, GetHandle()->side_data_elems, false);
-}
-
-Napi::Value NAVPacket::GetSideDataCount(const Napi::CallbackInfo& info) {
-    return Napi::Number::New(info.Env(), GetHandle()->side_data_elems);
 }
 
 Napi::Value NAVPacket::GetDuration(const Napi::CallbackInfo& info) {

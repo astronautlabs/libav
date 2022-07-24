@@ -20,8 +20,7 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
                 R_GETTER("size", &NAVPacket::GetSize),
                 R_ACCESSOR("streamIndex", &NAVPacket::GetStreamIndex, &NAVPacket::SetStreamIndex),
                 R_ACCESSOR("flags", &NAVPacket::GetFlags, &NAVPacket::SetFlags),
-                R_GETTER("sideData", &NAVPacket::GetSideData),
-                R_GETTER("sideDataCount", &NAVPacket::GetSideDataCount),
+                R_GETTER("sideData", &NAVPacket::GetSideDatas),
                 R_ACCESSOR("duration", &NAVPacket::GetDuration, &NAVPacket::SetDuration),
                 R_ACCESSOR("position", &NAVPacket::GetPosition, &NAVPacket::SetPosition),
                 R_ACCESSOR("opaqueBuffer", &NAVPacket::GetOpaqueBuffer, &NAVPacket::SetOpaqueBuffer),
@@ -32,6 +31,14 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
         virtual void Free();
         virtual void RefHandle();
     private:
+
+        // Methods
+
+        Napi::Value AddSideData(const Napi::CallbackInfo& info);
+        Napi::Value GetSideData(const Napi::CallbackInfo& info);
+
+        // Properties
+
         Napi::Value GetBuffer(const Napi::CallbackInfo& info);
         Napi::Value GetPts(const Napi::CallbackInfo& info);
         void SetPts(const Napi::CallbackInfo& info, const Napi::Value& value);
@@ -42,8 +49,7 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
         void SetStreamIndex(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetFlags(const Napi::CallbackInfo& info);
         void SetFlags(const Napi::CallbackInfo& info, const Napi::Value& value);
-        Napi::Value GetSideData(const Napi::CallbackInfo& info);
-        Napi::Value GetSideDataCount(const Napi::CallbackInfo& info);
+        Napi::Value GetSideDatas(const Napi::CallbackInfo& info);
         Napi::Value GetDuration(const Napi::CallbackInfo& info);
         void SetDuration(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetPosition(const Napi::CallbackInfo& info);
