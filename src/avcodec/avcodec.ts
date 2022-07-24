@@ -739,6 +739,24 @@ export declare class AVCodecContext {
     flags2: number;
 
     /**
+     * Some codecs need (or can use) extra data such as Huffman tables or codec-specific configuration.
+     * - This property can only be set in a decoder context. In an encoder context, this data will be 
+     *   provided and managed by the encoder.
+     * - CAUTION: Retrieving this value will always result in creating a copy of the data. Access 
+     *   it sparingly.
+     * 
+     * The bytewise contents of extradata must not depend on the architecture or CPU endianness.
+     * 
+     * Some examples:
+     * - MJPEG: Huffman tables
+     * - rv10: additional flags
+     * - MPEG-4: global headers (they can be in the bitstream or here)
+     * - AAC: AudioSpecificConfig (ie initialization)
+     * 
+     */
+    extraData: ArrayBuffer;
+
+    /**
      * This is the fundamental unit of time (in seconds) in terms
      * of which frame timestamps are represented. For fixed-fps content,
      * timebase should be 1/framerate and timestamp increments should be

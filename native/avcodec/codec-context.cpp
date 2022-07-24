@@ -232,6 +232,15 @@ bool NAVCodecContext::PullFromEncoder(AVCodecContext *context) {
 }
 
 void NAVCodecContext::Free() {
+    // If we are a decoder, then extradata will only be set by us, and we own that data.
+    // If it is set, we need to free it using av_free. 
+    // (If we are an encoder, the data is owned --and freed-- by libavcodec)
+
+    if (av_codec_is_decoder(GetHandle()->codec) && GetHandle()->extradata) {
+        av_freep(&GetHandle()->extradata);
+        GetHandle()->extradata_size = 0;
+    }
+
     running = false;
     auto handle = GetHandle();
     avcodec_free_context(&handle);
@@ -447,6 +456,40 @@ void NAVCodecContext::SetFlags2(const Napi::CallbackInfo& info, const Napi::Valu
 
 Napi::Value NAVCodecContext::GetFlags2(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), GetHandle()->flags2);
+}
+
+Napi::Value NAVCodecContext::GetExtraData(const Napi::CallbackInfo& info) {
+    auto extra = GetHandle()->extradata;
+    auto size = GetHandle()->extradata_size;
+    auto buffer = Napi::ArrayBuffer::New(info.Env(), size);
+    uint8_t *view = (uint8_t*)buffer.Data();
+    memcpy(view, extra, size);
+
+    return buffer;
+}
+
+void NAVCodecContext::SetExtraData(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    if (av_codec_is_encoder(GetHandle()->codec)) {
+        Napi::TypeError::New(info.Env(), "extraData can only be written when decoding.").ThrowAsJavaScriptException();
+        return;
+    }
+
+    Napi::ArrayBuffer buffer;
+
+    if (info[0].IsTypedArray()) {
+        buffer = info[0].As<Napi::TypedArray>().ArrayBuffer();
+    } else if (info[0].IsArrayBuffer()) {
+        buffer = info[0].As<Napi::ArrayBuffer>();
+    } else {
+        Napi::TypeError::New(info.Env(), "extraData must be set to a TypedArray or an ArrayBuffer.").ThrowAsJavaScriptException();
+        return;
+    }
+
+    size_t size = buffer.ByteLength();
+    uint8_t *extra = (uint8_t*)av_malloc(size + AV_INPUT_BUFFER_PADDING_SIZE);
+    
+    GetHandle()->extradata = extra;
+    GetHandle()->extradata_size = size;
 }
 
 void NAVCodecContext::SetTimeBase(const Napi::CallbackInfo& info, const Napi::Value& value) {

@@ -39,8 +39,10 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
                 R_ACCESSOR("bitRateTolerance", &NAVCodecContext::GetBitRateTolerance, &NAVCodecContext::SetBitRateTolerance),
                 R_ACCESSOR("globalQuality", &NAVCodecContext::GetGlobalQuality, &NAVCodecContext::SetGlobalQuality),
                 R_ACCESSOR("compressionLevel", &NAVCodecContext::GetCompressionLevel, &NAVCodecContext::SetCompressionLevel),
-                R_ACCESSOR("clags", &NAVCodecContext::GetFlags, &NAVCodecContext::SetFlags),
-                R_ACCESSOR("clags2", &NAVCodecContext::GetFlags2, &NAVCodecContext::SetFlags2),
+                R_ACCESSOR("flags", &NAVCodecContext::GetFlags, &NAVCodecContext::SetFlags),
+                R_ACCESSOR("flags2", &NAVCodecContext::GetFlags2, &NAVCodecContext::SetFlags2),
+                R_ACCESSOR("extraData", &NAVCodecContext::GetExtraData, &NAVCodecContext::SetExtraData),
+
                 R_ACCESSOR("timeBase", &NAVCodecContext::GetTimeBase, &NAVCodecContext::SetTimeBase),
                 R_ACCESSOR("ticksPerFrame", &NAVCodecContext::GetTicksPerFrame, &NAVCodecContext::SetTicksPerFrame),
                 R_ACCESSOR("delay", &NAVCodecContext::GetDelay, &NAVCodecContext::SetDelay),
@@ -196,6 +198,10 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         void SetFlags(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetFlags2(const Napi::CallbackInfo& info);
         void SetFlags2(const Napi::CallbackInfo& info, const Napi::Value& value);
+
+        Napi::Value GetExtraData(const Napi::CallbackInfo& info);
+        void SetExtraData(const Napi::CallbackInfo& info, const Napi::Value& value);
+
         Napi::Value GetTimeBase(const Napi::CallbackInfo& info);
         void SetTimeBase(const Napi::CallbackInfo& info, const Napi::Value& value);
         Napi::Value GetTicksPerFrame(const Napi::CallbackInfo& info);
