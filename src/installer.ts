@@ -41,13 +41,23 @@ async function main() {
     }
 
     let buildName = getBuildName();
+    if (!buildName && os.platform() === 'win32') {
+        console.error(`No build available for platform=${os.platform()}, arch=${os.arch()}`);
+        process.exit(1);
+    }
+
     let catalog = await getCatalog();
     let gpl = process.env['FFMPEG_ENABLE_GPL'] === '1';
 
-    let buildFile = catalog[`${buildName}-${gpl ? 'gpl' : 'lgpl'}-shared-5.0`];
-    if (!buildName && os.platform() === 'win32')
-        throw new Error(`No build available for platform=${os.platform()}, arch=${os.arch()}`);
+    let buildId = `${buildName}-${gpl ? 'gpl' : 'lgpl'}-shared-5.1`;
+    let buildFile = catalog[buildId];
 
+    if (!buildFile) {
+        console.error(`Failed to locate build ${buildId}, available options are:`);
+        console.dir(catalog);
+
+        process.exit(1);
+    }
     let buildFileName = path.basename(buildFile);
     let buildFileResponse = await fetch(buildFile);
     let body = <fs.ReadStream><unknown>buildFileResponse.body;
