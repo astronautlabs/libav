@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
-    "test": "npm run rebuild:native:debug && npm run build && node --expose-gc dist/test",
+    "test": "node dist/installer && npm run rebuild:native:debug && npm run build && node --expose-gc dist/test",
     "test:fast": "npm run build && node --expose-gc dist/test",
     "build:native": "node-gyp -j 8 build --release",
     "build:native:debug": "node-gyp -j 8 build --debug",
