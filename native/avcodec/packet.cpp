@@ -40,7 +40,14 @@ void NAVPacket::RefHandle() {
 
 Napi::Value NAVPacket::AddSideData(const Napi::CallbackInfo& info) {
     auto type = (AVPacketSideDataType)info[0].As<Napi::Number>().Int32Value();
-    auto buffer = info[1].As<Napi::ArrayBuffer>();
+    Napi::ArrayBuffer buffer;
+    
+    if (info[1].IsArrayBuffer()) {
+        buffer = info[1].As<Napi::ArrayBuffer>();
+    } else if (info[1].IsTypedArray()) {
+        buffer = info[1].As<Napi::TypedArray>().ArrayBuffer();
+    }
+    
     auto size = buffer.ByteLength();
     auto data = (uint8_t*)av_malloc(size);
     memcpy(data, buffer.Data(), size);

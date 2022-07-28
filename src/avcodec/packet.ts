@@ -390,7 +390,7 @@ export declare class AVPacket {
      * @param type 
      * @param buffer 
      */
-    addSideData(type: number, buffer: ArrayBuffer): AVPacketSideData;
+    addSideData(type: number, buffer: ArrayBuffer | Uint8Array): AVPacketSideData;
 
     /**
      * Additional packet data that can be provided by the container.
