@@ -89,7 +89,7 @@ describe("AVCodecContext", it => {
 
         expect(count).to.equal(1);
     });
-    it.only('should decode one packet for one frame (when using a trivial decoder)', async () => {
+    it('should decode one packet for one frame (when using a trivial decoder)', async () => {
         await delay(250);
 
         let context = createDecoderContext('rawvideo');

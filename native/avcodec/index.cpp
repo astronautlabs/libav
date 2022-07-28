@@ -13,4 +13,5 @@ void nlavc_init(Napi::Env env, Napi::Object exports) {
     NAVCodec::Register(env, exports);
     NAVCodecContext::Register(env, exports);
     NAVPacket::Register(env, exports);
+    NAVPacketSideData::Register(env, exports);
 }
