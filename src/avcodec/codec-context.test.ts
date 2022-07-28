@@ -29,6 +29,24 @@ describe("AVCodecContext", it => {
 
         return context;
     }
+    function createDecoderContext(encoder: string) {
+        let codec = AVCodec.findDecoder('rawvideo');
+        let context = codec.newContext();
+        context.bitRate = 400000;
+        context.width = 352;
+        context.height = 288;
+        context.timeBase = { num: 1, den: 25 };
+        context.frameRate = { num: 25, den: 1 };
+        context.gopSize = 10;
+        context.maxBFrames = 1;
+        context.pixelFormat = AVPixelFormat.AV_PIX_FMT_YUV420P;
+        context.onError = (err) => {
+            console.error(`ERROR while decoding:`);
+            console.error(err);
+        }
+
+        return context;
+    }
 
     function createTestFrame(context: AVCodecContextType) {
         let frame = new AVFrame();
@@ -39,6 +57,13 @@ describe("AVCodecContext", it => {
         frame.pts = 0;
 
         return frame;
+    }
+
+    function createTestPacket(context: AVCodecContextType) {
+        let data = new Uint8Array(4 * context.width * context.height);
+        let packet = new AVPacket(data);
+        packet.pts = 0;
+        return packet;
     }
 
     function createInvalidFrame(context: AVCodecContextType) {
@@ -63,6 +88,24 @@ describe("AVCodecContext", it => {
         await delay(250);
 
         expect(count).to.equal(1);
+    });
+    it.only('should decode one packet for one frame (when using a trivial decoder)', async () => {
+        await delay(250);
+
+        let context = createDecoderContext('rawvideo');
+        let count = 0;
+
+        context.onFrame = () => count += 1;
+        context.open();
+        context.sendPacket(createTestPacket(context));
+        await delay(250);
+        expect(count).to.equal(1);
+        context.sendPacket(createTestPacket(context));
+        await delay(250);
+        expect(count).to.equal(2);
+        context.sendPacket(createTestPacket(context));
+        await delay(250);
+        expect(count).to.equal(3);
     });
 
     it('should encode one packet for one frame (when using a trivial encoder)', async () => {

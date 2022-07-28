@@ -12,8 +12,8 @@ extern "C" {
 }
 
 struct WorkItem {
-    AVPacket *packet;
-    AVFrame *frame;
+    AVPacket *packet = nullptr;
+    AVFrame *frame = nullptr;
 };
 
 class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
@@ -138,7 +138,7 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         void ThreadLog(std::string message);
 
         bool opened = false;
-        bool threadTracing = false;
+        bool threadTracing = true;
         std::queue<AVFrame*> framePool;
         std::queue<AVPacket*> packetPool;
 

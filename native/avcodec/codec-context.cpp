@@ -150,7 +150,22 @@ bool NAVCodecContext::FeedToCodec() {
             break;
 
         if (result < 0) {
-            SendError("averror:" + std::to_string(result), "An error occurred during avcodec_send. Discarding queued item.");
+            char buf[256];
+            av_strerror(result, buf, sizeof(buf));
+            std::string func = "avcodec_send";
+
+            if (workItem.frame) {
+                func = "avcodec_send_frame";
+            } else if (workItem.packet) {
+                func = "avcodec_send_packet";
+            }
+
+            SendError(
+                "averror:" + std::to_string(result), 
+                "An error occurred during " 
+                    + func + "(). Discarding queued item. Error description: " 
+                    + std::string(buf)
+            );
             localQueue.pop_front();
             break;
         }
@@ -173,6 +188,8 @@ bool NAVCodecContext::FeedToCodec() {
 }
 
 bool NAVCodecContext::PullFromDecoder(AVCodecContext *context) {
+    ThreadLog("Pulling from decoder...");
+
     while (running) {
         if (!onFrameValid)
             break;
@@ -180,7 +197,8 @@ bool NAVCodecContext::PullFromDecoder(AVCodecContext *context) {
         auto frame = GetPoolFrame();
         int result = avcodec_receive_frame(context, frame);
 
-        if (AVERROR(result) == EAGAIN) {
+        if (AVERROR(result) == EAGAIN || result == AVERROR_EOF) {
+            ThreadLog("Decoder is starved.");
             FreePoolFrame(frame);
             break;
         }
@@ -191,7 +209,7 @@ bool NAVCodecContext::PullFromDecoder(AVCodecContext *context) {
         }
 
         // Send to the main thread
-
+        ThreadLog("** Received frame!");
         onFrameTSFN.BlockingCall([=](Napi::Env env, Napi::Function jsCallback) {
             jsCallback.Call({ NAVFrame::FromHandleWrapped(env, frame, true) });
         });
@@ -282,11 +300,16 @@ Napi::Value NAVCodecContext::Open(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value NAVCodecContext::SendPacket(const Napi::CallbackInfo& info) {
-    auto packet = NAVPacket::Unwrap(info[0].As<Napi::Object>());
-    auto result = avcodec_send_packet(GetHandle(), packet->GetHandle());
-    if (result < 0)
-        return nlav_throw(info.Env(), result, "avcodec_send_packet");
-    return info.Env().Undefined();
+    NAVPacket *packet = NAVPacket::Unwrap(info[0].As<Napi::Object>());
+    std::unique_lock<std::mutex> lock(mutex);
+    WorkItem item;
+
+    ThreadLog("Sending packet...");
+    item.packet = packet->GetHandle();
+    inQueue.push_back(item);
+    
+    threadWake.notify_one();
+    return Napi::Boolean::New(info.Env(), true);
 }
 
 Napi::Value NAVCodecContext::ReceiveFrame(const Napi::CallbackInfo& info) {
@@ -309,6 +332,7 @@ Napi::Value NAVCodecContext::SendFrame(const Napi::CallbackInfo& info) {
     std::unique_lock<std::mutex> lock(mutex);
     WorkItem item;
 
+    ThreadLog("Sending frame...");
     item.frame = frame->GetHandle();
     inQueue.push_back(item);
 
