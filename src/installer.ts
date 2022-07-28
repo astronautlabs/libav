@@ -81,4 +81,5 @@ async function finishStream(stream: stream.Writable) {
     });
 }
 
+console.log(`(**) Starting libav installer...`);
 main();
