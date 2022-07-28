@@ -14,6 +14,14 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
         inline static std::string ExportName() { return "AVPacket"; }
         inline static Napi::Function ClassDefinition(const Napi::Env &env) {
             return DefineClass(env, "AVPacket", {
+
+                // Methods
+                
+                R_METHOD("addSideData", &NAVPacket::AddSideData),
+                R_METHOD("getSideData", &NAVPacket::GetSideData),
+
+                // Properties 
+
                 R_GETTER("buffer", &NAVPacket::GetBuffer),
                 R_ACCESSOR("pts", &NAVPacket::GetPts, &NAVPacket::SetPts),
                 R_ACCESSOR("dts", &NAVPacket::GetDts, &NAVPacket::SetDts),
@@ -36,6 +44,7 @@ class NAVPacket : public NAVResource<NAVPacket, AVPacket> {
 
         Napi::Value AddSideData(const Napi::CallbackInfo& info);
         Napi::Value GetSideData(const Napi::CallbackInfo& info);
+        Napi::Value RemoveSideData(const Napi::CallbackInfo& info);
 
         // Properties
 
