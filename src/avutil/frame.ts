@@ -404,6 +404,7 @@ export declare class AVFrame {
      *
      * @return newly added side data object
      */
+    addSideData(type: AVFrameSideDataType, buffer: AVBuffer): AVFrameSideData;
     addSideData(type: AVFrameSideDataType, size: number): AVFrameSideData;
 
     /**
