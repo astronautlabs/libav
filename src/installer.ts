@@ -35,6 +35,11 @@ function getBuildName() {
  * Install FFmpeg from BtbN's FFmpeg-Builds service.
  */
 async function main() {
+    if (os.platform() !== 'win32') {
+        console.log(`(**) FFmpeg must be provided by the host system on this platform.`);
+        return;
+    }
+
     let buildName = getBuildName();
     let catalog = await getCatalog();
     let gpl = process.env['FFMPEG_ENABLE_GPL'] === '1';
@@ -54,6 +59,8 @@ async function main() {
         path.join(distDir, path.basename(buildFileName, '.zip')), 
         path.join(distDir, `ffmpeg`)
     );
+
+    console.log(`(**) FFmpeg build installed successfully.`);
 }
 
 async function removeDir(path: string) {
