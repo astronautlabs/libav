@@ -485,6 +485,9 @@ Napi::Value NAVCodecContext::GetFlags2(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value NAVCodecContext::GetExtraData(const Napi::CallbackInfo& info) {
+    if (!GetHandle()->extradata)
+        return info.Env().Null();
+    
     auto extra = GetHandle()->extradata;
     auto size = GetHandle()->extradata_size;
     auto buffer = Napi::ArrayBuffer::New(info.Env(), size);
