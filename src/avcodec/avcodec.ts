@@ -1972,6 +1972,11 @@ export declare class AVCodecContext {
      *             The decoder can then override during decoding as needed.
      */
     channelLayout: number;
+
+    /**
+     * number of audio channels
+     */
+    channels: number;
 }
 
 /**
