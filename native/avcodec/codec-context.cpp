@@ -20,12 +20,14 @@ NAVCodecContext::NAVCodecContext(const Napi::CallbackInfo& info):
 }
 
 void NAVCodecContext::ThreadMain() {
+    ThreadLog("Main thread started");
     std::unique_lock<std::mutex> lock(mutex);
     AVCodecContext *context = GetHandle();
     bool isEncoder = av_codec_is_encoder(context->codec);
     bool isDecoder = av_codec_is_decoder(context->codec);
     lock.unlock();
     
+    ThreadLog("Entering main loop...");
     while (running) {
         bool fed = FeedToCodec();
 
@@ -1101,4 +1103,12 @@ Napi::Value NAVCodecContext::GetChannelLayout(const Napi::CallbackInfo& info) {
 void NAVCodecContext::SetChannelLayout(const Napi::CallbackInfo& info, const Napi::Value& value) {
     auto layout = info[0].As<Napi::Number>().Int32Value();
     GetHandle()->channel_layout = layout;
+}
+
+Napi::Value NAVCodecContext::GetChannels(const Napi::CallbackInfo& info) {
+    return Napi::Number::New(info.Env(), GetHandle()->channels);
+}
+
+void NAVCodecContext::SetChannels(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    GetHandle()->channels = info[0].As<Napi::Number>().Int32Value();
 }

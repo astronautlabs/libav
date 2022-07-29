@@ -114,7 +114,10 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
                 R_ACCESSOR("rateControlInitialBufferOccupancy", &NAVCodecContext::GetRateControlInitialBufferOccupancy, &NAVCodecContext::SetRateControlInitialBufferOccupancy),
                 R_ACCESSOR("trellis", &NAVCodecContext::GetTrellis, &NAVCodecContext::SetTrellis),
                 R_ACCESSOR("workaroundBugs", &NAVCodecContext::GetWorkaroundBugs, &NAVCodecContext::SetWorkaroundBugs),
-                R_ACCESSOR("errorRecognitionFlags", &NAVCodecContext::GetErrorRecognitionFlags, &NAVCodecContext::SetErrorRecognitionFlags)
+                R_ACCESSOR("errorRecognitionFlags", &NAVCodecContext::GetErrorRecognitionFlags, &NAVCodecContext::SetErrorRecognitionFlags),
+                R_ACCESSOR("channelLayout", &NAVCodecContext::GetChannelLayout, &NAVCodecContext::SetChannelLayout),
+                R_ACCESSOR("channels", &NAVCodecContext::GetChannels, &NAVCodecContext::SetChannels)
+
             });
         }
 
@@ -349,6 +352,9 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
 
         Napi::Value GetChannelLayout(const Napi::CallbackInfo& info);
         void SetChannelLayout(const Napi::CallbackInfo& info, const Napi::Value& value);
+
+        Napi::Value GetChannels(const Napi::CallbackInfo& info);
+        void SetChannels(const Napi::CallbackInfo& info, const Napi::Value& value);
 };
 
 void nlavc_thread(NAVCodecContext *context);
