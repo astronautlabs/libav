@@ -35,42 +35,47 @@ function getBuildName() {
  * Install FFmpeg from BtbN's FFmpeg-Builds service.
  */
 async function main() {
-    if (os.platform() !== 'win32') {
-        console.log(`(**) FFmpeg must be provided by the host system on this platform.`);
-        return;
-    }
+    try {
+        if (os.platform() !== 'win32') {
+            console.log(`(**) FFmpeg must be provided by the host system on this platform.`);
+            return;
+        }
 
-    let buildName = getBuildName();
-    if (!buildName && os.platform() === 'win32') {
-        console.error(`No build available for platform=${os.platform()}, arch=${os.arch()}`);
+        let buildName = getBuildName();
+        if (!buildName && os.platform() === 'win32') {
+            console.error(`No build available for platform=${os.platform()}, arch=${os.arch()}`);
+            process.exit(1);
+        }
+
+        let catalog = await getCatalog();
+        let gpl = process.env['FFMPEG_ENABLE_GPL'] === '1';
+
+        let buildId = `${buildName}-${gpl ? 'gpl' : 'lgpl'}-shared-5.1`;
+        let buildFile = catalog[buildId];
+
+        if (!buildFile) {
+            console.error(`Failed to locate build ${buildId}, available options are:`);
+            console.dir(catalog);
+
+            process.exit(1);
+        }
+        let buildFileName = path.basename(buildFile);
+        let buildFileResponse = await fetch(buildFile);
+        let body = <fs.ReadStream><unknown>buildFileResponse.body;
+        let distDir = path.join(__dirname);
+
+        await removeDir(path.join(distDir, 'ffmpeg'));
+        await finishStream(body.pipe(unzip.Extract({ path: distDir })));
+        await rename(
+            path.join(distDir, path.basename(buildFileName, '.zip')), 
+            path.join(distDir, `ffmpeg`)
+        );
+
+        console.log(`(**) FFmpeg build installed successfully.`);
+    } catch (e) {
+        console.error(`(**) ERROR: Failed to install FFmpeg: ${e.message}`);
         process.exit(1);
     }
-
-    let catalog = await getCatalog();
-    let gpl = process.env['FFMPEG_ENABLE_GPL'] === '1';
-
-    let buildId = `${buildName}-${gpl ? 'gpl' : 'lgpl'}-shared-5.1`;
-    let buildFile = catalog[buildId];
-
-    if (!buildFile) {
-        console.error(`Failed to locate build ${buildId}, available options are:`);
-        console.dir(catalog);
-
-        process.exit(1);
-    }
-    let buildFileName = path.basename(buildFile);
-    let buildFileResponse = await fetch(buildFile);
-    let body = <fs.ReadStream><unknown>buildFileResponse.body;
-    let distDir = path.join(__dirname);
-
-    await removeDir(path.join(distDir, 'ffmpeg'));
-    await finishStream(body.pipe(unzip.Extract({ path: distDir })));
-    await rename(
-        path.join(distDir, path.basename(buildFileName, '.zip')), 
-        path.join(distDir, `ffmpeg`)
-    );
-
-    console.log(`(**) FFmpeg build installed successfully.`);
 }
 
 async function removeDir(path: string) {
