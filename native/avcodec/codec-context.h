@@ -141,7 +141,7 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         void ThreadLog(std::string message);
 
         bool opened = false;
-        bool threadTracing = true;
+        bool threadTracing = false;
         std::queue<AVFrame*> framePool;
         std::queue<AVPacket*> packetPool;
 
