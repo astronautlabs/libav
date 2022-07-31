@@ -19,6 +19,18 @@ NAVCodecContext::NAVCodecContext(const Napi::CallbackInfo& info):
     SetHandle(handle);
 }
 
+void NAVCodecContext::DiscardWorkItem(WorkItem *item) {
+    std::unique_lock<std::mutex> lock(reapMutex);
+    workItemsToReap.push_back(item);
+}
+
+void NAVCodecContext::ReapWorkItems() {
+    std::unique_lock<std::mutex> lock(reapMutex);
+    for (WorkItem *item : workItemsToReap)
+        delete item;
+    workItemsToReap.clear();
+}
+
 void NAVCodecContext::ThreadMain() {
     ThreadLog("Main thread started");
     std::unique_lock<std::mutex> lock(mutex);
@@ -53,22 +65,19 @@ void NAVCodecContext::WaitForWork() {
 AVFrame *NAVCodecContext::GetPoolFrame() {
     std::unique_lock<std::mutex> lock(mutex);
 
-    if (framePool.size() == 0)
+    if (framePool.size() == 0) {
         framePool.push(av_frame_alloc());
+    }
     
     auto frame = framePool.front();
     framePool.pop();
-    framePoolHeight += 1;
 
     return frame;
 }
 
 void NAVCodecContext::FreePoolFrame(AVFrame *frame) {
     framePool.push(frame);
-    framePoolHeight -= 1;
-
-    // Burn a single frame beyond the current height
-    if (framePool.size() > framePoolHeight + 4) {
+    if (framePool.size() > 4) {
         auto burnt = framePool.front();
         framePool.pop();
         av_frame_free(&burnt);
@@ -81,19 +90,15 @@ AVPacket *NAVCodecContext::GetPoolPacket() {
     if (packetPool.size() == 0)
         packetPool.push(av_packet_alloc());
     
-    auto frame = packetPool.front();
+    auto packet = packetPool.front();
     packetPool.pop();
-    packetPoolHeight += 1;
 
-    return frame;
+    return packet;
 }
 
 void NAVCodecContext::FreePoolPacket(AVPacket *frame) {
     packetPool.push(frame);
-    packetPoolHeight -= 1;
-
-    // Burn a single frame beyond the current height
-    if (packetPool.size() > packetPoolHeight + 4) {
+    if (packetPool.size() > 4) {
         auto burnt = packetPool.front();
         packetPool.pop();
         av_packet_free(&burnt);
@@ -127,7 +132,7 @@ void NAVCodecContext::ThreadLog(std::string message) {
 bool NAVCodecContext::FeedToCodec() {
     std::unique_lock<std::mutex> lock(mutex);
     auto handle = GetHandle();
-    std::deque<WorkItem> localQueue;
+    std::deque<WorkItem*> localQueue;
 
     localQueue = inQueue;
     inQueue.clear();
@@ -142,10 +147,37 @@ bool NAVCodecContext::FeedToCodec() {
         auto workItem = localQueue.front();
         int result;
 
-        if (workItem.frame) {
-            result = avcodec_send_frame(handle, workItem.frame);
-        } else if (workItem.packet) {
-            result = avcodec_send_packet(handle, workItem.packet);
+        if (workItem->frame) {
+
+            // In theory should never happen because we are holding a reference to the frame.
+            // The check is here nonetheless in case bugs are introduced later.
+            if (!workItem->frame->data) {
+                SendError(
+                    "internal-error:missing-frame-data", 
+                    "Queued frame is missing data, this indicates it was freed before use! The frame will be discarded."
+                );
+
+                localQueue.pop_front();
+                DiscardWorkItem(workItem);
+                break;
+            }
+
+            result = avcodec_send_frame(handle, workItem->frame);
+        } else if (workItem->packet) {
+
+            // In theory should never happen because we are holding a reference to the packet.
+            // The check is here nonetheless in case bugs are introduced later.
+            if (!workItem->packet->data) {
+                SendError(
+                    "internal-error:missing-packet-data", 
+                    "Queued packet is missing data, this indicates it was freed before use! The packet will be discarded."
+                );
+                localQueue.pop_front();
+                DiscardWorkItem(workItem);
+                break;
+            }
+
+            result = avcodec_send_packet(handle, workItem->packet);
         }
 
         if (result == AVERROR(EAGAIN))
@@ -156,9 +188,9 @@ bool NAVCodecContext::FeedToCodec() {
             av_strerror(result, buf, sizeof(buf));
             std::string func = "avcodec_send";
 
-            if (workItem.frame) {
+            if (workItem->frame) {
                 func = "avcodec_send_frame";
-            } else if (workItem.packet) {
+            } else if (workItem->packet) {
                 func = "avcodec_send_packet";
             }
 
@@ -168,12 +200,15 @@ bool NAVCodecContext::FeedToCodec() {
                     + func + "(). Discarding queued item. Error description: " 
                     + std::string(buf)
             );
+
             localQueue.pop_front();
+            DiscardWorkItem(workItem);
             break;
         }
 
         fed = true;
         localQueue.pop_front();
+        DiscardWorkItem(workItem);
     }
 
     // Return unprocessed items back to the queue
@@ -213,6 +248,8 @@ bool NAVCodecContext::PullFromDecoder(AVCodecContext *context) {
         // Send to the main thread
         ThreadLog("** Received frame!");
         onFrameTSFN.BlockingCall([=](Napi::Env env, Napi::Function jsCallback) {
+            ReapWorkItems();
+
             jsCallback.Call({ NAVFrame::FromHandleWrapped(env, frame, true) });
         });
     }
@@ -244,6 +281,7 @@ bool NAVCodecContext::PullFromEncoder(AVCodecContext *context) {
         // Send to the main thread
         ThreadLog("** Received packet!");
         onPacketTSFN.BlockingCall([=](Napi::Env env, Napi::Function jsCallback) {
+            ReapWorkItems();
             jsCallback.Call({ NAVPacket::FromHandleWrapped(env, packet, true) });
         });
     }
@@ -304,11 +342,21 @@ Napi::Value NAVCodecContext::Open(const Napi::CallbackInfo& info) {
 Napi::Value NAVCodecContext::SendPacket(const Napi::CallbackInfo& info) {
     NAVPacket *packet = NAVPacket::Unwrap(info[0].As<Napi::Object>());
     std::unique_lock<std::mutex> lock(mutex);
-    WorkItem item;
+    WorkItem *item = new WorkItem;
 
     ThreadLog("Sending packet...");
-    item.packet = packet->GetHandle();
+    item->packet = packet->GetHandle();
+    item->packetRef = Napi::Reference<Napi::Object>::New(packet->Value(), 1);
+
+    if (!item->packet->data) {
+        SendError("invalid-request", "sendPacket() called with a packet which has null data!");
+        Napi::Error::New(info.Env(), "sendPacket() called with a packet which has null data!")
+            .ThrowAsJavaScriptException();
+        return Napi::Boolean::New(info.Env(), false);
+    }
+
     inQueue.push_back(item);
+    ReapWorkItems();
     
     threadWake.notify_one();
     return Napi::Boolean::New(info.Env(), true);
@@ -332,12 +380,13 @@ Napi::Value NAVCodecContext::ReceiveFrame(const Napi::CallbackInfo& info) {
 Napi::Value NAVCodecContext::SendFrame(const Napi::CallbackInfo& info) {
     NAVFrame *frame = NAVFrame::Unwrap(info[0].As<Napi::Object>());
     std::unique_lock<std::mutex> lock(mutex);
-    WorkItem item;
+    WorkItem *item = new WorkItem;
 
     ThreadLog("Sending frame...");
-    item.frame = frame->GetHandle();
+    item->frame = frame->GetHandle();
+    item->frameRef = Napi::Reference<Napi::Object>::New(frame->Value(), 1);
     inQueue.push_back(item);
-
+    ReapWorkItems();
     threadWake.notify_one();
     return Napi::Boolean::New(info.Env(), true);
 }

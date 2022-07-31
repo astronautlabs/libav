@@ -13,7 +13,9 @@ extern "C" {
 
 struct WorkItem {
     AVPacket *packet = nullptr;
+    Napi::Reference<Napi::Object> packetRef;
     AVFrame *frame = nullptr;
+    Napi::Reference<Napi::Object> frameRef;
 };
 
 class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
@@ -140,19 +142,32 @@ class NAVCodecContext : public NAVResource<NAVCodecContext, AVCodecContext> {
         void SendError(std::string code, std::string message);
         void ThreadLog(std::string message);
 
+        /**
+         * Called on the worker thread.
+         * Mark a work item as discarded. This will add the work item to the reap list 
+         * so that it can be dereferenced and freed back on the main thread.
+         */
+        void DiscardWorkItem(WorkItem *item);
+
+        /**
+         * Called on the main thread.
+         * Responsible for freeing work items and releasing references to underlying 
+         * Javascript data buffers that they hold. Must be done on the main thread.
+         */
+        void ReapWorkItems();
+
         bool opened = false;
         bool threadTracing = false;
         std::queue<AVFrame*> framePool;
         std::queue<AVPacket*> packetPool;
-
-        uint32_t framePoolHeight = 0;
-        uint32_t packetPoolHeight = 0;
         
         std::thread *thread = nullptr;
         std::mutex mutex;
+        std::mutex reapMutex;
         std::condition_variable threadWake;
-        std::deque<WorkItem> inQueue;
-        std::queue<WorkItem> outQueue;
+        std::deque<WorkItem*> inQueue;
+        std::queue<WorkItem*> outQueue;
+        std::vector<WorkItem*> workItemsToReap;
         bool running = true;
 
         Napi::FunctionReference onFrame;
