@@ -88,7 +88,7 @@ async function rename(from: string, to: string) {
     await new Promise<void>((rs, rj) => fs.rename(from, to, (err) => err ? rj(err) : rs()));
 }
 
-async function finishStream(stream: stream.Writable) {
+async function finishStream(stream: NodeJS.WritableStream) {
     await new Promise<void>((rs, rj) => {
         stream.on('end', () => rs());
         stream.on('finish', () => rs());
