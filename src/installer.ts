@@ -2,7 +2,7 @@ import fetchImpl from 'node-fetch';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
-import * as unzip from 'unzipper';
+import * as unzip from 'unzip-stream';
 import rimraf from 'rimraf';
 import * as stream from 'stream';
 
